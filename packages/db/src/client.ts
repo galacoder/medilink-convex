@@ -1,10 +1,4 @@
-import { sql } from "@vercel/postgres";
-import { drizzle } from "drizzle-orm/vercel-postgres";
-
-import * as schema from "./schema";
-
-export const db = drizzle({
-  client: sql,
-  schema,
-  casing: "snake_case",
-});
+// packages/db/src/client.ts
+// Placeholder for Convex migration (M0-2)
+// Drizzle client removed - Convex client will be set up in M0-2
+export {};

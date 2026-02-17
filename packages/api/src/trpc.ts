@@ -10,8 +10,9 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
-import type { Auth } from "@acme/auth";
-import { db } from "@acme/db/client";
+import type { Auth } from "@medilink/auth";
+
+// TODO (M0-2): Import Convex client here when Convex is set up
 
 /**
  * 1. CONTEXT
@@ -37,7 +38,7 @@ export const createTRPCContext = async (opts: {
   return {
     authApi,
     session,
-    db,
+    // TODO (M0-2): Add Convex client to context
   };
 };
 /**
@@ -74,7 +75,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 export const createTRPCRouter = t.router;
 
 /**
- * Middleware for timing procedure execution and adding an articifial delay in development.
+ * Middleware for timing procedure execution and adding an artificial delay in development.
  *
  * You can remove this if you don't like it, but it can help catch unwanted waterfalls by simulating
  * network latency that would occur in production but not in local development.

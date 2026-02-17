@@ -1,0 +1,45 @@
+{
+  "issue_number": 46,
+  "title": "M0-1: Clone and Configure T3 Turbo Template",
+  "state": "OPEN",
+  "url": "https://github.com/galacoder/medilink-convex/issues/46",
+  "labels": ["type:scaffold", "priority:critical", "milestone:M0"],
+  "milestone": "M0: Infrastructure Setup",
+  "has_structured_requirements": true,
+  "acceptance_criteria": [
+    "pnpm install succeeds with zero errors",
+    "pnpm dev starts Next.js on localhost:3000",
+    "pnpm build produces clean production build",
+    "Package scope is @medilink/* in all package.json files",
+    "Convex dev server starts with npx convex dev",
+    "Drizzle/Prisma references removed (Convex replaces DB layer)",
+    "turbo.json configured with build/dev/lint/typecheck tasks",
+    "pnpm-workspace.yaml lists apps/* and packages/*",
+    "Rename apps/nextjs/ to apps/web/",
+    "Remove apps/tanstack-start/ directory",
+    "Verify apps/expo/ is retained",
+    "Update all workspace references after directory rename",
+    "TypeScript types pass pnpm typecheck with zero errors"
+  ],
+  "technical_spec": {
+    "actions": [
+      "Use create-t3-turbo as starting point",
+      "Rename all @acme/* references to @medilink/*",
+      "Remove Drizzle/Prisma packages and config",
+      "Verify Turborepo pipeline works (build, dev, lint, typecheck)",
+      "Single Next.js app at apps/web/ (rename from apps/nextjs/)"
+    ],
+    "files": [
+      {"path": "apps/web/", "action": "rename", "from": "apps/nextjs/"},
+      {"path": "apps/tanstack-start/", "action": "delete"},
+      {"path": "pnpm-workspace.yaml", "action": "modify"},
+      {"path": "turbo.json", "action": "modify"},
+      {"path": "apps/web/package.json", "action": "modify"},
+      {"path": "packages/*/package.json", "action": "modify"}
+    ]
+  },
+  "dependencies": {
+    "depends_on": [],
+    "blocks": ["M0-2 (#47)", "M0-3 (#48)", "M0-4 (#49)", "M0-5 (#50)", "M0-6 (#51)"]
+  }
+}
