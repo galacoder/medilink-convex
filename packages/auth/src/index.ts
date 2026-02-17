@@ -2,6 +2,7 @@ import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { oAuthProxy } from "better-auth/plugins";
+
 // TODO (M0-2): Import Convex adapter when Convex is set up
 // import { convexAdapter } from "better-auth/adapters/convex";
 

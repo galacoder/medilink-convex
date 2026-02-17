@@ -32,13 +32,11 @@ export const postRouter = {
       return null as Post | null;
     }),
 
-  create: protectedProcedure
-    .input(CreatePostSchema)
-    .mutation(({ input }) => {
-      // TODO (M0-2): Replace with Convex mutation
-      void input;
-      return null;
-    }),
+  create: protectedProcedure.input(CreatePostSchema).mutation(({ input }) => {
+    // TODO (M0-2): Replace with Convex mutation
+    void input;
+    return null;
+  }),
 
   delete: protectedProcedure.input(z.string()).mutation(({ input }) => {
     // TODO (M0-2): Replace with Convex mutation

@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 
 import type { RouterOutputs } from "@medilink/api";
-import { CreatePostSchema } from "@medilink/db/schema";
+import { CreatePostSchema } from "@medilink/api";
 import { cn } from "@medilink/ui";
 import { Button } from "@medilink/ui/button";
 import {

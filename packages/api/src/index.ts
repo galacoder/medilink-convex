@@ -20,4 +20,5 @@ type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export { type AppRouter, appRouter } from "./root";
 export { createTRPCContext } from "./trpc";
+export { CreatePostSchema } from "./router/post";
 export type { RouterInputs, RouterOutputs };
