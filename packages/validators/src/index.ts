@@ -1,7 +1,1 @@
-import { z } from "zod/v4";
-
-export const unused = z.string().describe(
-  `This lib is currently not used but as your application grows and you need validators to share
-   with back and frontend, you can put them in here
-  `,
-);
+export * from "./organizations";

@@ -24,6 +24,7 @@
     "@medilink/eslint-config": "workspace:*",
     "@medilink/prettier-config": "workspace:*",
     "@medilink/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
