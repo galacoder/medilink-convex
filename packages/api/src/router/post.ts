@@ -1,34 +1,48 @@
+// packages/api/src/router/post.ts
+// TODO (M0-2): Replace with Convex mutations/queries when Convex is set up
+// Drizzle ORM removed - this is a stub until Convex is configured
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod/v4";
 
-import { desc, eq } from "@medilink/db";
-import { CreatePostSchema, Post } from "@medilink/db/schema";
-
 import { protectedProcedure, publicProcedure } from "../trpc";
 
+export interface Post {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: Date;
+}
+
+export const CreatePostSchema = z.object({
+  title: z.string().max(256),
+  content: z.string().max(256),
+});
+
 export const postRouter = {
-  all: publicProcedure.query(({ ctx }) => {
-    return ctx.db.query.Post.findMany({
-      orderBy: desc(Post.id),
-      limit: 10,
-    });
+  all: publicProcedure.query(() => {
+    // TODO (M0-2): Replace with Convex query
+    return [] as Post[];
   }),
 
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.query.Post.findFirst({
-        where: eq(Post.id, input.id),
-      });
+    .query(({ input }) => {
+      // TODO (M0-2): Replace with Convex query
+      void input;
+      return null as Post | null;
     }),
 
   create: protectedProcedure
     .input(CreatePostSchema)
-    .mutation(({ ctx, input }) => {
-      return ctx.db.insert(Post).values(input);
+    .mutation(({ input }) => {
+      // TODO (M0-2): Replace with Convex mutation
+      void input;
+      return null;
     }),
 
-  delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
-    return ctx.db.delete(Post).where(eq(Post.id, input));
+  delete: protectedProcedure.input(z.string()).mutation(({ input }) => {
+    // TODO (M0-2): Replace with Convex mutation
+    void input;
+    return null;
   }),
 } satisfies TRPCRouterRecord;

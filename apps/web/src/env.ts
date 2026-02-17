@@ -16,7 +16,7 @@ export const env = createEnv({
    * This way you can ensure the app isn't built with invalid env vars.
    */
   server: {
-    POSTGRES_URL: z.url(),
+    // CONVEX_DEPLOYMENT will be added in M0-2 when Convex is configured
   },
 
   /**

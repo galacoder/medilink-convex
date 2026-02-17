@@ -1,10 +1,9 @@
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { oAuthProxy } from "better-auth/plugins";
-
-import { db } from "@medilink/db/client";
+// TODO (M0-2): Import Convex adapter when Convex is set up
+// import { convexAdapter } from "better-auth/adapters/convex";
 
 export function initAuth<
   TExtraPlugins extends BetterAuthPlugin[] = [],
@@ -13,14 +12,13 @@ export function initAuth<
   productionUrl: string;
   secret: string | undefined;
 
-  discordClientId: string;
-  discordClientSecret: string;
+  googleClientId: string;
+  googleClientSecret: string;
   extraPlugins?: TExtraPlugins;
 }) {
   const config = {
-    database: drizzleAdapter(db, {
-      provider: "pg",
-    }),
+    // TODO (M0-2): Replace with Convex adapter
+    // database: convexAdapter(convexClient),
     baseURL: options.baseUrl,
     secret: options.secret,
     plugins: [
@@ -31,15 +29,15 @@ export function initAuth<
       ...(options.extraPlugins ?? []),
     ],
     socialProviders: {
-      discord: {
-        clientId: options.discordClientId,
-        clientSecret: options.discordClientSecret,
-        redirectURI: `${options.productionUrl}/api/auth/callback/discord`,
+      google: {
+        clientId: options.googleClientId,
+        clientSecret: options.googleClientSecret,
+        redirectURI: `${options.productionUrl}/api/auth/callback/google`,
       },
     },
     trustedOrigins: ["expo://"],
     onAPIError: {
-      onError(error, ctx) {
+      onError(error: unknown, ctx: unknown) {
         console.error("BETTER AUTH API ERROR", error, ctx);
       },
     },

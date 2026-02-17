@@ -17,17 +17,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@medilink/db": "workspace:*",
     "@better-auth/expo": "catalog:",
     "@t3-oss/env-core": "^0.13.8",
     "better-auth": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@better-auth/cli": "catalog:",
     "@medilink/eslint-config": "workspace:*",
     "@medilink/prettier-config": "workspace:*",
     "@medilink/tsconfig": "workspace:*",
-    "@better-auth/cli": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"
