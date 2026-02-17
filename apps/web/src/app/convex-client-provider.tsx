@@ -1,33 +1,30 @@
 "use client";
 
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import type { ReactNode } from "react";
 
 import { env } from "~/env";
 
-// Lazy singleton pattern -- client is created only when the component first
-// mounts (client-side), never at module scope. This prevents the build error
-// "No address provided to ConvexReactClient" that occurs during Next.js static
-// page generation when NEXT_PUBLIC_CONVEX_URL is undefined during `next build`.
 let convex: ConvexReactClient | null = null;
-function getConvexClient(): ConvexReactClient {
-  convex ??= new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
+
+function getConvexClient(url: string): ConvexReactClient {
+  convex ??= new ConvexReactClient(url);
   return convex;
 }
 
 /**
  * Provides Convex real-time database access to all child components.
  *
- * Wraps children with ConvexProvider so any component in the tree can use:
- *   - useQuery() for real-time subscriptions
- *   - useMutation() for database writes
- *   - useAction() for external API calls
+ * During CI builds (when NEXT_PUBLIC_CONVEX_URL is unset and env validation
+ * is skipped), renders children without Convex so `next build` succeeds.
  */
-export function ConvexClientProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ConvexClientProvider({ children }: { children: ReactNode }) {
+  // env.NEXT_PUBLIC_CONVEX_URL is undefined during CI builds (skipValidation)
+  const url = env.NEXT_PUBLIC_CONVEX_URL as string | undefined;
+  if (!url) {
+    return <>{children}</>;
+  }
   return (
-    <ConvexProvider client={getConvexClient()}>{children}</ConvexProvider>
+    <ConvexProvider client={getConvexClient(url)}>{children}</ConvexProvider>
   );
 }
