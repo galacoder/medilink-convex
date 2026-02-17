@@ -3,12 +3,12 @@
   "task_id": "m0-1-clone-configure-t3-turbo",
   "task_description": "M0-1: Clone and Configure T3 Turbo Template - Rename @acme/* to @medilink/*, remove apps/tanstack-start/, rename apps/nextjs/ to apps/web/, remove Drizzle/Prisma boilerplate (Convex replaces DB), update turbo.json pipeline, verify build succeeds.",
   "domain": "coding",
-  "status": "awaiting_approval",
-  "current_phase": "PLAN",
-  "current_wave": null,
-  "current_feature_id": null,
+  "status": "complete",
+  "current_phase": "DONE",
+  "current_wave": 4,
+  "current_feature_id": "4.5",
   "created_at": "2026-02-17T16:30:00Z",
-  "updated_at": "2026-02-17T16:30:00Z",
+  "updated_at": "2026-02-17T21:30:00Z",
   "meta": {
     "title": "Clone and Configure T3 Turbo Template",
     "description": "Scaffold the MediLink monorepo from create-t3-turbo: rename scope from @acme/* to @medilink/*, restructure app directories, remove Drizzle/Prisma database layer (replaced by Convex), update Turborepo pipeline, and verify clean builds.",
@@ -304,7 +304,7 @@
       "name": "Directory Restructuring",
       "objective": "Rename apps/nextjs/ to apps/web/, remove apps/tanstack-start/, and update all path references (.vscode, root scripts) to reflect the new directory layout",
       "purpose_narrative": "WHY: All subsequent file edits reference the new directory structure. Renaming and cleanup must happen first to avoid editing files that will move or be deleted.",
-      "status": "pending",
+      "status": "complete",
       "model": "sonnet",
       "complexity": "low",
       "complexity_subcategory": "simple_code",
@@ -347,7 +347,7 @@
       "name": "Scope Rename @acme/* to @medilink/*",
       "objective": "Replace all @acme/* package references with @medilink/* across every package.json, tsconfig.json, eslint.config.ts, source file import, generator template, and prettier config",
       "purpose_narrative": "WHY: The @acme scope is the T3 Turbo template default. MediLink needs its own package identity (@medilink/*) for all workspace packages before any new code is written.",
-      "status": "pending",
+      "status": "complete",
       "model": "sonnet",
       "complexity": "medium",
       "complexity_subcategory": "moderate_code",
@@ -391,7 +391,7 @@
       "name": "Remove Drizzle/Prisma, Prep for Convex",
       "objective": "Remove all Drizzle ORM code and dependencies from packages/db/, clean turbo.json of database-specific tasks, update environment variable configuration to replace POSTGRES_URL with Convex variables",
       "purpose_narrative": "WHY: MediLink uses Convex instead of PostgreSQL/Drizzle for real-time data. Leaving Drizzle boilerplate would confuse developers and cause build failures when POSTGRES_URL is not set.",
-      "status": "pending",
+      "status": "complete",
       "model": "sonnet",
       "complexity": "medium",
       "complexity_subcategory": "moderate_code",
@@ -441,7 +441,7 @@
       "name": "Build Verification and Polish",
       "objective": "Run pnpm install, pnpm typecheck, pnpm build, and pnpm lint to verify the entire monorepo builds cleanly after all modifications, fix any remaining issues",
       "purpose_narrative": "WHY: This is a blocking milestone (M0-1) that 5 subsequent issues depend on. Every acceptance criterion must pass before merging - build failures here cascade to all downstream work.",
-      "status": "pending",
+      "status": "complete",
       "model": "sonnet",
       "complexity": "medium",
       "complexity_subcategory": "moderate_code",
@@ -489,7 +489,7 @@
       "wave": 1,
       "name": "Rename apps/nextjs/ to apps/web/",
       "description": "Move the Next.js app directory from apps/nextjs/ to apps/web/ and update its package.json name to @medilink/web to match CLAUDE.md architecture spec",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -511,7 +511,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -519,7 +519,7 @@
       "wave": 1,
       "name": "Remove apps/tanstack-start/",
       "description": "Delete the TanStack Start app entirely since MediLink uses a single Next.js app with route groups, not TanStack Start",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -538,7 +538,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -546,7 +546,7 @@
       "wave": 1,
       "name": "Update .vscode/launch.json path",
       "description": "Change cwd from apps/nextjs to apps/web in VS Code debug configuration so F5 debugging works after the directory rename",
-      "status": "pending",
+      "status": "complete",
       "priority": "medium",
       "tests_required": false,
       "findings": {
@@ -567,7 +567,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -575,7 +575,7 @@
       "wave": 1,
       "name": "Update root package.json dev:next script",
       "description": "Change dev:next filter from @acme/nextjs to @medilink/web so 'pnpm dev:next' targets the renamed app correctly",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -596,7 +596,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -604,7 +604,7 @@
       "wave": 2,
       "name": "Rename scope in all 14 package.json files",
       "description": "Replace @acme/* with @medilink/* in name fields and dependency references across all 14 workspace package.json files to establish the MediLink package identity",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -628,7 +628,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -636,7 +636,7 @@
       "wave": 2,
       "name": "Update all 11 tsconfig.json extends",
       "description": "Change @acme/tsconfig/* to @medilink/tsconfig/* in all tsconfig.json extends fields so TypeScript path resolution works with the new scope",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -659,7 +659,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -667,7 +667,7 @@
       "wave": 2,
       "name": "Update all eslint.config.ts imports",
       "description": "Change @acme/eslint-config/* to @medilink/eslint-config/* in 9+ eslint.config.ts files so lint runs resolve the shared config correctly",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -690,7 +690,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -698,7 +698,7 @@
       "wave": 2,
       "name": "Update source file imports in apps/ and packages/",
       "description": "Replace @acme/* import statements with @medilink/* in 25+ TypeScript source files across the entire monorepo so runtime module resolution works",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -721,7 +721,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -729,7 +729,7 @@
       "wave": 2,
       "name": "Update turbo/generators templates and config.ts",
       "description": "Replace @acme/ references in generator config.ts and Handlebars templates so future 'turbo gen init' creates packages with @medilink/ scope",
-      "status": "pending",
+      "status": "complete",
       "priority": "medium",
       "tests_required": false,
       "findings": {
@@ -754,7 +754,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -762,7 +762,7 @@
       "wave": 3,
       "name": "Gut packages/db/ Drizzle files",
       "description": "Remove Drizzle schema.ts (Post table), client.ts (Vercel Postgres connection), auth-schema.ts, and drizzle.config.ts, replacing with minimal placeholder exports for Convex migration",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -789,7 +789,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -797,7 +797,7 @@
       "wave": 3,
       "name": "Remove Drizzle dependencies from packages/db/package.json",
       "description": "Remove drizzle-orm, drizzle-zod, drizzle-kit, and @vercel/postgres from packages/db/package.json and update scripts to remove push/studio/with-env commands",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -820,7 +820,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -828,7 +828,7 @@
       "wave": 3,
       "name": "Update turbo.json: remove push/studio tasks, update globalEnv",
       "description": "Remove Drizzle-specific push and studio tasks from turbo.json and replace POSTGRES_URL with CONVEX_DEPLOYMENT in globalEnv for Convex compatibility",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -849,7 +849,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -857,7 +857,7 @@
       "wave": 3,
       "name": "Update .env.example: remove POSTGRES_URL, add CONVEX_DEPLOYMENT",
       "description": "Replace POSTGRES_URL with CONVEX_DEPLOYMENT and CONVEX_DEPLOY_KEY in .env.example, and update OAuth variables from Discord to Google per MediLink requirements",
-      "status": "pending",
+      "status": "complete",
       "priority": "medium",
       "tests_required": false,
       "findings": {
@@ -877,7 +877,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -885,7 +885,7 @@
       "wave": 3,
       "name": "Update apps/web/src/env.ts: remove POSTGRES_URL validation",
       "description": "Remove POSTGRES_URL from server env validation in env.ts to prevent build failures when the PostgreSQL connection string is not set (Convex uses its own client)",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -907,7 +907,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -915,7 +915,7 @@
       "wave": 4,
       "name": "Run pnpm install and verify zero errors",
       "description": "Execute pnpm install to verify all workspace:* references resolve correctly after the @medilink scope rename - zero errors means dependency graph is valid",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -932,7 +932,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -940,7 +940,7 @@
       "wave": 4,
       "name": "Run pnpm typecheck and fix any type errors",
       "description": "Execute pnpm typecheck across all workspaces to verify TypeScript compilation succeeds with zero errors after all scope and path changes",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -957,7 +957,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -965,7 +965,7 @@
       "wave": 4,
       "name": "Run pnpm build and verify clean production build",
       "description": "Execute pnpm build to verify all workspaces produce clean production output - critical gate since downstream issues depend on this milestone",
-      "status": "pending",
+      "status": "complete",
       "priority": "high",
       "tests_required": false,
       "findings": {
@@ -982,7 +982,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -990,7 +990,7 @@
       "wave": 4,
       "name": "Run pnpm lint and fix any lint errors",
       "description": "Execute pnpm lint to verify ESLint passes across all workspaces with the new @medilink/eslint-config references",
-      "status": "pending",
+      "status": "complete",
       "priority": "medium",
       "tests_required": false,
       "findings": {
@@ -1007,7 +1007,7 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     },
     {
@@ -1015,7 +1015,7 @@
       "wave": 4,
       "name": "Verify apps/expo/ retained and apps/web/ functional",
       "description": "Confirm apps/expo/ directory is untouched and apps/web/ structure is correct - final sanity check before PR to ensure no accidental deletions",
-      "status": "pending",
+      "status": "complete",
       "priority": "medium",
       "tests_required": false,
       "findings": {
@@ -1032,21 +1032,25 @@
         "tests_passing": null,
         "files_modified": [],
         "lines_changed": null,
-        "outcome": null
+        "outcome": "success"
       }
     }
   ],
   "progress": {
     "total_features": 19,
-    "completed_features": 0,
+    "completed_features": 19,
     "total_waves": 4,
-    "completed_waves": 0,
-    "percentage": 0
+    "completed_waves": 4,
+    "percentage": 100
   },
   "session_log": [
     {
       "timestamp": "2026-02-17T16:30:00Z",
       "action": "Task initialized via /start-coding-exp"
+    },
+    {
+      "timestamp": "2026-02-17T21:30:00Z",
+      "action": "All 4 waves completed: directory restructuring, scope rename, Drizzle removal, build verification"
     }
   ]
 }
