@@ -4,9 +4,9 @@
   "task_description": "M0-2: Configure Convex -- Deploy Project and Create Base Schema. Deploy a Convex project for medilink-convex and create the base schema tables for organizations, organizationMemberships, and users. Add ConvexProvider to the Next.js layout. Create Zod validators for organization inputs.",
   "domain": "coding",
   "status": "complete",
-  "current_phase": "CODE",
-  "current_wave": 3,
-  "current_feature_id": "3.4",
+  "current_phase": "VERIFY",
+  "current_wave": 4,
+  "current_feature_id": "4.3",
   "created_at": "2026-02-17T00:00:00Z",
   "updated_at": "2026-02-17T00:00:00Z",
   "meta": {
@@ -201,7 +201,15 @@
     "Schema validation failures",
     "TypeScript compilation errors across multiple workspaces"
   ],
-  "retry_history": [],
+  "retry_history": [
+    {
+      "attempt": 1,
+      "timestamp": "2026-02-17T22:23:46Z",
+      "phase": "execution",
+      "decision": "FIX",
+      "failure_count": 3
+    }
+  ],
   "async_strategy": {
     "enabled": false,
     "determined_by": "initializer-opus-4.6",
@@ -395,9 +403,51 @@
         "packages/db/src/index.ts",
         "packages/db/src/schema.ts"
       ]
+    },
+    {
+      "id": 4,
+      "name": "Verification Fixes",
+      "objective": "Fix build failure from ConvexReactClient module-scope instantiation, add tsx test runner dependency, and add convex/_generated to .gitignore",
+      "purpose_narrative": "WHY: Verification found the build fails during Next.js static generation because ConvexReactClient is instantiated at module scope with an undefined URL. Also missing test runner dependency and gitignore entry.",
+      "status": "complete",
+      "model": "sonnet",
+      "complexity": "low",
+      "complexity_subcategory": "simple_fix",
+      "complexity_reason": "Simple fixes: lazy-init pattern for client, add dependency, add gitignore entry",
+      "requires_code_generation": true,
+      "estimate_minutes": 10,
+      "agent_assignment": "coding",
+      "tools_to_use": [],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "verification_commands": [
+        "pnpm typecheck",
+        "pnpm lint",
+        "pnpm build"
+      ],
+      "features": [
+        "Fix ConvexReactClient build failure",
+        "Add tsx devDependency and test script",
+        "Add convex/_generated to .gitignore"
+      ],
+      "files": [
+        "apps/web/src/app/convex-client-provider.tsx",
+        "packages/validators/package.json",
+        ".gitignore"
+      ]
     }
   ],
-  "wave_verifications": [],
+  "wave_verifications": [
+    {
+      "timestamp": "2026-02-17T22:23:31Z",
+      "decision": "FIX",
+      "invoked_by": "subagent",
+      "failure_count": 3
+    }
+  ],
   "features": [
     {
       "id": "1.1",
@@ -732,13 +782,93 @@
         "lines_changed": null,
         "outcome": "success"
       }
+    },
+    {
+      "id": "4.1",
+      "wave": 4,
+      "name": "Fix ConvexReactClient build failure",
+      "description": "Lazy-initialize ConvexReactClient inside the component body instead of module scope to prevent build failure when NEXT_PUBLIC_CONVEX_URL is undefined during static generation",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          "apps/web/src/app/convex-client-provider.tsx"
+        ],
+        "patterns_found": [
+          "Module-scope instantiation throws during next build",
+          "Lint rules require env from ~/env and prefer-nullish-coalescing"
+        ],
+        "dependencies": [],
+        "risks": []
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": ["apps/web/src/app/convex-client-provider.tsx"],
+        "lines_changed": 10,
+        "outcome": "success"
+      }
+    },
+    {
+      "id": "4.2",
+      "wave": 4,
+      "name": "Add tsx devDependency and test script",
+      "description": "Add tsx to packages/validators devDependencies and add test script so the 18 validator tests can run",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          "packages/validators/package.json",
+          "pnpm-workspace.yaml"
+        ],
+        "patterns_found": [
+          "tsx not in dependencies",
+          "tsx added to catalog in pnpm-workspace.yaml"
+        ],
+        "dependencies": [
+          "tsx"
+        ],
+        "risks": []
+      },
+      "verification_results": {
+        "tests_passing": 18,
+        "files_modified": ["packages/validators/package.json", "pnpm-workspace.yaml"],
+        "lines_changed": 3,
+        "outcome": "success"
+      }
+    },
+    {
+      "id": "4.3",
+      "wave": 4,
+      "name": "Add convex/_generated to .gitignore",
+      "description": "Add convex/_generated entry to .gitignore to prevent accidental commits of Convex codegen output",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          ".gitignore"
+        ],
+        "patterns_found": [
+          "No convex/_generated entry"
+        ],
+        "dependencies": [],
+        "risks": []
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [".gitignore"],
+        "lines_changed": 3,
+        "outcome": "success"
+      }
     }
   ],
   "progress": {
-    "total_features": 11,
-    "completed_features": 11,
-    "total_waves": 3,
-    "completed_waves": 3,
+    "total_features": 14,
+    "completed_features": 14,
+    "total_waves": 4,
+    "completed_waves": 4,
     "percentage": 100
   },
   "session_log": [
@@ -757,6 +887,14 @@
     {
       "timestamp": "2026-02-17T01:30:00Z",
       "action": "Wave 3 complete: Zod validators created with bilingual errors, 18 tests passing, packages/db stubs updated, pnpm typecheck 13/13 and pnpm lint 11/11 passing"
+    },
+    {
+      "timestamp": "2026-02-17T22:30:00Z",
+      "action": "Wave 4 complete: ConvexReactClient lazy-init fix applied, tsx added to catalog and validators devDependencies with test script, convex/_generated added to .gitignore. pnpm typecheck 13/13, pnpm lint 11/11, pnpm build 4/4 passing, 18 validator tests passing"
     }
-  ]
+  ],
+  "verification_metadata": {
+    "invoked_by": "execute-coding-exp",
+    "timestamp": "2026-02-17T22:18:05Z"
+  }
 }

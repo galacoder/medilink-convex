@@ -4,10 +4,15 @@ import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 import { env } from "~/env";
 
-// Create a singleton ConvexReactClient instance for the browser.
-// This is intentionally created at module scope so the same WebSocket
-// connection is reused across re-renders (same pattern as tRPC query client).
-const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
+// Lazy singleton pattern -- client is created only when the component first
+// mounts (client-side), never at module scope. This prevents the build error
+// "No address provided to ConvexReactClient" that occurs during Next.js static
+// page generation when NEXT_PUBLIC_CONVEX_URL is undefined during `next build`.
+let convex: ConvexReactClient | null = null;
+function getConvexClient(): ConvexReactClient {
+  convex ??= new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL);
+  return convex;
+}
 
 /**
  * Provides Convex real-time database access to all child components.
@@ -22,5 +27,7 @@ export function ConvexClientProvider({
 }: {
   children: React.ReactNode;
 }) {
-  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+  return (
+    <ConvexProvider client={getConvexClient()}>{children}</ConvexProvider>
+  );
 }

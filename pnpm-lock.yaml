@@ -48,6 +48,9 @@ catalogs:
     tailwindcss:
       specifier: ^4.1.16
       version: 4.1.16
+    tsx:
+      specifier: ^4.19.4
+      version: 4.20.6
     typescript:
       specifier: ^5.9.3
       version: 5.9.3
@@ -486,6 +489,9 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.6.2
+      tsx:
+        specifier: 'catalog:'
+        version: 4.20.6
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -12948,7 +12954,6 @@ snapshots:
       '@esbuild/win32-arm64': 0.25.11
       '@esbuild/win32-ia32': 0.25.11
       '@esbuild/win32-x64': 0.25.11
-    optional: true
 
   esbuild@0.27.0:
     optionalDependencies:
@@ -16796,7 +16801,6 @@ snapshots:
       get-tsconfig: 4.12.0
     optionalDependencies:
       fsevents: 2.3.3
-    optional: true
 
   tunnel-agent@0.6.0:
     dependencies:
