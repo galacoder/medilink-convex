@@ -49,11 +49,7 @@ export default defineSchema({
     orgId: v.id("organizations"),
     userId: v.id("users"),
     // Bilingual label: vi: "Vai trò" / en: "Role"
-    role: v.union(
-      v.literal("owner"),
-      v.literal("admin"),
-      v.literal("member"),
-    ),
+    role: v.union(v.literal("owner"), v.literal("admin"), v.literal("member")),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -72,10 +68,7 @@ export default defineSchema({
     // Bilingual label: vi: "Vai trò nền tảng" / en: "Platform role"
     // Optional: only set for platform_admin or platform_support users
     platformRole: v.optional(
-      v.union(
-        v.literal("platform_admin"),
-        v.literal("platform_support"),
-      ),
+      v.union(v.literal("platform_admin"), v.literal("platform_support")),
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -147,11 +140,7 @@ export default defineSchema({
       v.literal("poor"),
     ),
     // vi: "Mức độ quan trọng" / en: "Criticality"
-    criticality: v.union(
-      v.literal("A"),
-      v.literal("B"),
-      v.literal("C"),
-    ),
+    criticality: v.union(v.literal("A"), v.literal("B"), v.literal("C")),
     serialNumber: v.optional(v.string()),
     model: v.optional(v.string()),
     manufacturer: v.optional(v.string()),

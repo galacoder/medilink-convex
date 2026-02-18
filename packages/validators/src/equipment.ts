@@ -193,9 +193,12 @@ export const createMaintenanceSchema = z.object({
   completedAt: z.number().optional(),
   technicianId: z.string().optional(),
   technicianNotes: z.string().optional(),
-  cost: z.number().min(0, {
-    message: "Chi phí không được âm (Cost cannot be negative)",
-  }).optional(),
+  cost: z
+    .number()
+    .min(0, {
+      message: "Chi phí không được âm (Cost cannot be negative)",
+    })
+    .optional(),
 });
 
 export const updateMaintenanceSchema = createMaintenanceSchema.partial();

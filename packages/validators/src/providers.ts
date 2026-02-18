@@ -79,8 +79,7 @@ export const createProviderSchema = z.object({
   contactEmail: z
     .string()
     .email({
-      message:
-        "Email không hợp lệ (Invalid email address)",
+      message: "Email không hợp lệ (Invalid email address)",
     })
     .optional(),
   contactPhone: z.string().optional(),
@@ -100,19 +99,24 @@ export const updateProviderSchema = createProviderSchema.partial();
  */
 export const createServiceOfferingSchema = z.object({
   providerId: z.string().min(1, {
-    message:
-      "ID nhà cung cấp không được để trống (Provider ID is required)",
+    message: "ID nhà cung cấp không được để trống (Provider ID is required)",
   }),
   specialty: serviceSpecialtySchema,
   descriptionVi: z.string().optional(),
   descriptionEn: z.string().optional(),
-  priceEstimate: z.number().min(0, {
-    message: "Giá ước tính không được âm (Price estimate cannot be negative)",
-  }).optional(),
-  turnaroundDays: z.number().min(1, {
-    message:
-      "Thời gian thực hiện phải ít nhất 1 ngày (Turnaround must be at least 1 day)",
-  }).optional(),
+  priceEstimate: z
+    .number()
+    .min(0, {
+      message: "Giá ước tính không được âm (Price estimate cannot be negative)",
+    })
+    .optional(),
+  turnaroundDays: z
+    .number()
+    .min(1, {
+      message:
+        "Thời gian thực hiện phải ít nhất 1 ngày (Turnaround must be at least 1 day)",
+    })
+    .optional(),
 });
 
 export const updateServiceOfferingSchema =
@@ -124,8 +128,7 @@ export const updateServiceOfferingSchema =
  */
 export const createCertificationSchema = z.object({
   providerId: z.string().min(1, {
-    message:
-      "ID nhà cung cấp không được để trống (Provider ID is required)",
+    message: "ID nhà cung cấp không được để trống (Provider ID is required)",
   }),
   nameVi: z.string().min(2, {
     message:
@@ -138,9 +141,12 @@ export const createCertificationSchema = z.object({
   issuingBody: z.string().optional(),
   issuedAt: z.number().optional(),
   expiresAt: z.number().optional(),
-  documentUrl: z.string().url({
-    message: "URL tài liệu không hợp lệ (Invalid document URL)",
-  }).optional(),
+  documentUrl: z
+    .string()
+    .url({
+      message: "URL tài liệu không hợp lệ (Invalid document URL)",
+    })
+    .optional(),
 });
 
 export const updateCertificationSchema = createCertificationSchema.partial();
@@ -151,12 +157,10 @@ export const updateCertificationSchema = createCertificationSchema.partial();
  */
 export const createCoverageAreaSchema = z.object({
   providerId: z.string().min(1, {
-    message:
-      "ID nhà cung cấp không được để trống (Provider ID is required)",
+    message: "ID nhà cung cấp không được để trống (Provider ID is required)",
   }),
   region: z.string().min(1, {
-    message:
-      "Tỉnh/Thành phố không được để trống (Region is required)",
+    message: "Tỉnh/Thành phố không được để trống (Region is required)",
   }),
   district: z.string().optional(),
   isActive: z.boolean(),

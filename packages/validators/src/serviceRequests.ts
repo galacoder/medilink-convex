@@ -101,8 +101,7 @@ export const createServiceRequestSchema = z.object({
  * Schema for updating a service request (all fields optional).
  * vi: "Cập nhật yêu cầu dịch vụ" / en: "Update service request"
  */
-export const updateServiceRequestSchema =
-  createServiceRequestSchema.partial();
+export const updateServiceRequestSchema = createServiceRequestSchema.partial();
 
 /**
  * Schema for creating a quote.
@@ -114,8 +113,7 @@ export const createQuoteSchema = z.object({
       "ID yêu cầu dịch vụ không được để trống (Service request ID is required)",
   }),
   providerId: z.string().min(1, {
-    message:
-      "ID nhà cung cấp không được để trống (Provider ID is required)",
+    message: "ID nhà cung cấp không được để trống (Provider ID is required)",
   }),
   status: quoteStatusSchema,
   amount: z.number().min(0, {
@@ -140,18 +138,20 @@ export const createServiceRatingSchema = z.object({
       "ID yêu cầu dịch vụ không được để trống (Service request ID is required)",
   }),
   providerId: z.string().min(1, {
-    message:
-      "ID nhà cung cấp không được để trống (Provider ID is required)",
+    message: "ID nhà cung cấp không được để trống (Provider ID is required)",
   }),
   ratedBy: z.string().min(1, {
     message: "Người đánh giá không được để trống (Rater ID is required)",
   }),
   // vi: "Đánh giá từ 1 đến 5 sao" / en: "Rating 1-5 stars"
-  rating: z.number().min(1, {
-    message: "Điểm đánh giá tối thiểu là 1 (Minimum rating is 1)",
-  }).max(5, {
-    message: "Điểm đánh giá tối đa là 5 (Maximum rating is 5)",
-  }),
+  rating: z
+    .number()
+    .min(1, {
+      message: "Điểm đánh giá tối thiểu là 1 (Minimum rating is 1)",
+    })
+    .max(5, {
+      message: "Điểm đánh giá tối đa là 5 (Maximum rating is 5)",
+    }),
   commentVi: z.string().optional(),
   commentEn: z.string().optional(),
   serviceQuality: z.number().min(1).max(5).optional(),

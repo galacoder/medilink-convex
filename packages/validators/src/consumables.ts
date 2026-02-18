@@ -86,16 +86,23 @@ export const createConsumableSchema = z.object({
     message:
       "Mức tồn tối thiểu phải lớn hơn 0 (Par level must be greater than 0)",
   }),
-  maxLevel: z.number().min(1, {
-    message: "Mức tồn tối đa phải lớn hơn 0 (Max level must be greater than 0)",
-  }).optional(),
+  maxLevel: z
+    .number()
+    .min(1, {
+      message:
+        "Mức tồn tối đa phải lớn hơn 0 (Max level must be greater than 0)",
+    })
+    .optional(),
   reorderPoint: z.number().min(1, {
     message:
       "Điểm đặt hàng lại phải lớn hơn 0 (Reorder point must be greater than 0)",
   }),
-  unitCost: z.number().min(0, {
-    message: "Chi phí đơn vị không được âm (Unit cost cannot be negative)",
-  }).optional(),
+  unitCost: z
+    .number()
+    .min(0, {
+      message: "Chi phí đơn vị không được âm (Unit cost cannot be negative)",
+    })
+    .optional(),
   relatedEquipmentId: z.string().optional(),
 });
 
@@ -147,8 +154,7 @@ export const createReorderRequestSchema = z.object({
   notes: z.string().optional(),
 });
 
-export const updateReorderRequestSchema =
-  createReorderRequestSchema.partial();
+export const updateReorderRequestSchema = createReorderRequestSchema.partial();
 
 // TypeScript type inference exports
 export type ConsumableCategoryType = z.infer<

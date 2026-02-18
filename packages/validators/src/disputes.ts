@@ -45,8 +45,7 @@ export const createDisputeSchema = z.object({
       "ID yêu cầu dịch vụ không được để trống (Service request ID is required)",
   }),
   raisedBy: z.string().min(1, {
-    message:
-      "Người khiếu nại không được để trống (Complainant ID is required)",
+    message: "Người khiếu nại không được để trống (Complainant ID is required)",
   }),
   assignedTo: z.string().optional(),
   status: disputeStatusSchema,
@@ -82,13 +81,16 @@ export const createDisputeMessageSchema = z.object({
       "Nội dung tin nhắn không được để trống (Message content is required)",
   }),
   contentEn: z.string().optional(),
-  attachmentUrls: z.array(z.string().url({
-    message: "URL đính kèm không hợp lệ (Invalid attachment URL)",
-  })).optional(),
+  attachmentUrls: z
+    .array(
+      z.string().url({
+        message: "URL đính kèm không hợp lệ (Invalid attachment URL)",
+      }),
+    )
+    .optional(),
 });
 
-export const updateDisputeMessageSchema =
-  createDisputeMessageSchema.partial();
+export const updateDisputeMessageSchema = createDisputeMessageSchema.partial();
 
 // TypeScript type inference exports
 export type DisputeStatus = z.infer<typeof disputeStatusSchema>;
