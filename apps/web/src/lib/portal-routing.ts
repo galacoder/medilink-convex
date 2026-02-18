@@ -79,3 +79,22 @@ export interface MiddlewareSessionData {
   orgType?: string | null;
   activeOrganizationId?: string | null;
 }
+
+/**
+ * Get the expected org_type for a given portal.
+ *
+ * WHY: Maps portal routes to the org_type that should be accessing them.
+ * Returns null for platform-admin (checked via platformRole, not orgType).
+ * Used to enforce cross-portal access boundaries in middleware Branch 4.
+ */
+export function getExpectedOrgTypeForPortal(portal: PortalType): string | null {
+  switch (portal) {
+    case "hospital":
+      return "hospital";
+    case "provider":
+      return "provider";
+    default:
+      // platform-admin uses platformRole check, not orgType
+      return null;
+  }
+}

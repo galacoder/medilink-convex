@@ -3,8 +3,12 @@ import { NextResponse } from "next/server";
 
 import { isPublicPath } from "@medilink/auth/middleware";
 
+import {
+  getDefaultRedirectForPortal,
+  getExpectedOrgTypeForPortal,
+  getPortalFromPathname,
+} from "~/lib/portal-routing";
 import type { MiddlewareSessionData } from "~/lib/portal-routing";
-import { getPortalFromPathname } from "~/lib/portal-routing";
 
 /**
  * Next.js middleware for portal-based route protection.
@@ -71,6 +75,9 @@ async function getSessionData(
       session?: {
         id?: string;
         activeOrganizationId?: string | null;
+        activeOrganization?: {
+          metadata?: { org_type?: string } | null;
+        } | null;
       } | null;
     } | null;
 
@@ -79,6 +86,11 @@ async function getSessionData(
     return {
       platformRole: data.user?.platformRole ?? null,
       activeOrganizationId: data.session?.activeOrganizationId ?? null,
+      // Extract org_type from metadata to enforce cross-portal access boundaries
+      orgType:
+        (data.session?.activeOrganization?.metadata?.org_type as
+          | string
+          | undefined) ?? null,
     };
   } catch {
     // If session fetch fails, treat as no session
@@ -147,13 +159,24 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
-  // Branch 4: Has active org → allow portal access
-  // WHY: Users are in the correct portal if they have an active organization.
-  // The sign-up flow set the correct callbackURL (hospital or provider dashboard),
-  // so we trust the session's portal routing. Root path redirects to sign-in
-  // to re-establish portal context.
+  // Branch 4: Has active org → validate portal access
+  // WHY: Enforce that hospital users can only access /hospital/* and
+  // provider users can only access /provider/*. A user at the root path
+  // is redirected to their correct dashboard based on orgType.
   if (pathname === "/") {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    const dashboard =
+      sessionData.orgType === "provider"
+        ? "/provider/dashboard"
+        : "/hospital/dashboard";
+    return NextResponse.redirect(new URL(dashboard, request.url));
+  }
+
+  const expectedOrgType = getExpectedOrgTypeForPortal(currentPortal);
+  if (expectedOrgType !== null && sessionData.orgType !== expectedOrgType) {
+    // Cross-portal attempt: redirect to the user's correct dashboard
+    const correctPortal = sessionData.orgType === "provider" ? "provider" : "hospital";
+    const correctDashboard = getDefaultRedirectForPortal(correctPortal);
+    return NextResponse.redirect(new URL(correctDashboard, request.url));
   }
 
   return NextResponse.next();
