@@ -7,6 +7,7 @@ import { Toaster } from "@medilink/ui/toast";
 
 import { ConvexClientProvider } from "~/app/convex-client-provider";
 import { env } from "~/env";
+import { getToken } from "~/lib/convex";
 import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/styles.css";
@@ -48,7 +49,13 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default async function RootLayout(props: { children: React.ReactNode }) {
+  // Fetch auth token server-side for SSR hydration.
+  // WHY: Passing the token as initialToken to ConvexBetterAuthProvider
+  // avoids an extra round-trip on the client for authentication,
+  // making the initial page load faster and preventing auth flicker.
+  const initialToken = await getToken();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -59,7 +66,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ThemeProvider>
-          <ConvexClientProvider>
+          <ConvexClientProvider initialToken={initialToken}>
             <TRPCReactProvider>{props.children}</TRPCReactProvider>
           </ConvexClientProvider>
           <div className="absolute right-4 bottom-4">

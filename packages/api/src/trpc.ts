@@ -22,11 +22,32 @@ import { z, ZodError } from "zod/v4";
  *
  * TODO (M1-2): Replace with Convex-native session retrieval (getToken + fetchAuthQuery)
  */
+/**
+ * Organization-aware session type.
+ * Better Auth's organization plugin populates activeOrganizationId and role
+ * when a user has an active organization set.
+ *
+ * WHY: AC-7 requires the session to include organizationId, role, and platformRole
+ * so that tRPC procedures can enforce organization-scoped authorization.
+ */
+export interface SessionData {
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    /** Platform-level role (platform_admin, platform_support, or undefined for regular users) */
+    platformRole?: "platform_admin" | "platform_support" | null;
+  } | null;
+  session?: {
+    id: string;
+    userId: string;
+    /** Active organization ID (set by Better Auth organization plugin) */
+    activeOrganizationId?: string | null;
+  } | null;
+}
+
 export interface AuthApi {
-  getSession: (opts: { headers: Headers }) => Promise<{
-    user?: { id: string; name: string; email: string } | null;
-    session?: { id: string; userId: string } | null;
-  } | null>;
+  getSession: (opts: { headers: Headers }) => Promise<SessionData | null>;
 }
 
 export interface AuthContext {
@@ -54,9 +75,21 @@ export const createTRPCContext = async (opts: {
   const session = await authApi.getSession({
     headers: opts.headers,
   });
+
+  // Extract organization-aware session fields (AC-7)
+  // WHY: Organization context must be available in every authenticated request
+  // so that tRPC procedures can enforce organization-scoped authorization
+  // without making additional database queries.
+  const organizationId = session?.session?.activeOrganizationId ?? null;
+  const platformRole = session?.user?.platformRole ?? null;
+
   return {
     authApi,
     session,
+    /** Active organization ID for the current request */
+    organizationId,
+    /** Platform-level role (null for regular users) */
+    platformRole,
     // TODO (M0-2): Add Convex client to context
   };
 };

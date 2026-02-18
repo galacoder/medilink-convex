@@ -48,7 +48,29 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) =>
         },
       }),
       // Convex plugin (required for Convex compatibility) - generates JWTs for Convex
-      convex({ authConfig }),
+      // Custom JWT payload includes session enrichment fields (AC-7)
+      convex({
+        authConfig,
+        jwt: {
+          // 15-minute JWT expiration (short for security)
+          expirationSeconds: 60 * 15,
+          // Include organization context in the JWT payload.
+          // WHY: This allows Convex queries to access organizationId, orgRole,
+          // and platformRole without additional database lookups per request.
+          definePayload: ({
+            user,
+            session,
+          }: {
+            user: Record<string, unknown>;
+            session: Record<string, unknown>;
+          }) => ({
+            // Active organization ID for org-scoped Convex queries
+            organizationId: session.activeOrganizationId ?? null,
+            // Platform-level role for platform admin access
+            platformRole: user.platformRole ?? null,
+          }),
+        },
+      }),
     ],
   }) satisfies BetterAuthOptions;
 
