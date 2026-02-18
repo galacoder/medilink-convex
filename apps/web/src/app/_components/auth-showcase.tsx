@@ -1,9 +1,8 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { Button } from "@medilink/ui/button";
 
-import { auth, getSession } from "~/auth/server";
+import { getSession } from "~/auth/server";
 
 export async function AuthShowcase() {
   const session = await getSession();
@@ -13,18 +12,12 @@ export async function AuthShowcase() {
       <form>
         <Button
           size="lg"
-          formAction={async () => {
+          formAction={() => {
             "use server";
-            const res = await auth.api.signInSocial({
-              body: {
-                provider: "google",
-                callbackURL: "/",
-              },
-            });
-            if (!res.url) {
-              throw new Error("No URL returned from signInSocial");
-            }
-            redirect(res.url);
+            // Redirect to the sign-in page
+            // WHY: With the Convex component model, social sign-in is handled
+            // via the Better Auth API route at /api/auth/sign-in/social
+            redirect("/sign-in");
           }}
         >
           Sign in with Google
@@ -36,18 +29,18 @@ export async function AuthShowcase() {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       <p className="text-center text-2xl">
-        <span>Logged in as {session.user.name}</span>
+        <span>Logged in</span>
       </p>
 
       <form>
         <Button
           size="lg"
-          formAction={async () => {
+          formAction={() => {
             "use server";
-            await auth.api.signOut({
-              headers: await headers(),
-            });
-            redirect("/");
+            // Sign out via the Better Auth API route
+            // WHY: The Convex Better Auth handler at /api/auth/[...all]
+            // handles the sign-out operation server-side
+            redirect("/api/auth/sign-out");
           }}
         >
           Sign out

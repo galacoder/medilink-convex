@@ -1,51 +1,31 @@
-import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
-import { expo } from "@better-auth/expo";
-import { betterAuth } from "better-auth";
-import { oAuthProxy } from "better-auth/plugins";
+/**
+ * @medilink/auth - Server-side auth exports
+ *
+ * This package provides shared auth configuration and type exports.
+ * The Better Auth instance itself lives in convex/auth.ts (Convex component model).
+ *
+ * WHY: The Convex component model requires Better Auth to be instantiated
+ * per-request with the Convex context. This package provides the shared
+ * configuration types and re-exports for consuming packages.
+ */
 
-// TODO (M0-2): Import Convex adapter when Convex is set up
-// import { convexAdapter } from "better-auth/adapters/convex";
+// Re-export organization plugin for use in convex/auth.ts
+export { organization } from "better-auth/plugins";
 
-export function initAuth<
-  TExtraPlugins extends BetterAuthPlugin[] = [],
->(options: {
-  baseUrl: string;
-  productionUrl: string;
-  secret: string | undefined;
+// Re-export useful Better Auth types for consuming packages
+export type {
+  BetterAuthOptions,
+  BetterAuthPlugin,
+  Session,
+  User,
+} from "better-auth";
 
-  googleClientId: string;
-  googleClientSecret: string;
-  extraPlugins?: TExtraPlugins;
-}) {
-  const config = {
-    // TODO (M0-2): Replace with Convex adapter
-    // database: convexAdapter(convexClient),
-    baseURL: options.baseUrl,
-    secret: options.secret,
-    plugins: [
-      oAuthProxy({
-        productionURL: options.productionUrl,
-      }),
-      expo(),
-      ...(options.extraPlugins ?? []),
-    ],
-    socialProviders: {
-      google: {
-        clientId: options.googleClientId,
-        clientSecret: options.googleClientSecret,
-        redirectURI: `${options.productionUrl}/api/auth/callback/google`,
-      },
-    },
-    trustedOrigins: ["expo://"],
-    onAPIError: {
-      onError(error: unknown, ctx: unknown) {
-        console.error("BETTER AUTH API ERROR", error, ctx);
-      },
-    },
-  } satisfies BetterAuthOptions;
-
-  return betterAuth(config);
-}
-
-export type Auth = ReturnType<typeof initAuth>;
-export type Session = Auth["$Infer"]["Session"];
+/**
+ * Auth type for use in tRPC context and other server-side code.
+ * This is a placeholder type that matches the shape returned by
+ * createAuth() in convex/auth.ts.
+ *
+ * WHY: tRPC context (packages/api/src/trpc.ts) imports Auth type
+ * from @medilink/auth to type the auth instance passed in.
+ */
+export type { Auth } from "./types";

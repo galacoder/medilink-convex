@@ -35,5 +35,8 @@
     "turbo": "^2.5.8",
     "typescript": "catalog:"
   },
-  "prettier": "@medilink/prettier-config"
+  "prettier": "@medilink/prettier-config",
+  "dependencies": {
+    "@convex-dev/better-auth": "^0.10.10"
+  }
 }

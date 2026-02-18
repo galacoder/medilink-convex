@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
+    "@convex-dev/better-auth": "^0.10.10",
     "@t3-oss/env-core": "^0.13.8",
     "better-auth": "catalog:",
     "zod": "catalog:"
@@ -27,6 +28,7 @@
     "@medilink/eslint-config": "workspace:*",
     "@medilink/prettier-config": "workspace:*",
     "@medilink/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "typescript": "catalog:"

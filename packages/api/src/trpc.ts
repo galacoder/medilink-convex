@@ -10,9 +10,49 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
-import type { Auth } from "@medilink/auth";
-
 // TODO (M0-2): Import Convex client here when Convex is set up
+
+/**
+ * Minimal auth API interface for the tRPC context.
+ *
+ * WHY: The Convex component model requires Better Auth to be instantiated
+ * per-request with the Convex context. For tRPC, we use a minimal interface
+ * that abstracts session retrieval, allowing both the old standalone pattern
+ * and the new Convex-native pattern.
+ *
+ * TODO (M1-2): Replace with Convex-native session retrieval (getToken + fetchAuthQuery)
+ */
+/**
+ * Organization-aware session type.
+ * Better Auth's organization plugin populates activeOrganizationId and role
+ * when a user has an active organization set.
+ *
+ * WHY: AC-7 requires the session to include organizationId, role, and platformRole
+ * so that tRPC procedures can enforce organization-scoped authorization.
+ */
+export interface SessionData {
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    /** Platform-level role (platform_admin, platform_support, or undefined for regular users) */
+    platformRole?: "platform_admin" | "platform_support" | null;
+  } | null;
+  session?: {
+    id: string;
+    userId: string;
+    /** Active organization ID (set by Better Auth organization plugin) */
+    activeOrganizationId?: string | null;
+  } | null;
+}
+
+export interface AuthApi {
+  getSession: (opts: { headers: Headers }) => Promise<SessionData | null>;
+}
+
+export interface AuthContext {
+  api: AuthApi;
+}
 
 /**
  * 1. CONTEXT
@@ -29,15 +69,27 @@ import type { Auth } from "@medilink/auth";
 
 export const createTRPCContext = async (opts: {
   headers: Headers;
-  auth: Auth;
+  auth: AuthContext;
 }) => {
   const authApi = opts.auth.api;
   const session = await authApi.getSession({
     headers: opts.headers,
   });
+
+  // Extract organization-aware session fields (AC-7)
+  // WHY: Organization context must be available in every authenticated request
+  // so that tRPC procedures can enforce organization-scoped authorization
+  // without making additional database queries.
+  const organizationId = session?.session?.activeOrganizationId ?? null;
+  const platformRole = session?.user?.platformRole ?? null;
+
   return {
     authApi,
     session,
+    /** Active organization ID for the current request */
+    organizationId,
+    /** Platform-level role (null for regular users) */
+    platformRole,
     // TODO (M0-2): Add Convex client to context
   };
 };
