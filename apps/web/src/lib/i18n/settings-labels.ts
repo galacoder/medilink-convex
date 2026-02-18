@@ -20,7 +20,10 @@ export const settingsLabels = {
     breadcrumb: { vi: "Cài đặt", en: "Settings" },
     form: {
       name: { vi: "Tên tổ chức", en: "Organization Name" },
-      namePlaceholder: { vi: "Nhập tên tổ chức", en: "Enter organization name" },
+      namePlaceholder: {
+        vi: "Nhập tên tổ chức",
+        en: "Enter organization name",
+      },
       slug: { vi: "Slug (đường dẫn)", en: "Slug (URL path)" },
       slugPlaceholder: { vi: "ten-to-chuc", en: "organization-name" },
       slugHint: {
@@ -28,7 +31,10 @@ export const settingsLabels = {
         en: "Only lowercase letters, numbers, and hyphens",
       },
       contactEmail: { vi: "Email liên hệ", en: "Contact Email" },
-      contactEmailPlaceholder: { vi: "email@to-chuc.vn", en: "email@organization.com" },
+      contactEmailPlaceholder: {
+        vi: "email@to-chuc.vn",
+        en: "email@organization.com",
+      },
       contactPhone: { vi: "Số điện thoại", en: "Phone Number" },
       contactPhonePlaceholder: { vi: "0901234567", en: "0901234567" },
       address: { vi: "Địa chỉ", en: "Address" },

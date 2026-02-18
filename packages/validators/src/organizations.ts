@@ -70,8 +70,7 @@ export const updateOrganizationSchema = createOrganizationSchema.partial();
 export const inviteMemberSchema = z.object({
   // vi: "Email không hợp lệ" / en: "Invalid email address"
   email: z.string().email({
-    message:
-      "Email không hợp lệ (Invalid email address)",
+    message: "Email không hợp lệ (Invalid email address)",
   }),
   // vi: "Vai trò phải là admin hoặc member" / en: "Role must be admin or member"
   role: z.enum(["admin", "member"], {
@@ -89,8 +88,7 @@ export const inviteMemberSchema = z.object({
 export const updateMemberRoleSchema = z.object({
   // vi: "ID người dùng không được để trống" / en: "User ID is required"
   userId: z.string().min(1, {
-    message:
-      "ID người dùng không được để trống (User ID is required)",
+    message: "ID người dùng không được để trống (User ID is required)",
   }),
   // vi: "Vai trò không hợp lệ" / en: "Invalid role"
   role: memberRoleSchema,
@@ -105,8 +103,7 @@ export const updateMemberRoleSchema = z.object({
 export const removeMemberSchema = z.object({
   // vi: "ID người dùng không được để trống" / en: "User ID is required"
   userId: z.string().min(1, {
-    message:
-      "ID người dùng không được để trống (User ID is required)",
+    message: "ID người dùng không được để trống (User ID is required)",
   }),
 });
 
@@ -143,8 +140,7 @@ export const updateOrgSettingsSchema = z.object({
   contactEmail: z
     .string()
     .email({
-      message:
-        "Email liên hệ không hợp lệ (Invalid contact email)",
+      message: "Email liên hệ không hợp lệ (Invalid contact email)",
     })
     .optional(),
   // vi: "Số điện thoại liên hệ" / en: "Contact phone number"

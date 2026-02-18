@@ -9,9 +9,9 @@ import {
 } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 
+import type { OrgSettingsValues } from "~/components/forms/org-settings-form";
 import { useActiveOrganization } from "~/auth/client";
 import { OrgSettingsForm } from "~/components/forms/org-settings-form";
-import type { OrgSettingsValues } from "~/components/forms/org-settings-form";
 import { settingsLabels } from "~/lib/i18n/settings-labels";
 
 /**
@@ -33,19 +33,25 @@ export default function ProviderSettingsPage() {
       throw new Error("Không tìm thấy tổ chức (Organization not found)");
     }
 
-    const response = await fetch("/api/convex/organizations/updateOrganization", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        orgId: activeOrg.id,
-        ...values,
-      }),
-    });
+    const response = await fetch(
+      "/api/convex/organizations/updateOrganization",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orgId: activeOrg.id,
+          ...values,
+        }),
+      },
+    );
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({})) as { message?: string };
+      const error = (await response.json().catch(() => ({}))) as {
+        message?: string;
+      };
       throw new Error(
-        error.message ?? "Không thể cập nhật cài đặt (Failed to update settings)",
+        error.message ??
+          "Không thể cập nhật cài đặt (Failed to update settings)",
       );
     }
   }

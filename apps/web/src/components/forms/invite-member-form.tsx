@@ -73,9 +73,7 @@ export function InviteMemberForm({
 
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError(
-        "Email không hợp lệ (Invalid email address)",
-      );
+      setEmailError("Email không hợp lệ (Invalid email address)");
       return;
     }
 
@@ -108,7 +106,9 @@ export function InviteMemberForm({
     }
   }
 
-  function getStatusBadgeVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+  function getStatusBadgeVariant(
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" {
     switch (status) {
       case "pending":
         return "secondary";
@@ -179,7 +179,7 @@ export function InviteMemberForm({
           </div>
 
           {/* Role select */}
-          <div className="sm:w-40 space-y-1.5">
+          <div className="space-y-1.5 sm:w-40">
             <Label htmlFor="invite-role">
               {labels.form.role.vi}{" "}
               <span className="text-muted-foreground text-xs font-normal">
@@ -206,9 +206,7 @@ export function InviteMemberForm({
 
           {/* Submit button */}
           <Button type="submit" disabled={isSubmitting} className="sm:w-auto">
-            {isSubmitting
-              ? labels.form.submitting.vi
-              : labels.form.submit.vi}
+            {isSubmitting ? labels.form.submitting.vi : labels.form.submit.vi}
           </Button>
         </div>
       </form>
