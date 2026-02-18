@@ -83,6 +83,19 @@ export default function SignUpPage() {
       return;
     }
 
+    // Step 3: Activate the new organization in the session
+    // WHY: Without setActive(), activeOrganizationId stays null. Middleware Branch 3
+    // would redirect back to /sign-up causing an infinite redirect loop.
+    const setActiveResult = await organization.setActive({
+      organizationId: orgResult.data!.id,
+    });
+
+    if (setActiveResult.error) {
+      setError(labels.errorGeneric.vi);
+      setIsLoading(false);
+      return;
+    }
+
     // Redirect to the correct portal dashboard
     router.push(
       orgType === "hospital" ? "/hospital/dashboard" : "/provider/dashboard",
