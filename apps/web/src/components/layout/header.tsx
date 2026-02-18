@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@medilink/ui/dropdown-menu";
+import { ThemeToggle } from "@medilink/ui/theme";
 
 import { signOut, useSession } from "~/auth/client";
 import type { NavItem } from "./nav-config";
@@ -72,6 +73,9 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
 
       {/* Spacer */}
       <div className="flex-1" />
+
+      {/* Theme toggle */}
+      <ThemeToggle />
 
       {/* User avatar dropdown */}
       <DropdownMenu>
