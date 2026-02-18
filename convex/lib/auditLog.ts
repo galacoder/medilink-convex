@@ -1,19 +1,28 @@
 /**
- * Audit logging helper for compliance with Vietnamese medical device regulations.
+ * Audit log helper for Convex mutations.
  *
- * WHY: Regulation requires 5-year retention of all changes to equipment-related
- * records. The auditLog table is the centralized trail used by all domains.
- * This helper ensures consistent log format across all mutations.
+ * WHY: Vietnamese medical device regulations require 5-year retention of all
+ * changes to equipment-related records. The auditLog table is the centralized
+ * trail used by all domains. This helper ensures consistent log format across
+ * all mutations.
+ *
+ * Two export names are provided for backwards compatibility:
+ *   - createAuditLogEntry / AuditLogArgs  — M1-6 provider management pattern
+ *   - createAuditEntry / AuditEntryInput  — M1-5 service request pattern
+ * Both write identical rows to the auditLog table.
  *
  * vi: "Tiện ích nhật ký kiểm tra" / en: "Audit log helper"
  */
 
 import type { GenericMutationCtx } from "convex/server";
-import type { Id } from "../_generated/dataModel";
-import type { DataModel } from "../_generated/dataModel";
+import type { Id, DataModel } from "../_generated/dataModel";
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 /**
- * Arguments for creating an audit log entry.
+ * Arguments for creating an audit log entry (M1-6 provider management pattern).
  * vi: "Tham số tạo bản ghi nhật ký" / en: "Audit log entry arguments"
  */
 export interface AuditLogArgs {
@@ -23,7 +32,7 @@ export interface AuditLogArgs {
   actorId: Id<"users">;
   /**
    * Dot-notation action name.
-   * Examples: "provider.profile_updated", "provider.offering_added"
+   * Examples: "provider.profile_updated", "serviceRequest.created"
    * vi: "Tên hành động" / en: "Action name"
    */
   action: string;
@@ -36,6 +45,16 @@ export interface AuditLogArgs {
   /** Values after the change (optional). vi: "Giá trị mới" / en: "New values" */
   newValues?: Record<string, unknown>;
 }
+
+/**
+ * Alias for AuditLogArgs — used by the M1-5 service request workflow.
+ * Identical structure, different name for API clarity at the call site.
+ */
+export type AuditEntryInput = AuditLogArgs;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 /**
  * Insert an audit log entry into the auditLog table.
@@ -67,4 +86,17 @@ export async function createAuditLogEntry(
     createdAt: now,
     updatedAt: now,
   });
+}
+
+/**
+ * Alias for createAuditLogEntry — used by the M1-5 service request workflow.
+ *
+ * WHY: Must be called from within a Convex mutation (not a query or action)
+ * since it writes to the database.
+ */
+export async function createAuditEntry(
+  ctx: GenericMutationCtx<DataModel>,
+  entry: AuditEntryInput,
+): Promise<Id<"auditLog">> {
+  return createAuditLogEntry(ctx, entry);
 }
