@@ -27,15 +27,16 @@ export const PUBLIC_PATHS = [
  * Used by the middleware to enforce role-based access control.
  *
  * Route groups in Next.js:
- * - (admin): Platform admin only
- * - (staff): Staff members of any org
- * - (student): Students of any org
- * - (marketing): Public pages
+ * - (platform-admin): Platform admin/support only → /admin/*
+ * - (hospital): Hospital org members → /hospital/*
+ * - (provider): Provider org members → /provider/*
+ * - (auth): Public auth pages → /sign-in, /sign-up, etc.
+ * - (marketing): Public pages → /, /about, etc.
  */
 export const PROTECTED_ROUTES = {
   admin: "/admin",
-  staff: "/staff",
-  student: "/student",
+  hospital: "/hospital",
+  provider: "/provider",
 } as const;
 
 /**
