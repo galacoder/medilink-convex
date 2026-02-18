@@ -6,6 +6,7 @@
  */
 export { Header } from "./header";
 export { MobileNav } from "./mobile-nav";
+export { PortalLayout } from "./portal-layout";
 export { Sidebar } from "./sidebar";
 export {
   adminNavItems,
