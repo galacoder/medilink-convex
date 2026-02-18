@@ -3,12 +3,12 @@ import { NextResponse } from "next/server";
 
 import { isPublicPath } from "@medilink/auth/middleware";
 
+import type { MiddlewareSessionData } from "~/lib/portal-routing";
 import {
   getDefaultRedirectForPortal,
   getExpectedOrgTypeForPortal,
   getPortalFromPathname,
 } from "~/lib/portal-routing";
-import type { MiddlewareSessionData } from "~/lib/portal-routing";
 
 /**
  * Next.js middleware for portal-based route protection.
@@ -184,7 +184,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const expectedOrgType = getExpectedOrgTypeForPortal(currentPortal);
   if (expectedOrgType !== null && sessionData.orgType !== expectedOrgType) {
     // Cross-portal attempt: redirect to the user's correct dashboard
-    const correctPortal = sessionData.orgType === "provider" ? "provider" : "hospital";
+    const correctPortal =
+      sessionData.orgType === "provider" ? "provider" : "hospital";
     const correctDashboard = getDefaultRedirectForPortal(correctPortal);
     return NextResponse.redirect(new URL(correctDashboard, request.url));
   }

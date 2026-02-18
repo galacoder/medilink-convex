@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { MobileNavController } from "./mobile-nav-controller";
 import type { NavItem } from "./nav-config";
+import { MobileNavController } from "./mobile-nav-controller";
 
 interface PortalLayoutProps {
   children: ReactNode;
@@ -26,7 +26,11 @@ export function PortalLayout({
 }: PortalLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden">
-      <MobileNavController navItems={navItems} orgName={orgName} locale={locale}>
+      <MobileNavController
+        navItems={navItems}
+        orgName={orgName}
+        locale={locale}
+      >
         {children}
       </MobileNavController>
     </div>
