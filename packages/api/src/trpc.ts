@@ -10,9 +10,28 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z, ZodError } from "zod/v4";
 
-import type { Auth } from "@medilink/auth";
-
 // TODO (M0-2): Import Convex client here when Convex is set up
+
+/**
+ * Minimal auth API interface for the tRPC context.
+ *
+ * WHY: The Convex component model requires Better Auth to be instantiated
+ * per-request with the Convex context. For tRPC, we use a minimal interface
+ * that abstracts session retrieval, allowing both the old standalone pattern
+ * and the new Convex-native pattern.
+ *
+ * TODO (M1-2): Replace with Convex-native session retrieval (getToken + fetchAuthQuery)
+ */
+export interface AuthApi {
+  getSession: (opts: { headers: Headers }) => Promise<{
+    user?: { id: string; name: string; email: string } | null;
+    session?: { id: string; userId: string } | null;
+  } | null>;
+}
+
+export interface AuthContext {
+  api: AuthApi;
+}
 
 /**
  * 1. CONTEXT
@@ -29,7 +48,7 @@ import type { Auth } from "@medilink/auth";
 
 export const createTRPCContext = async (opts: {
   headers: Headers;
-  auth: Auth;
+  auth: AuthContext;
 }) => {
   const authApi = opts.auth.api;
   const session = await authApi.getSession({

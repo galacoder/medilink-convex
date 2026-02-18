@@ -13,6 +13,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@convex-dev/better-auth": "^0.10.10",
     "@medilink/api": "workspace:*",
     "@medilink/auth": "workspace:*",
     "@medilink/db": "workspace:*",

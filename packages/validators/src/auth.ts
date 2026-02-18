@@ -26,10 +26,7 @@ export const signUpSchema = z.object({
   // vi: "Tên phải có ít nhất 2 ký tự" / en: "Name must be at least 2 characters"
   name: z
     .string()
-    .min(
-      2,
-      "Tên phải có ít nhất 2 ký tự / Name must be at least 2 characters",
-    ),
+    .min(2, "Tên phải có ít nhất 2 ký tự / Name must be at least 2 characters"),
 });
 
 /**
@@ -110,8 +107,7 @@ export const passwordResetConfirmSchema = z
       ),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message:
-      "Mật khẩu xác nhận không khớp / Passwords do not match",
+    message: "Mật khẩu xác nhận không khớp / Passwords do not match",
     path: ["confirmPassword"],
   });
 
