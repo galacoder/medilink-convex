@@ -9,10 +9,10 @@ import {
 } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 
+import type { OrgMember, OrgRole } from "~/components/members-table";
 import { useActiveOrganization } from "~/auth/client";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { MembersTable } from "~/components/members-table";
-import type { OrgMember, OrgRole } from "~/components/members-table";
 import { settingsLabels } from "~/lib/i18n/settings-labels";
 
 /**
@@ -59,10 +59,10 @@ export default function HospitalMembersPage() {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({})) as { message?: string };
-      throw new Error(
-        error.message ?? settingsLabels.invite.error.vi,
-      );
+      const error = (await response.json().catch(() => ({}))) as {
+        message?: string;
+      };
+      throw new Error(error.message ?? settingsLabels.invite.error.vi);
     }
   }
 
@@ -125,7 +125,9 @@ export default function HospitalMembersPage() {
       {/* Page header */}
       <div>
         <h1 className="text-2xl font-semibold">{labels.title.vi}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">{labels.subtitle.vi}</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {labels.subtitle.vi}
+        </p>
       </div>
 
       {/* Invite member section */}
@@ -134,14 +136,10 @@ export default function HospitalMembersPage() {
           <CardTitle className="text-base">
             {settingsLabels.invite.title.vi}
           </CardTitle>
-          <CardDescription>
-            {settingsLabels.invite.subtitle.vi}
-          </CardDescription>
+          <CardDescription>{settingsLabels.invite.subtitle.vi}</CardDescription>
         </CardHeader>
         <CardContent>
-          <InviteMemberForm
-            onInvite={handleInvite}
-          />
+          <InviteMemberForm onInvite={handleInvite} />
         </CardContent>
       </Card>
 
@@ -149,9 +147,7 @@ export default function HospitalMembersPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{labels.title.vi}</CardTitle>
-          <CardDescription>
-            {members.length} thành viên
-          </CardDescription>
+          <CardDescription>{members.length} thành viên</CardDescription>
         </CardHeader>
         <CardContent>
           <MembersTable

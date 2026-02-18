@@ -12,8 +12,8 @@ import {
   platformRoleSchema,
   removeMemberSchema,
   updateMemberRoleSchema,
-  updateOrgSettingsSchema,
   updateOrganizationSchema,
+  updateOrgSettingsSchema,
 } from "./organizations";
 
 describe("orgTypeSchema", () => {

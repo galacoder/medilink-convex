@@ -37,8 +37,7 @@ export const organizationRouter = {
       if (!ctx.organizationId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message:
-            "Bạn chưa chọn tổ chức (No active organization selected)",
+          message: "Bạn chưa chọn tổ chức (No active organization selected)",
         });
       }
 

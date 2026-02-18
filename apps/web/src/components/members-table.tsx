@@ -160,7 +160,7 @@ export function MembersTable({
     <TooltipProvider>
       <div className="overflow-hidden rounded-md border">
         {/* Table header */}
-        <div className="bg-muted/50 grid grid-cols-[1fr_1fr_auto_auto] gap-4 px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="bg-muted/50 text-muted-foreground grid grid-cols-[1fr_1fr_auto_auto] gap-4 px-4 py-3 text-xs font-medium tracking-wide uppercase">
           <span>{labels.table.name.vi}</span>
           <span className="hidden sm:block">{labels.table.email.vi}</span>
           <span>{labels.table.role.vi}</span>
@@ -173,7 +173,8 @@ export function MembersTable({
             const isCurrentUser = member.userId === callerId;
             const lastOwner = isLastOwner(member);
             const canChange = canChangeRole(member) && !!onChangeRole;
-            const canRemove = canRemoveMember(member) && !lastOwner && !!onRemoveMember;
+            const canRemove =
+              canRemoveMember(member) && !lastOwner && !!onRemoveMember;
 
             return (
               <li
@@ -184,7 +185,7 @@ export function MembersTable({
                 <div>
                   <span className="font-medium">{member.name}</span>
                   {isCurrentUser && (
-                    <span className="ml-1.5 text-muted-foreground text-xs">
+                    <span className="text-muted-foreground ml-1.5 text-xs">
                       (bạn)
                     </span>
                   )}

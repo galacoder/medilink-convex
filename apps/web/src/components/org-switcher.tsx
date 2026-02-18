@@ -15,7 +15,11 @@ import {
   DropdownMenuTrigger,
 } from "@medilink/ui/dropdown-menu";
 
-import { organization, useActiveOrganization, useListOrganizations } from "~/auth/client";
+import {
+  organization,
+  useActiveOrganization,
+  useListOrganizations,
+} from "~/auth/client";
 
 interface OrgSwitcherProps {
   /** Current portal type — used to detect cross-portal switches */
@@ -46,7 +50,7 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
 
   if (isLoading) {
     return (
-      <span className="text-muted-foreground h-5 w-32 animate-pulse rounded bg-muted text-sm" />
+      <span className="text-muted-foreground bg-muted h-5 w-32 animate-pulse rounded text-sm" />
     );
   }
 
@@ -54,11 +58,7 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
 
   // Single org: render org name as plain text (no dropdown needed)
   if (orgList.length <= 1) {
-    return (
-      <span className="text-sm font-medium">
-        {activeOrg?.name ?? ""}
-      </span>
-    );
+    return <span className="text-sm font-medium">{activeOrg?.name ?? ""}</span>;
   }
 
   // Multi-org: render dropdown switcher
@@ -90,7 +90,10 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
     const orgType = orgMetadata?.org_type as string | undefined;
     if (!orgType) return null;
 
-    const labels: Record<string, { vi: string; variant: "default" | "secondary" | "outline" }> = {
+    const labels: Record<
+      string,
+      { vi: string; variant: "default" | "secondary" | "outline" }
+    > = {
       hospital: { vi: "Bệnh viện", variant: "default" },
       provider: { vi: "Nhà cung cấp", variant: "secondary" },
     };
@@ -98,7 +101,11 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
     const label = labels[orgType];
     if (!label) return null;
 
-    return <Badge variant={label.variant} className="ml-1 text-xs">{label.vi}</Badge>;
+    return (
+      <Badge variant={label.variant} className="ml-1 text-xs">
+        {label.vi}
+      </Badge>
+    );
   }
 
   return (
@@ -127,12 +134,15 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
 
         {orgList.map((org) => {
           const isActive = org.id === activeOrg?.id;
-          const orgMetadata = (org as { metadata?: Record<string, unknown> }).metadata;
+          const orgMetadata = (org as { metadata?: Record<string, unknown> })
+            .metadata;
 
           return (
             <DropdownMenuItem
               key={org.id}
-              onClick={() => handleSwitch(org.id, orgMetadata?.org_type as string)}
+              onClick={() =>
+                handleSwitch(org.id, orgMetadata?.org_type as string)
+              }
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2 overflow-hidden">
@@ -140,7 +150,7 @@ export function OrgSwitcher({ currentPortal }: OrgSwitcherProps) {
                 {getOrgTypeBadge(orgMetadata)}
               </div>
               {isActive && (
-                <Check className="ml-2 h-4 w-4 shrink-0 text-primary" />
+                <Check className="text-primary ml-2 h-4 w-4 shrink-0" />
               )}
             </DropdownMenuItem>
           );

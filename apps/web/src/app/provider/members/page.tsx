@@ -9,10 +9,10 @@ import {
 } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 
+import type { OrgMember, OrgRole } from "~/components/members-table";
 import { useActiveOrganization } from "~/auth/client";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { MembersTable } from "~/components/members-table";
-import type { OrgMember, OrgRole } from "~/components/members-table";
 import { settingsLabels } from "~/lib/i18n/settings-labels";
 
 /**
