@@ -3,10 +3,7 @@ import { NextResponse } from "next/server";
 
 import { isPublicPath } from "@medilink/auth/middleware";
 
-import {
-  getDefaultRedirectForPortal,
-  getPortalFromPathname,
-} from "~/lib/portal-routing";
+import { getPortalFromPathname } from "~/lib/portal-routing";
 import type { MiddlewareSessionData } from "~/lib/portal-routing";
 
 /**
