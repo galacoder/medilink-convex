@@ -15,9 +15,11 @@ import {
   FileText,
   LayoutDashboard,
   Package,
+  Settings,
   Shield,
   Stethoscope,
   Truck,
+  Users,
   Wrench,
 } from "lucide-react";
 
@@ -60,6 +62,16 @@ export const hospitalNavItems: NavItem[] = [
     icon: AlertCircle,
     label: { vi: "Khiếu nại", en: "Disputes" },
   },
+  {
+    href: "/hospital/members",
+    icon: Users,
+    label: { vi: "Thành viên", en: "Members" },
+  },
+  {
+    href: "/hospital/settings",
+    icon: Settings,
+    label: { vi: "Cài đặt", en: "Settings" },
+  },
 ];
 
 /**
@@ -90,6 +102,16 @@ export const providerNavItems: NavItem[] = [
     href: "/provider/analytics",
     icon: BarChart3,
     label: { vi: "Phân tích", en: "Analytics" },
+  },
+  {
+    href: "/provider/members",
+    icon: Users,
+    label: { vi: "Thành viên", en: "Members" },
+  },
+  {
+    href: "/provider/settings",
+    icon: Settings,
+    label: { vi: "Cài đặt", en: "Settings" },
   },
 ];
 
