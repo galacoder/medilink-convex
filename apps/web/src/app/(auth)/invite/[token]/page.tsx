@@ -117,7 +117,7 @@ export default function InvitePage({ params }: InvitePageProps) {
           <CardDescription>{labels.subtitle.vi}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             {/* Bạn cần đăng nhập để chấp nhận lời mời / You need to sign in to accept this invitation */}
             Bạn cần đăng nhập để chấp nhận lời mời
           </p>
@@ -145,7 +145,7 @@ export default function InvitePage({ params }: InvitePageProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-green-600">{labels.accepted.vi}</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-sm">
             {labels.loading.vi}
           </p>
         </CardContent>
@@ -161,7 +161,7 @@ export default function InvitePage({ params }: InvitePageProps) {
           <CardTitle className="text-2xl">{labels.title.vi}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <div className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm">
             {labels.invalidToken.vi}
           </div>
         </CardContent>
@@ -182,7 +182,7 @@ export default function InvitePage({ params }: InvitePageProps) {
         <CardDescription>{labels.subtitle.vi}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {/* Token đã được xác thực / Token verified */}
           Token đã được xác thực. Nhấn chấp nhận để tiếp tục.
         </p>
@@ -193,7 +193,9 @@ export default function InvitePage({ params }: InvitePageProps) {
           onClick={handleAccept}
           disabled={acceptanceState === "accepting"}
         >
-          {acceptanceState === "accepting" ? labels.loading.vi : labels.accept.vi}
+          {acceptanceState === "accepting"
+            ? labels.loading.vi
+            : labels.accept.vi}
         </Button>
         <Button variant="ghost" asChild className="w-full">
           <Link href="/sign-in">{labels.backToSignIn.vi}</Link>
