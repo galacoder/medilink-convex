@@ -1,0 +1,112 @@
+{
+  "framework": "vitest",
+  "version": "3.0.0",
+  "command": "pnpm test",
+  "config": "vitest.workspace.ts",
+  "workspace_config": "packages/*/vitest.config.ts",
+  "patterns": [
+    "packages/validators/src/*.test.ts"
+  ],
+  "coverage": {
+    "provider": "@vitest/coverage-v8",
+    "thresholds_enforced": false
+  },
+  "test_files": {
+    "existing": [
+      {
+        "path": "packages/validators/src/auth.test.ts",
+        "lines": 251,
+        "test_count": 11,
+        "status": "passing"
+      },
+      {
+        "path": "packages/validators/src/organizations.test.ts",
+        "lines": 124,
+        "test_count": 12,
+        "status": "passing"
+      }
+    ],
+    "planned": [
+      {
+        "path": "packages/validators/src/equipment.test.ts",
+        "wave": 1,
+        "estimated_tests": 9,
+        "describes": [
+          "equipmentStatusSchema",
+          "criticalitySchema",
+          "createEquipmentSchema",
+          "updateEquipmentSchema",
+          "createMaintenanceSchema",
+          "createFailureReportSchema"
+        ]
+      },
+      {
+        "path": "packages/validators/src/serviceRequests.test.ts",
+        "wave": 2,
+        "estimated_tests": 8,
+        "describes": [
+          "serviceRequestStatusSchema",
+          "serviceRequestTypeSchema",
+          "serviceRequestPrioritySchema",
+          "quoteStatusSchema",
+          "createServiceRequestSchema",
+          "createQuoteSchema"
+        ]
+      },
+      {
+        "path": "packages/validators/src/providers.test.ts",
+        "wave": 2,
+        "estimated_tests": 8,
+        "describes": [
+          "providerStatusSchema",
+          "providerVerificationStatusSchema",
+          "serviceSpecialtySchema",
+          "createProviderSchema",
+          "updateProviderSchema"
+        ]
+      },
+      {
+        "path": "packages/validators/src/consumables.test.ts",
+        "wave": 3,
+        "estimated_tests": 8,
+        "describes": [
+          "consumableCategoryTypeSchema",
+          "transactionTypeSchema",
+          "createConsumableSchema",
+          "updateConsumableSchema",
+          "createReorderRequestSchema"
+        ]
+      },
+      {
+        "path": "packages/validators/src/disputes.test.ts",
+        "wave": 3,
+        "estimated_tests": 6,
+        "describes": [
+          "disputeStatusSchema",
+          "createDisputeSchema",
+          "updateDisputeSchema",
+          "createDisputeMessageSchema"
+        ]
+      }
+    ]
+  },
+  "verification_commands": [
+    {
+      "command": "pnpm test",
+      "purpose": "Run all validator tests via Vitest workspace",
+      "wave": 4
+    },
+    {
+      "command": "npx convex typecheck",
+      "purpose": "Verify Convex schema validity (table defs, v.id refs, indexes)",
+      "wave": 4
+    },
+    {
+      "command": "pnpm typecheck",
+      "purpose": "Full monorepo TypeScript check",
+      "wave": 4
+    }
+  ],
+  "total_estimated_tests": 39,
+  "ci_stage": "stage-2-unit-tests"
+}

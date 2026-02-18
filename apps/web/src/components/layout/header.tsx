@@ -15,8 +15,8 @@ import {
 } from "@medilink/ui/dropdown-menu";
 import { ThemeToggle } from "@medilink/ui/theme";
 
-import { signOut, useSession } from "~/auth/client";
 import type { NavItem } from "./nav-config";
+import { signOut, useSession } from "~/auth/client";
 
 interface HeaderProps {
   orgName?: string;
@@ -52,7 +52,7 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
   }
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-4 border-b bg-background px-6">
+    <header className="bg-background flex h-16 shrink-0 items-center gap-4 border-b px-6">
       {/* Mobile menu trigger — visible only on small screens */}
       <Button
         variant="ghost"
@@ -66,7 +66,7 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
 
       {/* Org name — shows the current organization context */}
       {orgName && (
-        <span className="hidden text-sm font-medium text-muted-foreground lg:block">
+        <span className="text-muted-foreground hidden text-sm font-medium lg:block">
           {orgName}
         </span>
       )}
@@ -95,10 +95,10 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">
+              <p className="text-sm leading-none font-medium">
                 {user?.name ?? "Người dùng"}
               </p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-muted-foreground text-xs leading-none">
                 {user?.email ?? ""}
               </p>
             </div>

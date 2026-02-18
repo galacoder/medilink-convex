@@ -1,0 +1,52 @@
+{
+  "task_id": "m0-5-turborepo-remote-caching-vercel",
+  "last_run": null,
+  "summary": {
+    "status": "not_run",
+    "total": 3,
+    "passing": 0,
+    "failing": 0,
+    "not_started": 3
+  },
+  "test_strategy": {
+    "unit_tests": false,
+    "integration_tests": false,
+    "visual_tests": {
+      "enabled": false,
+      "tool": null,
+      "flows": []
+    },
+    "e2e_tests": {
+      "enabled": false,
+      "critical_paths": []
+    },
+    "plugin_tests": {
+      "enabled": false,
+      "interactions": []
+    }
+  },
+  "use_cases": [],
+  "critical_paths": [],
+  "smoke_tests": [
+    {
+      "id": "SM1",
+      "name": "pnpm typecheck passes with zero errors",
+      "status": "not_tested"
+    },
+    {
+      "id": "SM2",
+      "name": "pnpm build succeeds across all workspaces",
+      "status": "not_tested"
+    },
+    {
+      "id": "SM3",
+      "name": "Second pnpm build shows Turborepo cache hit (FULL TURBO)",
+      "status": "not_tested"
+    }
+  ],
+  "test_files": [],
+  "coverage_target": 0,
+  "suites": [],
+  "failures": [],
+  "history": []
+}

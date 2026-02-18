@@ -1,0 +1,760 @@
+{
+  "task_slug": "m1-1-core-convex-schema-all-8-domains",
+  "task_description": "M1-1: Core Convex Schema -- All 8 MIGRATE Plugin Domains (equipment, service-requests, qr-code, providers, consumables, consumer-mgmt, disputes, audit-log)",
+  "domain": "coding",
+  "execution_mode": {
+    "type": "auto",
+    "auto_complete": true,
+    "auto_verify": true
+  },
+  "waves": [
+    {
+      "id": 1,
+      "name": "Equipment & QR Domains",
+      "objective": "Define equipment and QR-code domain tables in convex/schema.ts with all enums, foreign keys, and indexes. Create bilingual Zod validators and Vitest test suites for the equipment domain. This wave establishes 7 new tables: equipmentCategories, equipment, equipmentHistory, maintenanceRecords, failureReports, qrCodes, qrScanLog.",
+      "purpose_narrative": "WHY: Equipment is the core domain that all other domains reference (service requests, QR codes, consumables). It must be defined first because providers service equipment, consumables are linked to equipment, and QR codes identify equipment. QR is grouped here because it directly depends on the equipment table FK.",
+      "complexity": "medium",
+      "complexity_reason": "Largest single domain (5 tables, 6 enum types) with the most cross-table foreign key relationships; however, patterns are well-established from existing schema",
+      "model": "sonnet",
+      "model_escalation": [
+        "opus",
+        "opus",
+        "opus"
+      ],
+      "estimate_minutes": 35,
+      "tools_to_use": [
+        {
+          "name": "developing-with-convex",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Convex schema patterns"
+        },
+        {
+          "name": "test-driven-development",
+          "type": "skill",
+          "relevance_percent": 85,
+          "purpose": "TDD for validators"
+        },
+        {
+          "name": "mcp__sequential-thinking__sequentialthinking",
+          "type": "mcp",
+          "relevance_percent": null,
+          "purpose": "Schema design reasoning"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        {
+          "id": "1.1",
+          "wave": 1,
+          "name": "Define equipment domain enums",
+          "description": "Add 6 Convex enum types using v.union(v.literal()): equipmentStatus (operational/maintenance/repair/retired), equipmentCriticality (A/B/C), maintenanceStatus (5 values), recurringPattern (6 values), failureUrgency (4 values), failureStatus (5 values)",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "1.2",
+          "wave": 1,
+          "name": "Add equipmentCategories + equipment tables",
+          "description": "Create equipmentCategories table (name, description, organizationId) and equipment table (name, model, serialNumber, manufacturer, status, criticality, categoryId, assignedTo, location, purchaseDate, warrantyExpiry, metadata) with by_org, by_status, by_category indexes and org+serialNumber compound index",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "1.3",
+          "wave": 1,
+          "name": "Add equipmentHistory table",
+          "description": "Create equipmentHistory table for status transition audit trail (equipmentId, userId, previousStatus, newStatus, reason, metadata) with by_equipment and by_user indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "1.4",
+          "wave": 1,
+          "name": "Add maintenanceRecords table",
+          "description": "Create maintenanceRecords table for preventive maintenance scheduling (equipmentId, scheduledDate, recurringPattern, status, completedAt, technicianId, technicianNotes) with by_equipment, by_status, by_scheduledDate indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "1.5",
+          "wave": 1,
+          "name": "Add failureReports table",
+          "description": "Create failureReports table for equipment failure tracking (equipmentId, reporterId, description, urgency, status, assignedTo, resolvedAt, resolutionNotes) with by_equipment, by_status, by_urgency indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "1.6",
+          "wave": 1,
+          "name": "Add qrCodes + qrScanLog tables",
+          "description": "Create qrCodes table (equipmentId, organizationId, templateData, isActive) and qrScanLog table (equipmentId, scannedBy, location, metadata) with appropriate by_org, by_equipment indexes",
+          "status": "pending",
+          "priority": "medium",
+          "tests_required": false
+        },
+        {
+          "id": "1.7",
+          "wave": 1,
+          "name": "Create equipment Zod validators",
+          "description": "Create packages/validators/src/equipment.ts with bilingual Zod schemas: equipmentStatusSchema, criticalitySchema, createEquipmentSchema, updateEquipmentSchema, createMaintenanceSchema, createFailureReportSchema -- following existing auth.ts/organizations.ts patterns with Vietnamese/English error messages",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": true
+        },
+        {
+          "id": "1.8",
+          "wave": 1,
+          "name": "Create equipment validator tests",
+          "description": "Create packages/validators/src/equipment.test.ts with Vitest tests covering: enum validation, create/update schema acceptance/rejection, bilingual error messages, serial number format validation -- following existing auth.test.ts patterns",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        }
+      ],
+      "tests": [
+        "test_equipmentStatusSchema_accepts_valid_statuses()",
+        "test_equipmentStatusSchema_rejects_invalid_status()",
+        "test_criticalitySchema_accepts_A_B_C()",
+        "test_createEquipmentSchema_accepts_valid_input()",
+        "test_createEquipmentSchema_rejects_missing_serialNumber()",
+        "test_createEquipmentSchema_bilingual_error_messages()",
+        "test_updateEquipmentSchema_accepts_partial_input()",
+        "test_createMaintenanceSchema_accepts_valid_schedule()",
+        "test_createFailureReportSchema_rejects_empty_description()"
+      ],
+      "files": [
+        "convex/schema.ts",
+        "packages/validators/src/equipment.ts",
+        "packages/validators/src/equipment.test.ts"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Service Requests & Providers Domains",
+      "objective": "Define service request and provider domain tables in convex/schema.ts with cross-domain foreign keys to equipment tables. Create bilingual Zod validators and test suites for both domains. This wave adds 7 new tables: serviceRequests, quotes, serviceRatings, providers, serviceOfferings, certifications, coverageAreas.",
+      "purpose_narrative": "WHY: Service requests and providers are tightly coupled -- providers respond to service requests, submit quotes, and receive ratings. Defining them together ensures cross-domain FK consistency. They depend on equipment tables from Wave 1 (serviceRequests.equipmentId references equipment).",
+      "complexity": "medium",
+      "complexity_reason": "Cross-domain FK references to Wave 1 equipment tables and inter-domain references between providers and service requests require careful ordering within the schema file",
+      "model": "sonnet",
+      "model_escalation": [
+        "opus",
+        "opus",
+        "opus"
+      ],
+      "estimate_minutes": 35,
+      "tools_to_use": [
+        {
+          "name": "developing-with-convex",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Convex schema patterns"
+        },
+        {
+          "name": "test-driven-development",
+          "type": "skill",
+          "relevance_percent": 85,
+          "purpose": "TDD for validators"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        {
+          "id": "2.1",
+          "wave": 2,
+          "name": "Define service request + quote enums",
+          "description": "Add Convex enum types: serviceRequestStatus (pending/quoted/accepted/in_progress/completed/cancelled), serviceRequestType (repair/maintenance/calibration/inspection/other), serviceRequestPriority (low/medium/high/critical), quoteStatus (pending/forwarded/accepted/rejected/expired)",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "2.2",
+          "wave": 2,
+          "name": "Add serviceRequests + quotes + serviceRatings tables",
+          "description": "Create serviceRequests table (organizationId, equipmentId, type, status, priority, description, requesterId, assignedProviderId), quotes table (requestId, providerId, amount, currency, validUntil, status, notes), serviceRatings table (requestId, providerId, rating 1-5, feedback, serviceQuality, timeliness, professionalism) with comprehensive indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "2.3",
+          "wave": 2,
+          "name": "Define provider domain enums",
+          "description": "Add Convex enum types: providerStatus (active/inactive/suspended), providerVerificationStatus (pending/in_review/verified/rejected), serviceSpecialty (9 values: general_repair through other)",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "2.4",
+          "wave": 2,
+          "name": "Add providers table",
+          "description": "Create providers table with full profile (organizationId, name, companyName, email, phone, address, specialties, serviceAreas, status, verificationStatus, averageRating, totalRatings, completedServices, userId) and by_org, by_status, by_verificationStatus indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "2.5",
+          "wave": 2,
+          "name": "Add serviceOfferings + certifications + coverageAreas tables",
+          "description": "Create serviceOfferings (providerId, specialty, description, pricing), certifications (providerId, name, issuedBy, issuedDate, expiryDate, documentUrl, status), coverageAreas (providerId, area, isActive) with by_provider indexes",
+          "status": "pending",
+          "priority": "medium",
+          "tests_required": false
+        },
+        {
+          "id": "2.6",
+          "wave": 2,
+          "name": "Create serviceRequests + providers Zod validators",
+          "description": "Create packages/validators/src/serviceRequests.ts and packages/validators/src/providers.ts with bilingual Zod schemas for enums, create/update patterns, and TypeScript type inference exports",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": true
+        },
+        {
+          "id": "2.7",
+          "wave": 2,
+          "name": "Create serviceRequests + providers validator tests",
+          "description": "Create packages/validators/src/serviceRequests.test.ts and packages/validators/src/providers.test.ts with enum validation, create schema tests, bilingual error assertions, and partial update acceptance",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        }
+      ],
+      "tests": [
+        "test_serviceRequestStatusSchema_accepts_valid_statuses()",
+        "test_serviceRequestTypeSchema_rejects_invalid_type()",
+        "test_createServiceRequestSchema_accepts_valid_input()",
+        "test_createServiceRequestSchema_bilingual_error_messages()",
+        "test_quoteStatusSchema_accepts_valid_statuses()",
+        "test_providerStatusSchema_accepts_active_inactive_suspended()",
+        "test_createProviderSchema_accepts_valid_input()",
+        "test_createProviderSchema_rejects_invalid_email()",
+        "test_serviceSpecialtySchema_accepts_all_9_values()",
+        "test_updateProviderSchema_accepts_partial_input()"
+      ],
+      "files": [
+        "convex/schema.ts",
+        "packages/validators/src/serviceRequests.ts",
+        "packages/validators/src/serviceRequests.test.ts",
+        "packages/validators/src/providers.ts",
+        "packages/validators/src/providers.test.ts"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Consumables, Disputes & Audit Domains",
+      "objective": "Define consumables, disputes, and audit-log domain tables in convex/schema.ts. Create bilingual Zod validators and test suites for consumables and disputes domains. This wave adds 6 new tables: consumables, consumableUsageLog, reorderRequests, disputes, disputeMessages, auditLog.",
+      "purpose_narrative": "WHY: These three domains are the remaining leaf domains with the fewest inbound dependencies. Consumables references equipment (Wave 1), disputes references serviceRequests (Wave 2), and auditLog is a standalone cross-domain table. Grouping them ensures all domain tables are complete before Wave 4 verification.",
+      "complexity": "medium",
+      "complexity_reason": "Three separate domains with cross-wave FK dependencies (consumables->equipment, disputes->serviceRequests) but each domain is individually simpler than equipment or providers",
+      "model": "sonnet",
+      "model_escalation": [
+        "opus",
+        "opus",
+        "opus"
+      ],
+      "estimate_minutes": 30,
+      "tools_to_use": [
+        {
+          "name": "developing-with-convex",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Convex schema patterns"
+        },
+        {
+          "name": "test-driven-development",
+          "type": "skill",
+          "relevance_percent": 85,
+          "purpose": "TDD for validators"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        {
+          "id": "3.1",
+          "wave": 3,
+          "name": "Define consumable + dispute + audit enums",
+          "description": "Add Convex enum types: consumableCategoryType (7 values), transactionType (RECEIVE/USAGE/ADJUSTMENT/WRITE_OFF), alertSeverity (info/warning/critical), disputeStatus (open/investigating/resolved/escalated), auditAction (create/update/delete/status_change)",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.2",
+          "wave": 3,
+          "name": "Add consumables table",
+          "description": "Create consumables table with inventory management fields (organizationId, name, description, sku, manufacturer, unitOfMeasure, parLevel, maxLevel, currentStock, reorderPoint, unitCost, categoryType, metadata) with by_org, by_categoryType, org+sku compound indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.3",
+          "wave": 3,
+          "name": "Add consumableUsageLog + reorderRequests tables",
+          "description": "Create consumableUsageLog (consumableId, quantity, transactionType, userId, equipmentId, notes) and reorderRequests (consumableId, organizationId, requestedQuantity, status, requestedBy, approvedBy, notes) with appropriate indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.4",
+          "wave": 3,
+          "name": "Add disputes + disputeMessages tables",
+          "description": "Create disputes table (organizationId, serviceRequestId, status, description, reportedBy, assignedTo, resolvedBy, resolutionNotes) and disputeMessages table (disputeId, senderId, message) with by_org, by_status, by_serviceRequest, by_dispute indexes",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.5",
+          "wave": 3,
+          "name": "Add auditLog table",
+          "description": "Create centralized auditLog table (organizationId, userId, action, entityType, entityId, previousValues, newValues, ipAddress, userAgent) with by_org, by_user, by_entityType, by_createdAt indexes for cross-domain audit trail",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.6",
+          "wave": 3,
+          "name": "Create consumables + disputes Zod validators",
+          "description": "Create packages/validators/src/consumables.ts and packages/validators/src/disputes.ts with bilingual Zod schemas for enums, create/update patterns, inventory field constraints (parLevel > 0, reorderPoint > 0), and TypeScript type inference exports",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": true
+        },
+        {
+          "id": "3.7",
+          "wave": 3,
+          "name": "Create consumables + disputes validator tests",
+          "description": "Create packages/validators/src/consumables.test.ts and packages/validators/src/disputes.test.ts with enum validation, inventory constraint tests, bilingual error assertions, and dispute status transition tests",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        }
+      ],
+      "tests": [
+        "test_consumableCategoryTypeSchema_accepts_valid_types()",
+        "test_transactionTypeSchema_accepts_RECEIVE_USAGE()",
+        "test_createConsumableSchema_accepts_valid_input()",
+        "test_createConsumableSchema_rejects_negative_parLevel()",
+        "test_createConsumableSchema_bilingual_error_messages()",
+        "test_disputeStatusSchema_accepts_valid_statuses()",
+        "test_createDisputeSchema_accepts_valid_input()",
+        "test_createDisputeSchema_rejects_empty_description()",
+        "test_updateConsumableSchema_accepts_partial_input()"
+      ],
+      "files": [
+        "convex/schema.ts",
+        "packages/validators/src/consumables.ts",
+        "packages/validators/src/consumables.test.ts",
+        "packages/validators/src/disputes.ts",
+        "packages/validators/src/disputes.test.ts"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Validator Exports & Schema Verification",
+      "objective": "Wire up all new validator modules into the barrel export, update the packages/db schema reference documentation, and verify the complete schema deploys cleanly via Convex typecheck and monorepo typecheck.",
+      "purpose_narrative": "WHY: Without proper barrel exports, downstream packages cannot import new validators. Schema verification catches type errors and ensures all 23 tables with cross-domain FKs resolve correctly before any mutation/query development begins in M1-4+.",
+      "complexity": "low",
+      "complexity_reason": "Mechanical export wiring and verification commands with no new logic; fast model sufficient",
+      "model": "haiku",
+      "model_escalation": [
+        "sonnet",
+        "opus",
+        "opus"
+      ],
+      "estimate_minutes": 10,
+      "tools_to_use": [],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        {
+          "id": "4.1",
+          "wave": 4,
+          "name": "Update validators index.ts re-exports",
+          "description": "Add export statements for equipment, serviceRequests, providers, consumables, disputes to packages/validators/src/index.ts barrel file",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "4.2",
+          "wave": 4,
+          "name": "Update packages/db schema reference",
+          "description": "Update packages/db/src/schema.ts JSDoc comments to document all 23 tables across 8 domains with their enum types and index names",
+          "status": "pending",
+          "priority": "medium",
+          "tests_required": false
+        },
+        {
+          "id": "4.3",
+          "wave": 4,
+          "name": "Run Convex typecheck verification",
+          "description": "Execute npx convex typecheck to verify all table definitions, v.id() references, and index configurations are valid Convex schema",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        },
+        {
+          "id": "4.4",
+          "wave": 4,
+          "name": "Run monorepo typecheck verification",
+          "description": "Execute pnpm typecheck to verify all validator type exports are consumable by downstream packages and no TypeScript errors exist across workspaces",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "packages/validators/src/index.ts",
+        "packages/db/src/schema.ts"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "1.1",
+      "wave": 1,
+      "name": "Define equipment domain enums",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.2",
+      "wave": 1,
+      "name": "Add equipmentCategories + equipment tables",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.3",
+      "wave": 1,
+      "name": "Add equipmentHistory table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.4",
+      "wave": 1,
+      "name": "Add maintenanceRecords table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.5",
+      "wave": 1,
+      "name": "Add failureReports table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.6",
+      "wave": 1,
+      "name": "Add qrCodes + qrScanLog tables",
+      "status": "pending",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "1.7",
+      "wave": 1,
+      "name": "Create equipment Zod validators",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": true
+    },
+    {
+      "id": "1.8",
+      "wave": 1,
+      "name": "Create equipment validator tests",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.1",
+      "wave": 2,
+      "name": "Define service request + quote enums",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.2",
+      "wave": 2,
+      "name": "Add serviceRequests + quotes + serviceRatings tables",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.3",
+      "wave": 2,
+      "name": "Define provider domain enums",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.4",
+      "wave": 2,
+      "name": "Add providers table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.5",
+      "wave": 2,
+      "name": "Add serviceOfferings + certifications + coverageAreas tables",
+      "status": "pending",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "2.6",
+      "wave": 2,
+      "name": "Create serviceRequests + providers Zod validators",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": true
+    },
+    {
+      "id": "2.7",
+      "wave": 2,
+      "name": "Create serviceRequests + providers validator tests",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.1",
+      "wave": 3,
+      "name": "Define consumable + dispute + audit enums",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.2",
+      "wave": 3,
+      "name": "Add consumables table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.3",
+      "wave": 3,
+      "name": "Add consumableUsageLog + reorderRequests tables",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.4",
+      "wave": 3,
+      "name": "Add disputes + disputeMessages tables",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.5",
+      "wave": 3,
+      "name": "Add auditLog table",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.6",
+      "wave": 3,
+      "name": "Create consumables + disputes Zod validators",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": true
+    },
+    {
+      "id": "3.7",
+      "wave": 3,
+      "name": "Create consumables + disputes validator tests",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.1",
+      "wave": 4,
+      "name": "Update validators index.ts re-exports",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.2",
+      "wave": 4,
+      "name": "Update packages/db schema reference",
+      "status": "pending",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "4.3",
+      "wave": 4,
+      "name": "Run Convex typecheck verification",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "4.4",
+      "wave": 4,
+      "name": "Run monorepo typecheck verification",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    }
+  ],
+  "meta": {
+    "exp_version": "2026.02",
+    "total_waves": 4,
+    "total_features": 26,
+    "total_new_tables": 20,
+    "total_tables_after": 23,
+    "explore_agents": 2,
+    "key_findings": [
+      "Existing schema has 3 tables (organizations, organizationMemberships, users) with established Convex patterns: v.number() timestamps, v.union(v.literal()) enums, v.id() FKs, by_ index prefix",
+      "Legacy Drizzle schema has 35+ tables across 8 plugins; consolidation target is 20 new tables (23 total) by merging history tables into centralized auditLog and simplifying consumables",
+      "Validators use zod/v4 with bilingual error messages (Vietnamese primary / English secondary) and .partial() for update schemas",
+      "All tables require organizationId for multi-tenancy with by_org index -- consumer-mgmt domain needs no new tables (uses existing organizationMemberships)",
+      "Equipment domain has most cross-domain dependencies: service-requests, qr-code, and consumables all reference equipment tables via v.id('equipment')"
+    ],
+    "key_sources": [
+      {
+        "index": 1,
+        "path": "convex/schema.ts",
+        "description": "Current 3-table base schema with Convex patterns"
+      },
+      {
+        "index": 2,
+        "path": "packages/validators/src/auth.ts",
+        "description": "Validator pattern: bilingual zod/v4, type inference exports"
+      },
+      {
+        "index": 3,
+        "path": "packages/validators/src/organizations.ts",
+        "description": "Enum schema, create/update pattern, .partial() for updates"
+      },
+      {
+        "index": 4,
+        "path": "packages/validators/src/auth.test.ts",
+        "description": "Test pattern: safeParse, bilingual assertions, describe/it structure"
+      },
+      {
+        "index": 5,
+        "path": "legacy:packages/plugins/equipment/backend/schema.ts",
+        "description": "Equipment domain: 5 tables, 6 enums (357 lines)"
+      },
+      {
+        "index": 6,
+        "path": "legacy:packages/plugins/service-requests/backend/schema.ts",
+        "description": "Service domain: 4 tables, 4 enums (280 lines)"
+      },
+      {
+        "index": 7,
+        "path": "legacy:packages/plugins/providers/backend/schema.ts",
+        "description": "Provider domain: 6 tables, 5 enums (333 lines)"
+      },
+      {
+        "index": 8,
+        "path": "legacy:packages/plugins/consumables/backend/schema.ts",
+        "description": "Consumables domain: 7 tables, 6 enums (437 lines)"
+      },
+      {
+        "index": 9,
+        "path": "legacy:packages/plugins/disputes/backend/schema.ts",
+        "description": "Disputes domain: 2 tables, 1 enum (124 lines)"
+      }
+    ],
+    "git_integration": {
+      "worktree_enabled": true,
+      "worktree_path": "/home/sangle/dev/worktrees/m1-1-core-convex-schema-all-8-domains",
+      "branch_name": "feat/schema/m1-1-core-convex-schema-all-8-domains",
+      "base_branch": "main"
+    },
+    "github_integration": {
+      "issue_number": 52,
+      "issue_url": "https://github.com/galacoder/medilink-convex/issues/52",
+      "issue_title": "M1-1: Core Convex Schema -- All 8 MIGRATE Plugin Domains",
+      "task_type": "feat",
+      "has_structured_requirements": true,
+      "issue_source": "user_provided",
+      "acceptance_criteria": [
+        "convex/schema.ts defines all tables for 8 plugin domains",
+        "All tables include organizationId field (multi-tenancy)",
+        "All tables have appropriate indexes (by_org, by_status, by_date)",
+        "Enums use v.union(v.literal(...)) pattern",
+        "TypeScript types exported for UI consumption",
+        "Schema deploys cleanly (npx convex deploy)",
+        "Total table count: ~25 tables"
+      ],
+      "dependencies": {
+        "depends_on": "M0-2 (base schema with organizations, users, organizationMemberships)",
+        "blocks": [
+          "M1-4 (equipment functions)",
+          "M1-5 (service request functions)",
+          "M1-6 (provider functions)",
+          "M1-7 (seed data)"
+        ]
+      },
+      "effort": {
+        "story_points": 8,
+        "t_shirt": "L"
+      }
+    },
+    "standards_context": {
+      "has_standards": false,
+      "source": "not_found",
+      "standards_path": "",
+      "applicable_standards": [],
+      "domains": []
+    },
+    "memory_context": {
+      "has_memories": false,
+      "memories": []
+    }
+  }
+}

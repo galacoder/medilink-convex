@@ -1,0 +1,598 @@
+{
+  "schema_version": "2026.02",
+  "task_id": "m0-5-turborepo-remote-caching-vercel",
+  "task_description": "M0-5: Configure Turborepo Remote Caching and Vercel Deployment for medilink-convex monorepo",
+  "domain": "coding",
+  "status": "complete",
+  "current_phase": "PLAN",
+  "current_wave": null,
+  "current_feature_id": null,
+  "created_at": "2026-02-17T00:00:00Z",
+  "updated_at": "2026-02-17T00:00:00Z",
+  "meta": {
+    "title": "M0-5: Turborepo Remote Caching + Vercel Deployment",
+    "description": "Configure Turborepo remote caching via Vercel for faster CI builds, create Vercel deployment config for the monorepo, update environment variable documentation, and fix Woodpecker CI secret references for remote cache integration.",
+    "estimated_hours": 1.5,
+    "exp_version": "v1.0.0",
+    "model_selection": {
+      "planning": "opus",
+      "execution": "sonnet",
+      "verification": "sonnet"
+    },
+    "key_findings": [
+      "turbo.json globalPassThroughEnv missing TURBO_TEAM and TURBO_TOKEN needed for remote caching",
+      "Root turbo.json build outputs include .next/** but apps/web/turbo.json correctly excludes .next/cache/** - root needs alignment",
+      "Woodpecker CI has TURBO_TEAM/TURBO_TOKEN as empty strings instead of from_secret references",
+      "GitHub Actions CI already has correct TURBO_TEAM/TURBO_TOKEN secret references",
+      ".env.example missing CONVEX_SITE_URL, AUTH_REDIRECT_PROXY_URL, and CONVEX_DEPLOY_KEY variables",
+      "No vercel.json exists - needs creation for monorepo root directory override",
+      "apps/web/next.config.js already Vercel-compatible with transpilePackages and jiti env validation"
+    ],
+    "key_sources": [
+      {
+        "index": 1,
+        "path": "turbo.json",
+        "description": "Root Turborepo config - needs globalPassThroughEnv update for remote caching"
+      },
+      {
+        "index": 2,
+        "path": "apps/web/turbo.json",
+        "description": "Web app Turbo config - extends root, has correct .next/cache exclusion"
+      },
+      {
+        "index": 3,
+        "path": ".woodpecker.yml",
+        "description": "Woodpecker CI pipeline - needs from_secret syntax for TURBO_TEAM/TURBO_TOKEN"
+      },
+      {
+        "index": 4,
+        "path": ".github/workflows/ci.yml",
+        "description": "GitHub Actions CI - already has correct secret references (reference model)"
+      },
+      {
+        "index": 5,
+        "path": ".env.example",
+        "description": "Environment variable documentation - missing several deployment variables"
+      },
+      {
+        "index": 6,
+        "path": "apps/web/next.config.js",
+        "description": "Next.js config - already Vercel-compatible, no changes needed"
+      },
+      {
+        "index": 7,
+        "path": ".env.ci",
+        "description": "CI environment file - has CONVEX_SITE_URL placeholder, reference for .env.example"
+      }
+    ],
+    "explore_agents": 1,
+    "github_integration": {
+      "issue_number": 50,
+      "issue_url": "https://github.com/sangle/medilink-convex/issues/50",
+      "issue_title": "M0-5: Turborepo Remote Caching + Vercel Deployment",
+      "labels": [
+        "type:scaffold",
+        "priority:medium",
+        "milestone:M0",
+        "area:infra"
+      ],
+      "milestone": "M0: Infrastructure Setup",
+      "has_structured_requirements": true,
+      "acceptance_criteria": [
+        "Turborepo remote cache configured (homelab or Vercel)",
+        "turbo.json has correct outputs for all tasks",
+        "Second build is cache-hit (under 5 seconds for unchanged packages)",
+        "Vercel project linked to medilink-convex repo",
+        "Preview deploys trigger on every PR",
+        "Production deploy triggers on push to main",
+        "Environment variables configured in Vercel (CONVEX_URL, auth secrets)",
+        "Custom domain configured (if available)",
+        "TypeScript types pass pnpm typecheck with zero errors"
+      ],
+      "files_to_modify": [
+        {
+          "file": "turbo.json",
+          "action": "Modify",
+          "purpose": "Add outputs arrays for all tasks to enable remote caching"
+        },
+        {
+          "file": "apps/web/next.config.ts",
+          "action": "Modify",
+          "purpose": "Ensure Vercel-compatible Next.js build configuration"
+        },
+        {
+          "file": ".env.example",
+          "action": "Modify",
+          "purpose": "Document all required Vercel env vars (CONVEX_URL, auth secrets)"
+        },
+        {
+          "file": "vercel.json",
+          "action": "Create (optional)",
+          "purpose": "Vercel project config (build command, root directory override)"
+        }
+      ],
+      "technical_spec": [
+        "Configure Turborepo remote cache (Vercel remote cache or self-hosted)",
+        "Link Vercel project to GitHub repo",
+        "Configure build command: cd apps/web && pnpm build",
+        "Set environment variables in Vercel dashboard",
+        "Test preview deploy with a test PR"
+      ],
+      "dependencies": {
+        "depends_on": [
+          "M0-1 (#46) -- working monorepo required for Vercel project setup"
+        ],
+        "blocks": "None directly -- enables faster CI/CD for all subsequent milestones"
+      },
+      "effort": {
+        "story_points": 3,
+        "tshirt": "S"
+      },
+      "pr_number": 87,
+      "pr_url": "https://github.com/galacoder/medilink-convex/pull/87",
+      "pr_created_at": "2026-02-17T23:05:59Z"
+    },
+    "git_integration": {
+      "branch_name": "feat/m0-5-turborepo-remote-caching-vercel",
+      "worktree_path": "/home/sangle/dev/worktrees/m0-5-turborepo-remote-caching-vercel",
+      "worktree_enabled": true,
+      "created_from_branch": "main"
+    },
+    "ci_status": {
+      "last_workflow_run": null,
+      "status": "pending",
+      "checks_url": null
+    },
+    "automation": {
+      "auto_complete": true,
+      "auto_merge": false,
+      "wait_for_ci": true,
+      "auto_approve": true,
+      "ci_timeout_minutes": 30,
+      "merge_method": "squash",
+      "delete_branch": true
+    },
+    "memory_query_executed": true,
+    "memory_notes": "No relevant memories found for this infrastructure configuration task",
+    "past_learnings": [],
+    "standards_context": {
+      "has_standards": false,
+      "source": "not_found",
+      "standards_path": "",
+      "applicable_standards": [],
+      "domains": []
+    },
+    "memory_context": {
+      "has_memories": false,
+      "memories": []
+    }
+  },
+  "execution_mode": {
+    "type": "auto",
+    "auto_complete": true,
+    "auto_verify": true
+  },
+  "execution_strategy": {
+    "type": "unified",
+    "description": "Single agent sequential execution - only 2 waves, all config edits with clear dependencies",
+    "_auto_detected": "async_strategy.enabled=false AND wave_count < 4 -> unified"
+  },
+  "decision_matrix": {
+    "PROCEED": {
+      "condition": "pnpm typecheck and pnpm build pass with zero errors",
+      "action": "Continue to next wave automatically"
+    },
+    "FIX": {
+      "condition": "Typecheck or build errors in modified files only",
+      "action": "Fix config syntax, re-verify"
+    },
+    "REDO": {
+      "condition": "Multiple cascading errors from config changes",
+      "action": "Revert changes, retry wave with corrected approach"
+    },
+    "ESCALATE": {
+      "condition": "Pre-existing errors unrelated to this task or Vercel API issues",
+      "action": "Report to user, wait for decision"
+    }
+  },
+  "escalation_triggers": [
+    "Pre-existing typecheck errors not caused by this task",
+    "Vercel CLI authentication failures",
+    "Woodpecker CI syntax issues requiring pipeline restart",
+    "Environment variable conflicts between CI systems"
+  ],
+  "retry_history": [],
+  "async_strategy": {
+    "enabled": false,
+    "determined_by": "initializer-opus-4.6",
+    "analysis_timestamp": "2026-02-17T00:00:00Z",
+    "maxParallelAgents": 1,
+    "parallel_groups": [],
+    "sequential_waves": [
+      1,
+      2
+    ],
+    "execution_order": [
+      {
+        "wave": 1,
+        "type": "sequential"
+      },
+      {
+        "wave": 2,
+        "type": "sequential",
+        "after": [
+          1
+        ]
+      }
+    ],
+    "rationale": "Config-only task with 2 waves and file dependencies between them - sequential unified agent is optimal",
+    "estimated_speedup": "0%"
+  },
+  "test_infrastructure": {
+    "server_management": {
+      "strategy": "none",
+      "startup_timeout_ms": 0,
+      "health_check_interval_ms": 0,
+      "max_restart_attempts": 0,
+      "health_endpoint": null
+    },
+    "test_execution": {
+      "batch_size": 0,
+      "timeout_per_test_ms": 0,
+      "timeout_per_batch_ms": 0,
+      "cleanup_between_batches": false,
+      "headless_mode": false,
+      "health_check_after_batch": false
+    }
+  },
+  "waves": [
+    {
+      "id": 1,
+      "name": "Turborepo Remote Cache + CI Secrets",
+      "objective": "Enable Turborepo remote caching by adding TURBO_TEAM/TURBO_TOKEN to globalPassThroughEnv, fix Woodpecker CI to use from_secret references, and document missing environment variables in .env.example",
+      "purpose_narrative": "WHY: Remote caching is the foundation of faster CI builds. Without TURBO_TEAM/TURBO_TOKEN in globalPassThroughEnv, Turborepo silently ignores remote cache. Woodpecker CI also uses empty strings instead of secret references, so cached builds never happen on homelab CI.",
+      "status": "complete",
+      "model": "sonnet",
+      "model_escalation": [
+        "opus",
+        "opus",
+        "opus"
+      ],
+      "complexity": "low",
+      "complexity_subcategory": "no_code",
+      "complexity_reason": "Config-only edits to JSON and YAML files with well-understood Turborepo and Woodpecker patterns - low risk but must be done first since Wave 2 depends on correct turbo.json",
+      "requires_code_generation": false,
+      "estimate_minutes": 15,
+      "agent_assignment": "coding",
+      "haiku_fallback": {
+        "enabled": false,
+        "fallback_model": "sonnet",
+        "reason": "Using sonnet directly - YAML secret syntax requires careful formatting"
+      },
+      "tools_to_use": [
+        {
+          "name": "building-with-turborepo",
+          "type": "skill",
+          "relevance_percent": 92,
+          "purpose": "Turbo remote cache config"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        "Add TURBO_TEAM and TURBO_TOKEN to globalPassThroughEnv",
+        "Fix Woodpecker CI from_secret references",
+        "Update .env.example with missing variables",
+        "Align root turbo.json build outputs with apps/web exclusion"
+      ],
+      "tests": [
+        "pnpm typecheck",
+        "pnpm build"
+      ],
+      "files": [
+        "turbo.json",
+        ".woodpecker.yml",
+        ".env.example"
+      ],
+      "verification_commands": [
+        "pnpm typecheck",
+        "pnpm build"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Vercel Deployment Config + Verification",
+      "objective": "Create vercel.json with monorepo root directory override and framework preset, then verify all changes pass typecheck and build with zero errors",
+      "purpose_narrative": "WHY: Vercel needs explicit configuration for monorepo deployments to know which app to build and where the root directory is. Without vercel.json, Vercel auto-detection may pick the wrong directory or build command, causing failed deploys.",
+      "status": "complete",
+      "model": "sonnet",
+      "model_escalation": [
+        "opus",
+        "opus",
+        "opus"
+      ],
+      "complexity": "low",
+      "complexity_subcategory": "no_code",
+      "complexity_reason": "Creating a small vercel.json and running verification commands - depends on Wave 1 turbo.json being correct first",
+      "requires_code_generation": false,
+      "estimate_minutes": 10,
+      "agent_assignment": "coding",
+      "haiku_fallback": {
+        "enabled": false,
+        "fallback_model": "sonnet",
+        "reason": "Using sonnet directly - verification step needs to interpret build output"
+      },
+      "tools_to_use": [
+        {
+          "name": "building-with-turborepo",
+          "type": "skill",
+          "relevance_percent": 78,
+          "purpose": "Monorepo Vercel integration"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Write",
+        "Bash"
+      ],
+      "features": [
+        "Create vercel.json with monorepo config",
+        "Run pnpm typecheck to verify zero errors",
+        "Run pnpm build to verify cache-ready outputs"
+      ],
+      "tests": [
+        "pnpm typecheck",
+        "pnpm build"
+      ],
+      "files": [
+        "vercel.json"
+      ],
+      "verification_commands": [
+        "pnpm typecheck",
+        "pnpm build"
+      ]
+    }
+  ],
+  "wave_verifications": [
+    {
+      "timestamp": "2026-02-17T23:04:11Z",
+      "decision": "PROCEED",
+      "invoked_by": "subagent",
+      "failure_count": 0,
+      "checks": {
+        "standards": "PASS (no standards configured)",
+        "issue_requirements": "PASS (5/5 automatable ACs met, 4 manual platform steps documented)",
+        "turbo_json_valid": "PASS",
+        "woodpecker_yaml_valid": "PASS",
+        "vercel_json_valid": "PASS",
+        "env_example_complete": "PASS",
+        "turbo_passthrough_env": "PASS (TURBO_TEAM + TURBO_TOKEN)",
+        "build_cache_exclusion": "PASS (!.next/cache/** added)",
+        "woodpecker_from_secret": "PASS (both steps updated)",
+        "build_verified": "PASS (FULL TURBO on 2nd run)",
+        "typecheck": "PASS (0 errors)"
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "1.1",
+      "wave": 1,
+      "name": "Add TURBO_TEAM and TURBO_TOKEN to globalPassThroughEnv",
+      "description": "Add TURBO_TEAM and TURBO_TOKEN to turbo.json globalPassThroughEnv array so Turborepo can read remote cache credentials from the environment instead of silently skipping remote cache",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          "turbo.json"
+        ],
+        "patterns_found": [
+          "globalPassThroughEnv exists with 6 entries but missing TURBO_TEAM/TURBO_TOKEN"
+        ],
+        "dependencies": [],
+        "risks": [
+          "None - additive change to existing array"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "1.2",
+      "wave": 1,
+      "name": "Fix Woodpecker CI from_secret references",
+      "description": "Replace empty-string TURBO_TEAM/TURBO_TOKEN environment values in .woodpecker.yml with Woodpecker from_secret syntax so CI builds use remote caching on the homelab runner",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          ".woodpecker.yml",
+          ".github/workflows/ci.yml"
+        ],
+        "patterns_found": [
+          "Woodpecker uses TURBO_TEAM: '' and TURBO_TOKEN: '' (empty, never caches)",
+          "GitHub Actions uses ${{ vars.TURBO_TEAM }} and ${{ secrets.TURBO_TOKEN }} (correct pattern to emulate)"
+        ],
+        "dependencies": [],
+        "risks": [
+          "Woodpecker secret syntax differs from GitHub Actions - must use from_secret key"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "1.3",
+      "wave": 1,
+      "name": "Update .env.example with missing variables",
+      "description": "Add CONVEX_SITE_URL, AUTH_REDIRECT_PROXY_URL, and TURBO_TEAM/TURBO_TOKEN documentation to .env.example so developers know all required environment variables for local and Vercel deployments",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          ".env.example",
+          ".env.ci"
+        ],
+        "patterns_found": [
+          ".env.ci has CONVEX_SITE_URL and AUTH_REDIRECT_PROXY_URL but .env.example does not",
+          "TURBO_TEAM/TURBO_TOKEN not documented anywhere for developer setup"
+        ],
+        "dependencies": [],
+        "risks": [
+          "None - documentation-only change"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "1.4",
+      "wave": 1,
+      "name": "Align root turbo.json build outputs with apps/web exclusion",
+      "description": "Update root turbo.json build outputs to use '!.next/cache/**' exclusion pattern matching apps/web/turbo.json, preventing large Next.js cache files from being stored in remote cache",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          "turbo.json",
+          "apps/web/turbo.json"
+        ],
+        "patterns_found": [
+          "Root turbo.json has '.next/**' in build outputs (includes cache)",
+          "apps/web/turbo.json correctly has '.next/**' with '!.next/cache/**' exclusion",
+          "apps/web extends root (//) so its override takes precedence for web, but root pattern affects other packages"
+        ],
+        "dependencies": [],
+        "risks": [
+          "Low - root build outputs for .next only apply to apps that produce .next directories"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "2.1",
+      "wave": 2,
+      "name": "Create vercel.json with monorepo config",
+      "description": "Create vercel.json at repo root to tell Vercel to build from apps/web directory with Next.js framework preset, enabling preview deploys on PRs and production deploys on main pushes",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [
+          "apps/web/next.config.js",
+          "package.json"
+        ],
+        "patterns_found": [
+          "No vercel.json exists yet",
+          "apps/web/next.config.js is already Vercel-compatible",
+          "Monorepo needs rootDirectory or buildCommand override for Vercel"
+        ],
+        "dependencies": [
+          "Wave 1 turbo.json changes must be committed first"
+        ],
+        "risks": [
+          "Vercel buildCommand must match pnpm workspace filter syntax"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "2.2",
+      "wave": 2,
+      "name": "Run pnpm typecheck to verify zero errors",
+      "description": "Execute pnpm typecheck across all workspaces to confirm config changes do not introduce TypeScript errors, satisfying acceptance criterion 9 from issue #50",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [],
+        "patterns_found": [],
+        "dependencies": [
+          "All config changes from features 1.1-2.1 must be applied"
+        ],
+        "risks": [
+          "Pre-existing typecheck errors may exist from prior milestones"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    },
+    {
+      "id": "2.3",
+      "wave": 2,
+      "name": "Run pnpm build to verify cache-ready outputs",
+      "description": "Execute pnpm build to confirm the monorepo builds successfully and Turborepo output caching works correctly with the updated turbo.json configuration",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false,
+      "findings": {
+        "files_analyzed": [],
+        "patterns_found": [],
+        "dependencies": [
+          "All config changes and typecheck must pass first"
+        ],
+        "risks": [
+          "Build may fail if env validation in next.config.js requires missing env vars"
+        ]
+      },
+      "verification_results": {
+        "tests_passing": null,
+        "files_modified": [],
+        "lines_changed": null,
+        "outcome": null
+      }
+    }
+  ],
+  "progress": {
+    "total_features": 7,
+    "completed_features": 7,
+    "total_waves": 2,
+    "completed_waves": 2,
+    "percentage": 100
+  },
+  "session_log": [
+    {
+      "timestamp": "2026-02-17T00:00:00Z",
+      "action": "Task initialized via /start-coding-exp"
+    }
+  ],
+  "verification_metadata": {
+    "invoked_by": null,
+    "timestamp": "2026-02-18T03:59:09Z"
+  },
+  "verification_status": "passed",
+  "verification_experimental": true
+}

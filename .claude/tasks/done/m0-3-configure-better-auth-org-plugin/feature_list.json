@@ -1,0 +1,669 @@
+{
+  "task_slug": "m0-3-configure-better-auth-org-plugin",
+  "task_description": "M0-3: Configure Better Auth with Organization Plugin -- Set up Better Auth with Convex adapter and organization plugin. Configure the 3-actor auth model: hospital orgs, provider orgs, and platform admin users. Each organization has owner/admin/member roles. Email/password provider, CSRF protection, middleware for route groups, auth API handler.",
+  "domain": "coding",
+  "execution_mode": {
+    "type": "auto",
+    "description": "Full A-Z automation",
+    "retry_on_failure": true,
+    "max_retries": 3,
+    "escalate_after": 3,
+    "autonomous_completion": true,
+    "autonomous_verification": true
+  },
+  "created_at": "2026-02-17",
+  "waves": [
+    {
+      "id": 1,
+      "name": "Convex Auth Infrastructure + Validators",
+      "objective": "Install @convex-dev/better-auth, create Convex component configuration (convex.config.ts, auth.config.ts, auth.ts), and build Zod validators for all auth inputs. This establishes the Convex-side authentication foundation that all other waves depend on.",
+      "purpose_narrative": "WHY: Without the Convex component registration and auth configuration, no auth flow can function. The Convex adapter is the core integration point between Better Auth and the Convex database -- every subsequent wave (client, middleware, session) depends on this infrastructure existing first.",
+      "complexity": "high",
+      "complexity_reason": "Convex component model integration with Better Auth beta is architecturally complex -- requires understanding both systems and their interop patterns. org_type metadata bridging adds additional complexity.",
+      "model": "opus",
+      "estimate_minutes": 40,
+      "tools_to_use": [
+        {
+          "name": "authenticating-with-better-auth",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Better Auth config patterns"
+        },
+        {
+          "name": "developing-with-convex",
+          "type": "skill",
+          "relevance_percent": 90,
+          "purpose": "Convex component model"
+        },
+        {
+          "name": "test-driven-development",
+          "type": "skill",
+          "relevance_percent": 65,
+          "purpose": "TDD for validators"
+        },
+        {
+          "name": "mcp__context7__query-docs",
+          "type": "mcp",
+          "relevance_percent": null,
+          "purpose": "Better Auth + Convex docs"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash",
+        "Write"
+      ],
+      "features": [
+        "Install @convex-dev/better-auth package",
+        "Create convex/convex.config.ts with betterAuth component",
+        "Create convex/auth.config.ts with getAuthConfigProvider",
+        "Create convex/auth.ts with createAuth, email/password, org plugin, CSRF",
+        "Create convex getCurrentUser query helper",
+        "Create packages/validators/src/auth.ts with sign-up/sign-in Zod schemas",
+        "Create packages/validators/src/auth.test.ts with pure-Node validator tests"
+      ],
+      "tests": [
+        "test_signUpSchema_accepts_valid_email_password()",
+        "test_signUpSchema_rejects_short_password()",
+        "test_signUpSchema_rejects_invalid_email()",
+        "test_signInSchema_accepts_valid_credentials()",
+        "test_signUpSchema_bilingual_error_messages()",
+        "test_orgSignUpSchema_requires_org_type()",
+        "test_orgSignUpSchema_accepts_hospital_provider()"
+      ],
+      "files": [
+        "convex/convex.config.ts",
+        "convex/auth.config.ts",
+        "convex/auth.ts",
+        "packages/validators/src/auth.ts",
+        "packages/validators/src/auth.test.ts"
+      ],
+      "status": "complete"
+    },
+    {
+      "id": 2,
+      "name": "Auth Package Restructure + Client Integration",
+      "objective": "Restructure packages/auth/ for the Convex component model. Create the auth client with organization plugin hooks. Update ConvexClientProvider to use ConvexBetterAuthProvider. Update server-side auth helpers for Next.js SSR with Convex Better Auth.",
+      "purpose_narrative": "WHY: The existing auth package was scaffolded for standalone Better Auth but the Convex component model requires a fundamentally different client/server split. The ConvexBetterAuthProvider is required to sync auth state between Better Auth sessions and Convex's reactive queries -- without it, authenticated Convex queries will fail.",
+      "complexity": "high",
+      "complexity_reason": "Requires careful restructuring of existing code across 3 packages (auth, web, api) while maintaining type safety and the monorepo export contract.",
+      "model": "opus",
+      "estimate_minutes": 35,
+      "tools_to_use": [
+        {
+          "name": "authenticating-with-better-auth",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Auth client patterns"
+        },
+        {
+          "name": "developing-with-nextjs",
+          "type": "skill",
+          "relevance_percent": 80,
+          "purpose": "SSR token handling"
+        },
+        {
+          "name": "building-with-turborepo",
+          "type": "skill",
+          "relevance_percent": 60,
+          "purpose": "Package exports"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Bash"
+      ],
+      "features": [
+        "Restructure packages/auth/src/index.ts for Convex component model",
+        "Create packages/auth/src/client.ts with organizationClient plugin",
+        "Update ConvexClientProvider to ConvexBetterAuthProvider",
+        "Create lib/convex.ts with convexBetterAuthNextJs SSR helpers",
+        "Update apps/web/src/auth/server.ts for Convex auth pattern",
+        "Update apps/web/src/auth/client.ts to re-export from @medilink/auth/client",
+        "Update packages/auth/package.json dependencies"
+      ],
+      "tests": [],
+      "files": [
+        "packages/auth/src/index.ts",
+        "packages/auth/src/client.ts",
+        "packages/auth/package.json",
+        "apps/web/src/app/convex-client-provider.tsx",
+        "apps/web/src/auth/server.ts",
+        "apps/web/src/auth/client.ts",
+        "apps/web/src/lib/convex.ts"
+      ],
+      "status": "complete"
+    },
+    {
+      "id": 3,
+      "name": "Middleware + Route Protection + Session Enrichment",
+      "objective": "Create Next.js middleware for route group protection (admin, hospital/staff, provider). Configure Better Auth session to include organizationId, role, and platformRole. Update tRPC context to pass organization-aware session data. Update auth API route handler.",
+      "purpose_narrative": "WHY: Route protection is a security requirement -- unauthenticated users must not access protected route groups, and organization context must be available in every authenticated request. Without middleware, any user could access any route group regardless of role.",
+      "complexity": "medium",
+      "complexity_reason": "Middleware logic is well-documented in Better Auth docs, but session enrichment with custom fields (platformRole, org_type) requires careful plugin configuration.",
+      "model": "sonnet",
+      "estimate_minutes": 25,
+      "tools_to_use": [
+        {
+          "name": "authenticating-with-better-auth",
+          "type": "skill",
+          "relevance_percent": 90,
+          "purpose": "Middleware patterns"
+        },
+        {
+          "name": "developing-with-nextjs",
+          "type": "skill",
+          "relevance_percent": 85,
+          "purpose": "Next.js middleware"
+        }
+      ],
+      "core_tools": [
+        "Read",
+        "Edit",
+        "Write"
+      ],
+      "features": [
+        "Create apps/web/src/middleware.ts with route group guards",
+        "Configure session plugin for organizationId + role + platformRole",
+        "Update packages/api/src/trpc.ts context with org-aware session",
+        "Update apps/web/src/app/api/auth/[...all]/route.ts for Convex auth",
+        "Create packages/auth/src/middleware.ts export (fulfills package.json export)"
+      ],
+      "tests": [],
+      "files": [
+        "apps/web/src/middleware.ts",
+        "packages/auth/src/middleware.ts",
+        "packages/api/src/trpc.ts",
+        "apps/web/src/app/api/auth/[...all]/route.ts"
+      ],
+      "status": "complete"
+    },
+    {
+      "id": 4,
+      "name": "Typecheck + Integration Verification",
+      "objective": "Run pnpm typecheck across all workspaces and fix any type errors. Run existing validator tests. Verify the auth API route is configured correctly. Ensure all package exports resolve. Run pnpm lint to catch any issues.",
+      "purpose_narrative": "WHY: TypeScript type safety across the monorepo is an acceptance criterion (AC-11). After restructuring auth across 3 packages, type errors are likely at package boundaries. Catching these now prevents cascading failures in downstream milestones (M0-6, M1-2, M1-3).",
+      "complexity": "medium",
+      "complexity_reason": "Cross-package type resolution in monorepos can surface non-obvious errors. Better Auth beta types may have gaps.",
+      "model": "sonnet",
+      "estimate_minutes": 20,
+      "tools_to_use": [
+        {
+          "name": "building-with-turborepo",
+          "type": "skill",
+          "relevance_percent": 70,
+          "purpose": "Monorepo typecheck"
+        },
+        {
+          "name": "test-driven-development",
+          "type": "skill",
+          "relevance_percent": 55,
+          "purpose": "Run validator tests"
+        }
+      ],
+      "core_tools": [
+        "Bash",
+        "Read",
+        "Edit"
+      ],
+      "features": [
+        "Run pnpm typecheck and fix all type errors",
+        "Run existing validator tests (organizations + auth)",
+        "Verify package exports resolve correctly",
+        "Run pnpm lint and fix lint errors",
+        "Verify env validation works with new variables"
+      ],
+      "tests": [
+        "test_pnpm_typecheck_passes()",
+        "test_auth_validators_pass()",
+        "test_organization_validators_pass()",
+        "test_pnpm_lint_passes()"
+      ],
+      "files": [],
+      "status": "complete"
+    }
+  ],
+  "features": [
+    {
+      "id": "1.1",
+      "wave": 1,
+      "name": "Install @convex-dev/better-auth package",
+      "description": "Install the Convex Better Auth component package at root level, enabling the Convex component model integration that replaces the standalone Better Auth adapter approach",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "1.2",
+      "wave": 1,
+      "name": "Create convex/convex.config.ts with betterAuth component",
+      "description": "Register the Better Auth component in Convex app configuration via app.use(betterAuth), which enables Better Auth to manage its own tables inside the Convex database",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "1.3",
+      "wave": 1,
+      "name": "Create convex/auth.config.ts with getAuthConfigProvider",
+      "description": "Configure Better Auth as the authentication provider for Convex's built-in auth system, enabling token validation and user identity resolution",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "1.4",
+      "wave": 1,
+      "name": "Create convex/auth.ts with createAuth, email/password, org plugin, CSRF",
+      "description": "Create the main Convex-side Better Auth configuration with email/password provider, organization plugin (with org_type metadata support for hospital/provider), CSRF protection, and Google OAuth social provider",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "1.5",
+      "wave": 1,
+      "name": "Create convex getCurrentUser query helper",
+      "description": "Add a Convex query function that returns the currently authenticated user via authComponent.getAuthUser(ctx), providing a reusable pattern for auth-gated queries",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "1.6",
+      "wave": 1,
+      "name": "Create packages/validators/src/auth.ts with sign-up/sign-in Zod schemas",
+      "description": "Build bilingual Zod v4 validators for signUpSchema (email, password, name), signInSchema (email, password), orgSignUpSchema (extends signUp with org_type, orgName), and passwordResetSchema with Vietnamese/English error messages",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": true
+    },
+    {
+      "id": "1.7",
+      "wave": 1,
+      "name": "Create packages/validators/src/auth.test.ts with pure-Node validator tests",
+      "description": "Write pure-Node tests (matching existing organizations.test.ts pattern) verifying all auth Zod schemas accept valid inputs, reject invalid inputs, and produce bilingual error messages",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.1",
+      "wave": 2,
+      "name": "Restructure packages/auth/src/index.ts for Convex component model",
+      "description": "Refactor initAuth() to work with the Convex component model, exporting shared auth configuration that convex/auth.ts and the Next.js app both consume. Remove standalone Better Auth instantiation TODOs.",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.2",
+      "wave": 2,
+      "name": "Create packages/auth/src/client.ts with organizationClient plugin",
+      "description": "Create the auth client module with createAuthClient configured with organizationClient() plugin, exporting useSession, useOrganization, and other React hooks for client-side auth state management",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.3",
+      "wave": 2,
+      "name": "Update ConvexClientProvider to ConvexBetterAuthProvider",
+      "description": "Replace ConvexProvider with ConvexBetterAuthProvider in the client provider component, passing the authClient instance so Convex queries receive authenticated context automatically",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.4",
+      "wave": 2,
+      "name": "Create lib/convex.ts with convexBetterAuthNextJs SSR helpers",
+      "description": "Set up convexBetterAuthNextJs() for server-side rendering, exporting getToken, handler, isAuthenticated, fetchAuthQuery, and preloadAuthQuery for use in Server Components",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.5",
+      "wave": 2,
+      "name": "Update apps/web/src/auth/server.ts for Convex auth pattern",
+      "description": "Refactor the server-side auth module to use the new Convex component pattern instead of standalone Better Auth instantiation, maintaining getSession for Server Components",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "2.6",
+      "wave": 2,
+      "name": "Update apps/web/src/auth/client.ts to re-export from @medilink/auth/client",
+      "description": "Update the web app's client auth module to re-export from the shared @medilink/auth/client package, ensuring single source of truth for auth client configuration",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "2.7",
+      "wave": 2,
+      "name": "Update packages/auth/package.json dependencies",
+      "description": "Add @convex-dev/better-auth dependency, update exports map to include all entry points (index, client, middleware, env), and ensure convex peer dependency is specified",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.1",
+      "wave": 3,
+      "name": "Create apps/web/src/middleware.ts with route group guards",
+      "description": "Implement Next.js middleware that protects (admin), (staff)/(hospital), and (provider) route groups, redirecting unauthenticated users to sign-in and checking organization membership for org-scoped routes",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "3.2",
+      "wave": 3,
+      "name": "Configure session plugin for organizationId + role + platformRole",
+      "description": "Extend Better Auth session to include the active organization ID, the user's role within that organization, and their platformRole (if any), fulfilling AC-7 requirement",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.3",
+      "wave": 3,
+      "name": "Update packages/api/src/trpc.ts context with org-aware session",
+      "description": "Update tRPC context creation to include organizationId, orgRole, and platformRole from the enriched session, enabling organization-scoped API procedures",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.4",
+      "wave": 3,
+      "name": "Update apps/web/src/app/api/auth/[...all]/route.ts for Convex auth",
+      "description": "Update the auth API route handler to use the Convex-integrated Better Auth handler pattern, ensuring all auth endpoints (sign-up, sign-in, session, organization) are properly routed",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.5",
+      "wave": 3,
+      "name": "Create packages/auth/src/middleware.ts export",
+      "description": "Create the middleware utility module that packages/auth/package.json already exports as ./middleware, providing reusable auth middleware helpers for the Next.js app",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "4.1",
+      "wave": 4,
+      "name": "Run pnpm typecheck and fix all type errors",
+      "description": "Execute pnpm typecheck across all workspaces via Turbo, fixing any TypeScript errors introduced by the auth restructuring, especially at package boundary types",
+      "status": "complete",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "4.2",
+      "wave": 4,
+      "name": "Run existing validator tests (organizations + auth)",
+      "description": "Execute both organizations.test.ts and auth.test.ts via tsx to verify all Zod validators produce correct results and bilingual error messages",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.3",
+      "wave": 4,
+      "name": "Verify package exports resolve correctly",
+      "description": "Verify that all @medilink/auth exports (index, client, middleware, env) resolve correctly from consuming packages (@medilink/web, @medilink/api)",
+      "status": "complete",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.4",
+      "wave": 4,
+      "name": "Run pnpm lint and fix lint errors",
+      "description": "Execute pnpm lint across all workspaces, fixing any ESLint errors from new or modified files to maintain code quality standards",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "4.5",
+      "wave": 4,
+      "name": "Verify env validation works with new variables",
+      "description": "Ensure the @t3-oss/env-nextjs validation in apps/web/src/env.ts correctly validates new auth-related environment variables and skips validation during CI",
+      "status": "complete",
+      "priority": "medium",
+      "tests_required": false
+    }
+  ],
+  "meta": {
+    "exp_version": "v1.0.0",
+    "total_waves": 4,
+    "total_features": 22,
+    "estimated_total_minutes": 120,
+    "key_findings": [
+      "Better Auth + Convex uses COMPONENT model (@convex-dev/better-auth), NOT standalone adapter -- requires convex/convex.config.ts, auth.config.ts, auth.ts",
+      "Existing packages/auth/src/index.ts initAuth() must be restructured for Convex component pattern",
+      "ConvexClientProvider must be swapped to ConvexBetterAuthProvider for auth state sync",
+      "Organization plugin has built-in owner/admin/member roles matching our schema",
+      "Better Auth manages its own tables inside Convex component; our schema tables are application-level",
+      "Session enrichment needed: organizationId, role, platformRole (AC-7)",
+      "No test framework -- validators tested via tsx + custom assertions (matching existing pattern)"
+    ],
+    "key_sources": [
+      {
+        "index": 1,
+        "path": "packages/auth/src/index.ts",
+        "description": "Current auth config with initAuth(), needs restructuring"
+      },
+      {
+        "index": 2,
+        "path": "convex/schema.ts",
+        "description": "Existing schema with organizations, memberships, users tables"
+      },
+      {
+        "index": 3,
+        "path": "apps/web/src/auth/server.ts",
+        "description": "Server-side auth instantiation, needs Convex pattern update"
+      },
+      {
+        "index": 4,
+        "path": "apps/web/src/app/convex-client-provider.tsx",
+        "description": "Provider must change to ConvexBetterAuthProvider"
+      },
+      {
+        "index": 5,
+        "path": "packages/api/src/trpc.ts",
+        "description": "tRPC context receives Auth type, needs org-aware session"
+      },
+      {
+        "index": 6,
+        "path": "packages/validators/src/organizations.ts",
+        "description": "Existing validators and bilingual pattern to follow"
+      },
+      {
+        "index": 7,
+        "path": "apps/web/src/env.ts",
+        "description": "Environment validation, may need new auth variables"
+      }
+    ],
+    "explore_agents": 1,
+    "git_integration": {
+      "worktree_enabled": true,
+      "worktree_path": "/home/sangle/dev/worktrees/m0-3-configure-better-auth-org-plugin",
+      "branch_name": "feat/m0-3/configure-better-auth-org-plugin",
+      "base_branch": "main"
+    },
+    "github_integration": {
+      "issue_number": 48,
+      "issue_url": "https://github.com/galacoder/medilink-convex/issues/48",
+      "issue_title": "M0-3: Configure Better Auth with Organization Plugin",
+      "task_type": "scaffold",
+      "has_structured_requirements": true,
+      "labels": [
+        "type:scaffold",
+        "priority:critical",
+        "milestone:M0",
+        "area:auth"
+      ],
+      "milestone": "M0: Infrastructure Setup",
+      "acceptance_criteria": [
+        {
+          "id": "AC-1",
+          "description": "Better Auth installed with Convex adapter (@medilink/auth package)",
+          "status": "pending"
+        },
+        {
+          "id": "AC-2",
+          "description": "Organization plugin enabled with org_type metadata field",
+          "status": "pending"
+        },
+        {
+          "id": "AC-3",
+          "description": "Hospital org sign-up flow works (creates org with org_type=hospital)",
+          "status": "pending"
+        },
+        {
+          "id": "AC-4",
+          "description": "Provider org sign-up flow works (creates org with org_type=provider)",
+          "status": "pending"
+        },
+        {
+          "id": "AC-5",
+          "description": "Platform admin sign-in works (user with platformRole=platform_admin)",
+          "status": "pending"
+        },
+        {
+          "id": "AC-6",
+          "description": "Organization membership roles enforced: owner, admin, member",
+          "status": "pending"
+        },
+        {
+          "id": "AC-7",
+          "description": "Session includes organizationId, role, and platformRole",
+          "status": "pending"
+        },
+        {
+          "id": "AC-8",
+          "description": "Auth API routes at /api/auth/[...all]",
+          "status": "pending"
+        },
+        {
+          "id": "AC-9",
+          "description": "Email/password provider configured",
+          "status": "pending"
+        },
+        {
+          "id": "AC-10",
+          "description": "CSRF protection enabled",
+          "status": "pending"
+        },
+        {
+          "id": "AC-11",
+          "description": "TypeScript types pass pnpm typecheck with zero errors",
+          "status": "pending"
+        },
+        {
+          "id": "AC-12",
+          "description": "Auth flows tested: sign-up -> email verification -> sign-in -> session check",
+          "status": "pending"
+        }
+      ],
+      "dependencies": {
+        "depends_on": [
+          "M0-1 (#46)",
+          "M0-2 (#47)"
+        ],
+        "blocks": [
+          "M0-6 (#51)",
+          "M1-2 (#53)",
+          "M1-3 (#54)"
+        ]
+      },
+      "technical_spec": {
+        "actions": [
+          "Create @medilink/auth package with Better Auth server config",
+          "Configure Convex adapter for Better Auth",
+          "Enable organization plugin with org_type metadata",
+          "Create auth client with React hooks",
+          "Configure middleware for route group protection",
+          "Set up auth API handler at /api/auth/[...all]",
+          "Create Zod validators for auth inputs"
+        ],
+        "files": [
+          {
+            "path": "packages/auth/src/index.ts",
+            "action": "modify",
+            "purpose": "Better Auth server config with Convex adapter + org plugin"
+          },
+          {
+            "path": "packages/auth/src/client.ts",
+            "action": "create",
+            "purpose": "Auth client with useSession, useOrganization hooks"
+          },
+          {
+            "path": "packages/auth/package.json",
+            "action": "modify",
+            "purpose": "@medilink/auth package definition"
+          },
+          {
+            "path": "apps/web/src/middleware.ts",
+            "action": "create",
+            "purpose": "Route group protection"
+          },
+          {
+            "path": "apps/web/src/app/api/auth/[...all]/route.ts",
+            "action": "modify",
+            "purpose": "Better Auth API handler"
+          },
+          {
+            "path": "packages/validators/src/auth.ts",
+            "action": "create",
+            "purpose": "Zod validators for sign-up/sign-in inputs"
+          }
+        ]
+      }
+    },
+    "standards_context": {
+      "has_standards": false,
+      "source": "not_found",
+      "standards_path": "",
+      "applicable_standards": [],
+      "domains": []
+    },
+    "memory_context": {
+      "has_memories": false,
+      "memories": []
+    },
+    "automation": {
+      "auto_merge": true
+    }
+  },
+  "verification_metadata": {
+    "invoked_by": "execute-coding-exp",
+    "timestamp": "2026-02-18T01:18:03Z"
+  },
+  "wave_verifications": [
+    {
+      "timestamp": "2026-02-18T01:25:12Z",
+      "decision": "PROCEED",
+      "invoked_by": "subagent",
+      "failure_count": 1,
+      "notes": "1 MEDIUM issue (AUTH_GOOGLE_ID/SECRET required but docs say optional). All HARD GATES pass: tests 37/37, typecheck 11/12 (expo pre-existing on main), git clean. isPublicPath concern from PR review was incorrect - code is safe."
+    }
+  ],
+  "verification_status": "passed",
+  "verification_experimental": true,
+  "pr_number": 85,
+  "pr_url": "https://github.com/galacoder/medilink-convex/pull/85",
+  "pr_created_at": "2026-02-18T01:26:34Z",
+  "pr_merged": true,
+  "pr_merged_at": "2026-02-18T01:37:03Z"
+}

@@ -1,0 +1,462 @@
+{
+  "task_id": "m0-6-auth-followup-fixes",
+  "task_description": "fix(auth/middleware): M0-6 post-merge follow-up -- critical sign-up redirect loop + cross-portal enforcement + HIGH fixes",
+  "domain": "coding",
+  "complexity": "medium",
+  "created_at": "2026-02-18",
+  "waves": [
+    {
+      "id": 1,
+      "name": "Fix Sign-Up Redirect Loop",
+      "objective": "Fix the infinite redirect loop caused by missing organization.setActive() call after organization creation in sign-up flow. Without this fix, users cannot complete registration.",
+      "purpose_narrative": "WHY: After organization.create() succeeds, the session still has activeOrganizationId=null because setActive() is never called. Middleware Branch 3 sees null org and redirects back to /sign-up, creating an infinite loop. This is the most critical bug blocking all new user registration.",
+      "complexity": "low",
+      "complexity_reason": "Single-file fix with a clear root cause -- add one async call after org creation",
+      "model": "sonnet",
+      "model_escalation": ["opus", "opus", "opus"],
+      "estimate_minutes": 15,
+      "tools_to_use": [
+        {
+          "name": "authenticating-with-better-auth",
+          "type": "skill",
+          "relevance_percent": 95,
+          "purpose": "Better Auth org plugin API"
+        }
+      ],
+      "core_tools": ["Read", "Edit", "Bash"],
+      "features": [
+        {
+          "id": "1.1",
+          "wave": 1,
+          "name": "Add organization.setActive() after org creation",
+          "description": "Call await organization.setActive({ organizationId: orgResult.data.id }) immediately after successful organization.create() in sign-up/page.tsx, before router.push(). This populates activeOrganizationId in the session so middleware Branch 3 does not redirect back to /sign-up.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        },
+        {
+          "id": "1.2",
+          "wave": 1,
+          "name": "Add error handling for setActive failure",
+          "description": "Wrap organization.setActive() in error handling. If setActive fails, show user-facing error and do not redirect, preventing the user from landing in a broken state.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "apps/web/src/app/(auth)/sign-up/page.tsx"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Cross-Portal Enforcement in Middleware",
+      "objective": "Enforce that hospital users can only access /hospital/* routes and provider users can only access /provider/* routes by extracting org_type from the Better Auth session response and validating it against the current portal path in middleware Branch 4.",
+      "purpose_narrative": "WHY: Currently middleware Branch 4 just calls NextResponse.next() for any authenticated user with an active organization, meaning a hospital user can freely access /provider/* routes and vice versa. This is a security boundary violation. The session API already returns activeOrganization.metadata but middleware ignores it.",
+      "complexity": "medium",
+      "complexity_reason": "Requires understanding Better Auth session response shape, extending middleware type parsing, and adding portal-to-orgType validation logic across 3 files",
+      "model": "sonnet",
+      "model_escalation": ["opus", "opus", "opus"],
+      "estimate_minutes": 30,
+      "tools_to_use": [
+        {
+          "name": "authenticating-with-better-auth",
+          "type": "skill",
+          "relevance_percent": 92,
+          "purpose": "Session response shape"
+        },
+        {
+          "name": "developing-with-nextjs",
+          "type": "skill",
+          "relevance_percent": 78,
+          "purpose": "Edge middleware patterns"
+        }
+      ],
+      "core_tools": ["Read", "Edit", "Bash"],
+      "features": [
+        {
+          "id": "2.1",
+          "wave": 2,
+          "name": "Extend getSessionData() to extract orgType from session",
+          "description": "Update the session API response type in middleware.ts to capture session.activeOrganization.metadata.org_type. Parse this field and include it in the MiddlewareSessionData return value so Branch 4 can use it for portal validation.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        },
+        {
+          "id": "2.2",
+          "wave": 2,
+          "name": "Update MiddlewareSessionData interface",
+          "description": "In portal-routing.ts, the orgType field already exists on MiddlewareSessionData but is never populated. Ensure the middleware populates it from the parsed session data. No interface change needed, just data flow fix.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        },
+        {
+          "id": "2.3",
+          "wave": 2,
+          "name": "Add portal-to-orgType validation helper",
+          "description": "Create a validatePortalAccess() function in portal-routing.ts that maps portal paths to expected orgType values (hospital portal requires orgType 'hospital', provider portal requires orgType 'provider'). Returns the correct redirect URL if mismatched.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        },
+        {
+          "id": "2.4",
+          "wave": 2,
+          "name": "Enforce cross-portal check in middleware Branch 4",
+          "description": "Replace the unconditional NextResponse.next() in Branch 4 with a call to validatePortalAccess(). If the user's orgType does not match the current portal, redirect them to their correct portal dashboard. Also fix the root path '/' redirect to go to the user's correct dashboard instead of /sign-in.",
+          "status": "pending",
+          "priority": "critical",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "apps/web/src/middleware.ts",
+        "apps/web/src/lib/portal-routing.ts"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Sign-In CallbackURL + Header Cleanup",
+      "objective": "Fix sign-in page to respect the returnTo query parameter instead of hardcoding /hospital/dashboard, and remove the unused navItems prop from Header component to eliminate dead code.",
+      "purpose_narrative": "WHY: The middleware correctly sets returnTo when redirecting unauthenticated users, but sign-in ignores it and always routes to /hospital/dashboard. This breaks the user experience for provider users and for any deep-link return. The Header navItems cleanup is grouped here because both are small, low-risk changes to the same UI layer.",
+      "complexity": "low",
+      "complexity_reason": "Two small, independent fixes in UI components with no cross-file dependencies",
+      "model": "sonnet",
+      "model_escalation": ["opus", "opus", "opus"],
+      "estimate_minutes": 15,
+      "tools_to_use": [
+        {
+          "name": "developing-with-nextjs",
+          "type": "skill",
+          "relevance_percent": 75,
+          "purpose": "useSearchParams usage"
+        }
+      ],
+      "core_tools": ["Read", "Edit", "Bash"],
+      "features": [
+        {
+          "id": "3.1",
+          "wave": 3,
+          "name": "Read returnTo param in sign-in page",
+          "description": "Import useSearchParams from next/navigation and read the returnTo query parameter. Use it as the callbackURL for signIn.email() and router.push(), falling back to '/' when returnTo is absent. This ensures users return to their intended page after authentication.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.2",
+          "wave": 3,
+          "name": "Wrap sign-in page in Suspense for useSearchParams",
+          "description": "Next.js App Router requires a Suspense boundary when using useSearchParams in a client component. Extract the form into a SignInForm component and wrap it in Suspense in the default export to avoid the build warning.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "3.3",
+          "wave": 3,
+          "name": "Remove navItems from HeaderProps and call sites",
+          "description": "Remove navItems from the HeaderProps interface in header.tsx (it is declared but never used in the component body). Remove navItems={navItems} from the <Header> call in portal-layout.tsx. Remove the NavItem import from header.tsx if no longer needed.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "apps/web/src/app/(auth)/sign-in/page.tsx",
+        "apps/web/src/components/layout/header.tsx",
+        "apps/web/src/components/layout/portal-layout.tsx"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "PortalLayout Server Component Refactor",
+      "objective": "Convert PortalLayout from a client component to a server component by extracting the mobile nav open/close state into a dedicated MobileNavController client component. This allows portal layout pages to remain server-rendered.",
+      "purpose_narrative": "WHY: The 'use client' directive on PortalLayout forces all children (every portal page) into the client bundle, increasing JS payload and preventing server-side rendering of portal content. The only client state is a single boolean for mobile nav visibility, which can be isolated into a small client wrapper.",
+      "complexity": "medium",
+      "complexity_reason": "Requires creating a new component, moving state management, and updating the parent component while preserving the exact same visual behavior and prop flow",
+      "model": "sonnet",
+      "model_escalation": ["opus", "opus", "opus"],
+      "estimate_minutes": 25,
+      "tools_to_use": [
+        {
+          "name": "developing-with-nextjs",
+          "type": "skill",
+          "relevance_percent": 88,
+          "purpose": "Server/client component boundary"
+        }
+      ],
+      "core_tools": ["Read", "Edit", "Write", "Bash"],
+      "features": [
+        {
+          "id": "4.1",
+          "wave": 4,
+          "name": "Create MobileNavController client component",
+          "description": "Create apps/web/src/components/layout/mobile-nav-controller.tsx as a 'use client' component that owns the mobileNavOpen state (useState). It receives navItems, orgName, locale, children as props and renders Sidebar + Header + main + MobileNav, exactly matching the current PortalLayout JSX structure.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "4.2",
+          "wave": 4,
+          "name": "Convert PortalLayout to server component",
+          "description": "Remove 'use client' and useState import from portal-layout.tsx. Simplify it to render the outer flex container div and delegate to <MobileNavController> for all client-side interactivity. This makes PortalLayout a thin server component wrapper.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "4.3",
+          "wave": 4,
+          "name": "Update barrel export in layout/index.ts",
+          "description": "Add export { MobileNavController } from './mobile-nav-controller' to the layout barrel file so the new component is available for direct imports if needed.",
+          "status": "pending",
+          "priority": "medium",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "apps/web/src/components/layout/mobile-nav-controller.tsx",
+        "apps/web/src/components/layout/portal-layout.tsx",
+        "apps/web/src/components/layout/index.ts"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Dead Code Cleanup + Typecheck Verification",
+      "objective": "Remove unused PROTECTED_ROUTES export from auth middleware package and run full typecheck + build to verify all changes compile correctly across the monorepo.",
+      "purpose_narrative": "WHY: PROTECTED_ROUTES is exported from packages/auth/src/middleware.ts but never imported anywhere. Dead exports add confusion and suggest unused architectural intent. Final typecheck ensures all 4 waves of changes integrate correctly before PR.",
+      "complexity": "low",
+      "complexity_reason": "Single deletion plus verification commands -- no logic changes",
+      "model": "sonnet",
+      "model_escalation": ["opus", "opus", "opus"],
+      "estimate_minutes": 15,
+      "tools_to_use": [],
+      "core_tools": ["Read", "Edit", "Bash"],
+      "features": [
+        {
+          "id": "5.1",
+          "wave": 5,
+          "name": "Remove unused PROTECTED_ROUTES export",
+          "description": "Delete the PROTECTED_ROUTES constant and its JSDoc comment from packages/auth/src/middleware.ts. Grep confirms nothing imports it. Also remove the requiresAuth function if similarly unused.",
+          "status": "pending",
+          "priority": "medium",
+          "tests_required": false
+        },
+        {
+          "id": "5.2",
+          "wave": 5,
+          "name": "Run pnpm typecheck across monorepo",
+          "description": "Execute pnpm typecheck from project root to verify all TypeScript compiles. This validates that Header prop removal, portal-layout refactor, middleware type changes, and sign-in/sign-up edits are all type-safe.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        },
+        {
+          "id": "5.3",
+          "wave": 5,
+          "name": "Run pnpm build to verify production build",
+          "description": "Execute pnpm build from project root. This catches any SSR/CSR boundary issues introduced by the PortalLayout refactor and ensures the middleware compiles for Edge runtime.",
+          "status": "pending",
+          "priority": "high",
+          "tests_required": false
+        }
+      ],
+      "tests": [],
+      "files": [
+        "packages/auth/src/middleware.ts"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "1.1",
+      "wave": 1,
+      "name": "Add organization.setActive() after org creation",
+      "description": "Call await organization.setActive({ organizationId: orgResult.data.id }) immediately after successful organization.create() in sign-up/page.tsx, before router.push().",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "1.2",
+      "wave": 1,
+      "name": "Add error handling for setActive failure",
+      "description": "Wrap organization.setActive() in error handling with user-facing error message.",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.1",
+      "wave": 2,
+      "name": "Extend getSessionData() to extract orgType from session",
+      "description": "Update middleware session response type to capture session.activeOrganization.metadata.org_type.",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.2",
+      "wave": 2,
+      "name": "Update MiddlewareSessionData population",
+      "description": "Populate the existing orgType field in MiddlewareSessionData from parsed session data.",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.3",
+      "wave": 2,
+      "name": "Add portal-to-orgType validation helper",
+      "description": "Create validatePortalAccess() in portal-routing.ts to map portals to expected orgType values.",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "2.4",
+      "wave": 2,
+      "name": "Enforce cross-portal check in middleware Branch 4",
+      "description": "Replace NextResponse.next() in Branch 4 with portal access validation and redirect.",
+      "status": "pending",
+      "priority": "critical",
+      "tests_required": false
+    },
+    {
+      "id": "3.1",
+      "wave": 3,
+      "name": "Read returnTo param in sign-in page",
+      "description": "Use useSearchParams to read returnTo and use it as callbackURL instead of hardcoded path.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.2",
+      "wave": 3,
+      "name": "Wrap sign-in page in Suspense for useSearchParams",
+      "description": "Extract form into SignInForm component, wrap in Suspense to satisfy Next.js App Router requirement.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "3.3",
+      "wave": 3,
+      "name": "Remove navItems from HeaderProps and call sites",
+      "description": "Remove unused navItems from HeaderProps interface and <Header> call in portal-layout.tsx.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.1",
+      "wave": 4,
+      "name": "Create MobileNavController client component",
+      "description": "New client component that owns mobileNavOpen state, renders Sidebar+Header+main+MobileNav.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.2",
+      "wave": 4,
+      "name": "Convert PortalLayout to server component",
+      "description": "Remove 'use client' from portal-layout.tsx, delegate to MobileNavController.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "4.3",
+      "wave": 4,
+      "name": "Update barrel export in layout/index.ts",
+      "description": "Add MobileNavController export to layout barrel file.",
+      "status": "pending",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "5.1",
+      "wave": 5,
+      "name": "Remove unused PROTECTED_ROUTES export",
+      "description": "Delete PROTECTED_ROUTES and requiresAuth from packages/auth/src/middleware.ts.",
+      "status": "pending",
+      "priority": "medium",
+      "tests_required": false
+    },
+    {
+      "id": "5.2",
+      "wave": 5,
+      "name": "Run pnpm typecheck across monorepo",
+      "description": "Verify all TypeScript compiles after all waves of changes.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    },
+    {
+      "id": "5.3",
+      "wave": 5,
+      "name": "Run pnpm build to verify production build",
+      "description": "Run full build to catch SSR/CSR boundary issues and Edge runtime compatibility.",
+      "status": "pending",
+      "priority": "high",
+      "tests_required": false
+    }
+  ],
+  "meta": {
+    "exp_version": "2026.02",
+    "git_integration": {
+      "worktree_enabled": true,
+      "worktree_path": "/home/sangle/dev/worktrees/m0-6-auth-followup-fixes",
+      "branch_name": "fix/m0-6-auth-followup-fixes",
+      "base_branch": "main",
+      "project_root": "/home/sangle/dev/medilink-convex"
+    },
+    "async_strategy": "sequential",
+    "key_findings": [
+      "CRITICAL: sign-up/page.tsx calls organization.create() but never calls organization.setActive() -- session.activeOrganizationId stays null, triggering middleware Branch 3 infinite redirect to /sign-up",
+      "CRITICAL: middleware Branch 4 allows any authenticated user with an org to access any portal -- no cross-portal validation. Better Auth session API returns activeOrganization.metadata.org_type but middleware ignores it",
+      "HIGH: sign-in/page.tsx hardcodes callbackURL='/hospital/dashboard' and ignores the returnTo query param that middleware sets when redirecting unauthenticated users",
+      "HIGH: Header component declares navItems in interface but never uses it in the function body -- dead prop",
+      "HIGH: PortalLayout uses 'use client' solely for useState(false) -- forces all portal page children into the client bundle",
+      "MEDIUM: PROTECTED_ROUTES exported from packages/auth/src/middleware.ts but never imported anywhere"
+    ],
+    "key_sources": [
+      {"index": 1, "path": "apps/web/src/app/(auth)/sign-up/page.tsx", "description": "Sign-up page with missing setActive() call (CRITICAL 1)"},
+      {"index": 2, "path": "apps/web/src/middleware.ts", "description": "Portal routing middleware with Branch 3/4 logic"},
+      {"index": 3, "path": "apps/web/src/lib/portal-routing.ts", "description": "Portal routing utilities and MiddlewareSessionData type"},
+      {"index": 4, "path": "apps/web/src/app/(auth)/sign-in/page.tsx", "description": "Sign-in page with hardcoded callbackURL"},
+      {"index": 5, "path": "apps/web/src/components/layout/header.tsx", "description": "Header with unused navItems prop"},
+      {"index": 6, "path": "apps/web/src/components/layout/portal-layout.tsx", "description": "PortalLayout with unnecessary 'use client'"},
+      {"index": 7, "path": "packages/auth/src/client.ts", "description": "Auth client exports (confirms organization.setActive is available)"},
+      {"index": 8, "path": "packages/auth/src/middleware.ts", "description": "Auth middleware with unused PROTECTED_ROUTES export"},
+      {"index": 9, "path": "convex/auth.ts", "description": "Convex auth config with JWT definePayload"}
+    ],
+    "explore_agents": 3,
+    "standards_context": {
+      "has_standards": false,
+      "source": "not_found",
+      "standards_path": "",
+      "applicable_standards": [],
+      "domains": []
+    },
+    "memory_context": {
+      "has_memories": false,
+      "memories": []
+    },
+    "github_integration": {
+      "has_structured_requirements": false,
+      "issue_number": null,
+      "source": "not_linked"
+    }
+  }
+}

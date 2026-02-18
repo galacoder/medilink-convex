@@ -55,7 +55,7 @@ export function MobileNav({
                 href={item.href}
                 onClick={() => onOpenChange(false)}
                 className={cn(
-                  "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                  "hover:bg-accent hover:text-accent-foreground flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                     : "text-muted-foreground",
@@ -64,7 +64,7 @@ export function MobileNav({
                 <Icon className="h-5 w-5 shrink-0" />
                 <span>{item.label[locale]}</span>
                 {item.badge && (
-                  <span className="ml-auto rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium">
+                  <span className="bg-primary/20 ml-auto rounded-full px-2 py-0.5 text-xs font-medium">
                     {item.badge}
                   </span>
                 )}

@@ -1,0 +1,316 @@
+{
+  "exploration_focus": "database-schema",
+  "task": "M1-1: Core Convex Schema — All 8 MIGRATE Plugin Domains",
+  "timestamp": "2026-02-17T23:53:42Z",
+  "findings": {
+    "relevant_files": [
+      {
+        "path": "/home/sangle/dev/medilink-convex/convex/schema.ts",
+        "relevance": 100,
+        "reason": "Canonical Convex schema definition with existing tables: organizations, organizationMemberships, users. Defines all Convex conventions: v.id(), v.union(), indexes by_<field>, timestamps as v.number() epoch ms."
+      },
+      {
+        "path": "/home/sangle/dev/medilink-convex/packages/validators/src/organizations.ts",
+        "relevance": 95,
+        "reason": "Zod validator patterns for organization domain. Shows bilingual validation messages (Vietnamese/English), enum patterns, and input/output schemas. Template for validators package."
+      },
+      {
+        "path": "/home/sangle/dev/medilink-convex/packages/db/src/schema.ts",
+        "relevance": 90,
+        "reason": "Database schema reference stub. Canonical schema location documented here. Link between Convex and validators packages."
+      },
+      {
+        "path": "/home/sangle/dev/medilink-convex/packages/validators/src/auth.ts",
+        "relevance": 85,
+        "reason": "Auth validators showing bilingual pattern, enum usage (orgTypeSchema), extended schemas (orgSignUpSchema). Reusable pattern for feature-specific validators."
+      },
+      {
+        "path": "/home/sangle/dev/medilink-convex/docs/migration/medilink-plugin-audit.md",
+        "relevance": 100,
+        "reason": "Complete plugin inventory, 8 MIGRATE domains with database tables, dependency map, and Convex migration roadmap. Maps 8 plugins to 8 feature modules."
+      },
+      {
+        "path": "/home/sangle/dev/project-medilink/packages/plugins/equipment/backend/schema.ts",
+        "relevance": 95,
+        "reason": "Legacy equipment schema (Drizzle ORM): 6 tables with enums, indexes, FK references. Reference for Convex mapping. Shows multi-tenant isolation via organizationId."
+      },
+      {
+        "path": "/home/sangle/dev/project-medilink/packages/plugins/service-requests/backend/schema.ts",
+        "relevance": 95,
+        "reason": "Legacy service-requests schema: 4 tables with enum statuses (pending→quoted→accepted→in_progress→completed). Reference for Convex mapping."
+      },
+      {
+        "path": "/home/sangle/dev/project-medilink/packages/plugins/qr-code/backend/schema.ts",
+        "relevance": 90,
+        "reason": "Legacy QR-code schema: 2 tables (pluginQrScanLogs, pluginQrLabelTemplates). Simple reference for Convex mapping."
+      },
+      {
+        "path": "/home/sangle/dev/project-medilink/packages/plugins/consumables/backend/schema.ts",
+        "relevance": 90,
+        "reason": "Legacy consumables schema: Multiple enums (consumableCategoryType, consumableRelationship, consumableAlertType, alertSeverity, transactionType). Complex status tracking model."
+      },
+      {
+        "path": "/home/sangle/dev/medilink-convex/convex/auth.ts",
+        "relevance": 85,
+        "reason": "Better Auth integration with Convex. Shows query pattern (getCurrentUser), JWT payload enrichment with organizationId and platformRole for auth-gated Convex queries."
+      }
+    ],
+    "existing_schema_tables": [
+      "organizations",
+      "organizationMemberships",
+      "users"
+    ],
+    "validator_patterns": [
+      {
+        "pattern": "Bilingual enums",
+        "example": "orgTypeSchema = z.enum(['hospital', 'provider']); with comments vi:'Loại tổ chức' en:'Organization type'",
+        "files": ["packages/validators/src/organizations.ts", "packages/validators/src/auth.ts"]
+      },
+      {
+        "pattern": "Bilingual validation messages",
+        "example": "z.string().min(2, { message: 'Tên phải có ít nhất 2 ký tự (Name must be at least 2 characters)' })",
+        "files": ["packages/validators/src/organizations.ts", "packages/validators/src/auth.ts"]
+      },
+      {
+        "pattern": "Extended schemas (partial updates)",
+        "example": "updateOrganizationSchema = createOrganizationSchema.partial()",
+        "files": ["packages/validators/src/organizations.ts"]
+      },
+      {
+        "pattern": "Input/output type inference",
+        "example": "export type CreateOrganizationInput = z.infer<typeof createOrganizationSchema>",
+        "files": ["packages/validators/src/organizations.ts"]
+      },
+      {
+        "pattern": "Auth schema composition",
+        "example": "orgSignUpSchema = signUpSchema.extend({ orgName: z.string(), org_type: orgTypeSchema })",
+        "files": ["packages/validators/src/auth.ts"]
+      }
+    ],
+    "legacy_schema_info": {
+      "location": "/home/sangle/dev/project-medilink/packages/plugins/",
+      "status": "READ-ONLY reference for migration",
+      "orm": "Drizzle ORM + PostgreSQL (pgTable, pgEnum, pgCore)",
+      "pattern": "One schema.ts per plugin with: enums, tables, FK references, indexes, type exports ($inferInsert, $inferSelect)",
+      "estimated_tables": "35-40 tables across 15 plugins (8 MIGRATE + 4 REBUILD + 3 DISCARD)",
+      "key_patterns": [
+        "Multi-tenant isolation via organizationId foreign key to organizations.id",
+        "Timestamps: createdAt, updatedAt (timestamp fields, defaultNow())",
+        "Status enums for domain workflows (equipment_status, service_request_status, etc.)",
+        "JSON metadata columns (jsonb) for flexible data storage",
+        "Performance indexes on FK + query paths (by_<field> naming convention)",
+        "Type exports for ORM integration ($inferInsert, $inferSelect)"
+      ]
+    },
+    "convex_patterns_established": [
+      {
+        "pattern": "Table definition",
+        "example": "defineTable({ field: v.string(), createdAt: v.number(), updatedAt: v.number() })",
+        "source": "convex/schema.ts"
+      },
+      {
+        "pattern": "Enum as union type",
+        "example": "org_type: v.union(v.literal('hospital'), v.literal('provider'))",
+        "source": "convex/schema.ts"
+      },
+      {
+        "pattern": "Foreign key reference",
+        "example": "orgId: v.id('organizations')",
+        "source": "convex/schema.ts"
+      },
+      {
+        "pattern": "Index naming convention",
+        "example": ".index('by_org', ['orgId']), .index('by_slug', ['slug'])",
+        "source": "convex/schema.ts"
+      },
+      {
+        "pattern": "Timestamps as epoch milliseconds",
+        "example": "createdAt: v.number(), updatedAt: v.number() (store as epoch ms)",
+        "source": "convex/schema.ts and CLAUDE.md"
+      },
+      {
+        "pattern": "Auth-gated queries",
+        "example": "const getCurrentUser = query({ args: {}, handler: async (ctx) => authComponent.getAuthUser(ctx) })",
+        "source": "convex/auth.ts"
+      },
+      {
+        "pattern": "JWT payload enrichment",
+        "example": "definePayload includes organizationId, platformRole for auth checks in Convex functions",
+        "source": "convex/auth.ts"
+      }
+    ],
+    "migration_plugin_domains": [
+      {
+        "plugin": "equipment",
+        "legacy_tables": 6,
+        "target_path": "apps/web/src/features/equipment/",
+        "key_tables": [
+          "equipment_items",
+          "equipment_categories",
+          "equipment_history",
+          "equipment_maintenance",
+          "equipment_failures"
+        ],
+        "enums": ["equipmentStatus", "equipmentCriticality"],
+        "multi_tenant": true,
+        "dependencies": 4
+      },
+      {
+        "plugin": "service-requests",
+        "legacy_tables": 4,
+        "target_path": "apps/web/src/features/service-requests/",
+        "key_tables": [
+          "service_requests",
+          "service_quotes",
+          "service_ratings",
+          "service_request_history"
+        ],
+        "enums": [
+          "serviceRequestStatus",
+          "serviceRequestType",
+          "serviceRequestPriority",
+          "quoteStatus"
+        ],
+        "multi_tenant": true,
+        "dependencies": 5
+      },
+      {
+        "plugin": "qr-code",
+        "legacy_tables": 2,
+        "target_path": "apps/web/src/features/qr-code/",
+        "key_tables": ["qr_scan_logs", "qr_label_templates"],
+        "enums": [],
+        "multi_tenant": true,
+        "dependencies": 4
+      },
+      {
+        "plugin": "providers",
+        "legacy_tables": 1,
+        "target_path": "apps/web/src/features/providers/",
+        "key_tables": ["providers"],
+        "enums": [],
+        "multi_tenant": true,
+        "dependencies": 3
+      },
+      {
+        "plugin": "consumables",
+        "legacy_tables": 4,
+        "target_path": "apps/web/src/features/consumables/",
+        "key_tables": [
+          "consumables_categories",
+          "consumables_items",
+          "consumables_lots",
+          "consumables_transactions"
+        ],
+        "enums": [
+          "consumableCategoryType",
+          "consumableRelationship",
+          "consumableAlertType",
+          "alertSeverity",
+          "transactionType"
+        ],
+        "multi_tenant": true,
+        "dependencies": 4
+      },
+      {
+        "plugin": "consumer-mgmt",
+        "legacy_tables": 1,
+        "target_path": "apps/web/src/features/consumer-mgmt/",
+        "key_tables": ["consumers"],
+        "enums": [],
+        "multi_tenant": true,
+        "dependencies": 2
+      },
+      {
+        "plugin": "disputes",
+        "legacy_tables": 2,
+        "target_path": "apps/web/src/features/disputes/",
+        "key_tables": ["disputes", "dispute_resolutions"],
+        "enums": ["disputeStatus", "resolutionOutcome"],
+        "multi_tenant": true,
+        "dependencies": 3
+      },
+      {
+        "plugin": "audit-log",
+        "legacy_tables": 1,
+        "target_path": "apps/web/src/features/audit-log/",
+        "key_tables": ["audit_logs"],
+        "enums": ["auditAction", "auditResource"],
+        "multi_tenant": true,
+        "dependencies": 2
+      }
+    ]
+  },
+  "key_insights": [
+    "Current Convex schema is minimal (3 tables: organizations, organizationMemberships, users). Provides clean foundation for 8 MIGRATE domains.",
+    "8 MIGRATE plugins map directly to 8 feature modules. Legacy Drizzle schemas (35-40 tables) require conversion to Convex v.* validators.",
+    "Bilingual pattern is established in validators (Vietnamese primary, English secondary). All new domain validators must follow this pattern.",
+    "Multi-tenancy via organizationId is mandatory across all 8 domains. Convex queries must enforce organizationId isolation.",
+    "Status enum workflows are central to service-requests, disputes, and equipment domains. Use v.union(v.literal()) pattern with comprehensive status lifecycle.",
+    "Timestamps convention: Convex uses v.number() epoch milliseconds. All 8 domains must follow this (no date objects).",
+    "Indexes follow by_<field> naming convention. Critical for performance: by_org, by_user, by_org_and_user for multi-tenant queries.",
+    "Better Auth integration enriches JWT with organizationId and platformRole, enabling auth-gated Convex queries without additional lookups.",
+    "Metadata flexibility: Legacy schemas use jsonb for flexible data. Convex uses v.any() or custom objects for similar flexibility.",
+    "Auth pattern established: queries must use authComponent.getAuthUser(ctx) or extract organizationId from JWT payload.",
+    "Feature module structure (colocated in apps/web/src/features/) replaces plugin package architecture. No @repo/equipment package needed.",
+    "Convex conventions are documented in CLAUDE.md: v.id(), v.union(), by_* indexes, timestamps as v.number(), createdAt/updatedAt on all tables."
+  ],
+  "recommendations": [
+    "Start with equipment domain: 6 tables, 2 enums, well-isolated business logic. Serves as template for other 7 domains.",
+    "Create packages/validators/<domain>.ts for each of 8 domains. Reuse bilingual pattern from organizations.ts and auth.ts.",
+    "Map legacy Drizzle pgEnum to Convex v.union(v.literal()). Example: equipmentStatusEnum → status: v.union(v.literal('operational'), v.literal('maintenance'), ...).",
+    "Ensure all 8 domains include createdAt/updatedAt (v.number() epoch ms) and organizationId (v.id('organizations')) for multi-tenancy.",
+    "Index strategy: by_org, by_user, by_org_and_user for all tables. Add domain-specific indexes (e.g., by_equipment_id for service-requests).",
+    "Create Convex query/mutation helpers that extract organizationId from JWT context automatically. Reduces boilerplate in domain implementations.",
+    "Test multi-tenant isolation: ensure queries filter by organizationId from JWT, not from user input.",
+    "Bilingual error messages: All Zod schemas in packages/validators/ must include Vietnamese + English validation messages.",
+    "Reference legacy schemas for field names and relationships, but adapt to Convex idioms (no foreign key constraints in schema, enforce in queries).",
+    "Plan Phase 2 migration order: equipment first, then service-requests (depends on equipment), then qr-code, providers, consumables, consumer-mgmt, disputes, audit-log."
+  ],
+  "risks": [
+    "Schema mapping complexity: 35-40 Drizzle tables → Convex schema requires careful field-by-field validation. Risk: missed fields or type mismatches.",
+    "Multi-tenancy enforcement: Queries must filter organizationId from JWT, not user input. Risk: authorization bypass if not consistently applied.",
+    "Enum migration: Drizzle pgEnum → Convex v.union(v.literal()). Risk: incomplete status coverage or typos in literal values.",
+    "Timestamp format: Legacy uses Drizzle timestamp (ISO 8601). Convex uses epoch ms. Risk: data loss or comparison errors if not consistently converted.",
+    "Metadata flexibility: Legacy uses jsonb columns. Convex v.any() is less type-safe. Risk: runtime errors from unexpected data shapes.",
+    "Cross-domain dependencies: service-requests depends on equipment. Risk: migration order matters; must migrate equipment before service-requests.",
+    "Query performance: No automatic FK joins in Convex. Risk: N+1 queries if not carefully planned. Indexes by_equipment_id critical.",
+    "Bilingual content: UI labels require Vietnamese + English. Risk: incomplete translations or inconsistent terminology across domains.",
+    "Test coverage: Legacy plugins may lack comprehensive tests. Risk: unknown bugs during migration. Recommend adding tests during rewrite.",
+    "Backwards compatibility: Once deployed, changing Convex schema is hard. Risk: breaking changes to production data. Plan schema carefully before deployment."
+  ],
+  "convex_schema_structure": {
+    "patterns": [
+      "All tables have createdAt/updatedAt as v.number() (epoch ms)",
+      "All tables have multi-tenant scope via organizationId: v.id('organizations')",
+      "Enums are v.union(v.literal('a'), v.literal('b'), ...) not Drizzle pgEnum",
+      "No explicit FK constraints in schema (enforced in query logic)",
+      "Indexes use by_<field> naming convention for discoverability",
+      "Timestamps never use dates; always epoch milliseconds",
+      "Nullable fields use v.optional()",
+      "Metadata/flexible fields use v.any() (but type-check in Zod validators)"
+    ],
+    "file_locations": {
+      "schema_canonical": "/home/sangle/dev/medilink-convex/convex/schema.ts",
+      "validators_package": "/home/sangle/dev/medilink-convex/packages/validators/src/",
+      "db_reference": "/home/sangle/dev/medilink-convex/packages/db/src/schema.ts",
+      "auth_integration": "/home/sangle/dev/medilink-convex/convex/auth.ts"
+    }
+  },
+  "table_count_estimate": {
+    "current_convex": 3,
+    "8_migrate_domains": 23,
+    "total_post_m1_1": 26,
+    "breakdown": {
+      "equipment": 6,
+      "service_requests": 4,
+      "qr_code": 2,
+      "providers": 1,
+      "consumables": 4,
+      "consumer_mgmt": 1,
+      "disputes": 2,
+      "audit_log": 1,
+      "core_existing": 3
+    }
+  }
+}

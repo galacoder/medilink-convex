@@ -8,10 +8,8 @@
 export default function PlatformAdminDashboardPage() {
   return (
     <div>
-      <h1 className="text-2xl font-semibold">
-        Tổng quan {/* Dashboard */}
-      </h1>
-      <p className="mt-2 text-muted-foreground">
+      <h1 className="text-2xl font-semibold">Tổng quan {/* Dashboard */}</h1>
+      <p className="text-muted-foreground mt-2">
         Chào mừng đến Cổng quản lý nền tảng MediLink
         {/* Welcome to MediLink Platform Admin Portal */}
       </p>

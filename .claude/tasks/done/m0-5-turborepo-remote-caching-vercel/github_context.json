@@ -1,0 +1,36 @@
+{
+  "issue_number": 50,
+  "title": "M0-5: Turborepo Remote Caching + Vercel Deployment",
+  "labels": ["type:scaffold", "priority:medium", "milestone:M0", "area:infra"],
+  "milestone": "M0: Infrastructure Setup",
+  "has_structured_requirements": true,
+  "acceptance_criteria": [
+    "Turborepo remote cache configured (homelab or Vercel)",
+    "turbo.json has correct outputs for all tasks",
+    "Second build is cache-hit (under 5 seconds for unchanged packages)",
+    "Vercel project linked to medilink-convex repo",
+    "Preview deploys trigger on every PR",
+    "Production deploy triggers on push to main",
+    "Environment variables configured in Vercel (CONVEX_URL, auth secrets)",
+    "Custom domain configured (if available)",
+    "TypeScript types pass pnpm typecheck with zero errors"
+  ],
+  "files_to_modify": [
+    {"file": "turbo.json", "action": "Modify", "purpose": "Add outputs arrays for all tasks to enable remote caching"},
+    {"file": "apps/web/next.config.ts", "action": "Modify", "purpose": "Ensure Vercel-compatible Next.js build configuration"},
+    {"file": ".env.example", "action": "Modify", "purpose": "Document all required Vercel env vars (CONVEX_URL, auth secrets)"},
+    {"file": "vercel.json", "action": "Create (optional)", "purpose": "Vercel project config (build command, root directory override)"}
+  ],
+  "technical_spec": [
+    "Configure Turborepo remote cache (Vercel remote cache or self-hosted)",
+    "Link Vercel project to GitHub repo",
+    "Configure build command: cd apps/web && pnpm build",
+    "Set environment variables in Vercel dashboard",
+    "Test preview deploy with a test PR"
+  ],
+  "dependencies": {
+    "depends_on": ["M0-1 (#46) — working monorepo required for Vercel project setup"],
+    "blocks": "None directly — enables faster CI/CD for all subsequent milestones"
+  },
+  "effort": {"story_points": 3, "tshirt": "S"}
+}
