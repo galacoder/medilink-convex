@@ -22,9 +22,12 @@ import { env } from "~/env";
 // Convex URL format:      https://<deployment>.convex.cloud
 // WHY: The site URL is used for server-side auth token validation. If not
 // explicitly configured, we derive it from the deployment URL.
+// NOTE: env vars may be undefined at build-time when CI=true and skipValidation
+// is active. Guard with nullish coalescing to avoid ".replace is not a function".
 const convexSiteUrl =
   env.NEXT_PUBLIC_CONVEX_SITE_URL ??
-  env.NEXT_PUBLIC_CONVEX_URL.replace(".convex.cloud", ".convex.site");
+  env.NEXT_PUBLIC_CONVEX_URL?.replace(".convex.cloud", ".convex.site") ??
+  "";
 
 export const {
   getToken,
