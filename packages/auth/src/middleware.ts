@@ -31,3 +31,13 @@ export function isPublicPath(pathname: string): boolean {
     (path) => pathname === path || pathname.startsWith(`${path}/`),
   );
 }
+
+/**
+ * Check if a pathname requires authentication.
+ *
+ * WHY: Inverse of isPublicPath. Used by middleware to gate access to
+ * protected portal routes (hospital, provider, admin).
+ */
+export function requiresAuth(pathname: string): boolean {
+  return !isPublicPath(pathname);
+}
