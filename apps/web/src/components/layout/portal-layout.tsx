@@ -40,7 +40,6 @@ export function PortalLayout({
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header
           orgName={orgName}
-          navItems={navItems}
           onMobileMenuOpen={() => setMobileNavOpen(true)}
         />
 

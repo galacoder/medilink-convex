@@ -15,12 +15,10 @@ import {
 } from "@medilink/ui/dropdown-menu";
 import { ThemeToggle } from "@medilink/ui/theme";
 
-import type { NavItem } from "./nav-config";
 import { signOut, useSession } from "~/auth/client";
 
 interface HeaderProps {
   orgName?: string;
-  navItems: NavItem[];
   onMobileMenuOpen?: () => void;
 }
 

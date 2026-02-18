@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@medilink/ui/button";
 import {
@@ -20,14 +20,22 @@ import { signIn } from "~/auth/client";
 import { authLabels } from "~/lib/i18n/auth-labels";
 
 /**
- * Sign-in page for all portal users.
+ * Inner sign-in form that reads the returnTo search param.
  *
- * WHY: Single sign-in entry point for all users (hospital, provider, platform admin).
- * After sign-in, middleware routes to the correct portal based on session data.
+ * WHY: useSearchParams() requires a Suspense boundary in Next.js App Router.
+ * Extracted here so the outer SignInPage can wrap it in Suspense without
+ * making the entire page a loading state.
  */
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const labels = authLabels.signIn;
+
+  // WHY: Middleware sets returnTo when redirecting unauthenticated users.
+  // Using it as callbackURL ensures users land on the page they originally
+  // intended to visit instead of always going to /hospital/dashboard.
+  const returnTo = searchParams.get("returnTo");
+  const callbackURL = returnTo ?? "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,7 +50,7 @@ export default function SignInPage() {
     const result = await signIn.email({
       email,
       password,
-      callbackURL: "/hospital/dashboard",
+      callbackURL,
     });
 
     if (result.error) {
@@ -52,7 +60,7 @@ export default function SignInPage() {
     }
 
     // Middleware will redirect to the correct portal based on session
-    router.push("/hospital/dashboard");
+    router.push(callbackURL);
   }
 
   return (
@@ -115,5 +123,20 @@ export default function SignInPage() {
         </CardFooter>
       </form>
     </Card>
+  );
+}
+
+/**
+ * Sign-in page for all portal users.
+ *
+ * WHY: Single sign-in entry point for all users (hospital, provider, platform admin).
+ * After sign-in, middleware routes to the correct portal based on session data.
+ * Suspense boundary is required by Next.js App Router when using useSearchParams.
+ */
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 }
