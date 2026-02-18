@@ -102,10 +102,12 @@ describe("createOrganizationSchema", () => {
     if (!result.success) {
       const nameError = result.error.issues.find((i) => i.path[0] === "name");
       expect(nameError).toBeDefined();
-      expect(
-        nameError!.message.includes("ít nhất 2 ký tự") &&
-          nameError!.message.includes("at least 2 characters"),
-      ).toBe(true);
+      if (nameError) {
+        expect(
+          nameError.message.includes("ít nhất 2 ký tự") &&
+            nameError.message.includes("at least 2 characters"),
+        ).toBe(true);
+      }
     }
   });
 });

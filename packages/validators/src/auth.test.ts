@@ -65,10 +65,12 @@ describe("signUpSchema", () => {
         (i) => i.path[0] === "password",
       );
       expect(passwordError).toBeDefined();
-      expect(
-        passwordError!.message.includes("ít nhất 8 ký tự") &&
-          passwordError!.message.includes("at least 8 characters"),
-      ).toBe(true);
+      if (passwordError) {
+        expect(
+          passwordError.message.includes("ít nhất 8 ký tự") &&
+            passwordError.message.includes("at least 8 characters"),
+        ).toBe(true);
+      }
     }
   });
 
@@ -82,10 +84,12 @@ describe("signUpSchema", () => {
     if (!result.success) {
       const nameError = result.error.issues.find((i) => i.path[0] === "name");
       expect(nameError).toBeDefined();
-      expect(
-        nameError!.message.includes("ít nhất 2 ký tự") &&
-          nameError!.message.includes("at least 2 characters"),
-      ).toBe(true);
+      if (nameError) {
+        expect(
+          nameError.message.includes("ít nhất 2 ký tự") &&
+            nameError.message.includes("at least 2 characters"),
+        ).toBe(true);
+      }
     }
   });
 });
@@ -236,10 +240,12 @@ describe("passwordResetConfirmSchema", () => {
         (i) => i.path[0] === "confirmPassword",
       );
       expect(confirmError).toBeDefined();
-      expect(
-        confirmError!.message.includes("không khớp") &&
-          confirmError!.message.includes("do not match"),
-      ).toBe(true);
+      if (confirmError) {
+        expect(
+          confirmError.message.includes("không khớp") &&
+            confirmError.message.includes("do not match"),
+        ).toBe(true);
+      }
     }
   });
 });
