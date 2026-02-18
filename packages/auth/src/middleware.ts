@@ -20,6 +20,7 @@ export const PUBLIC_PATHS = [
   "/forgot-password",
   "/reset-password",
   "/api/auth",
+  "/invite",
 ] as const;
 
 /**
