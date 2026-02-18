@@ -111,6 +111,17 @@ export const passwordResetConfirmSchema = z
     path: ["confirmPassword"],
   });
 
+/**
+ * Invite acceptance schema.
+ * Used when an invited member accepts an organization invitation.
+ *
+ * vi: "Chấp nhận lời mời" / en: "Accept invitation"
+ */
+export const inviteAcceptSchema = z.object({
+  // vi: "Token không hợp lệ / Invalid token"
+  token: z.string().min(1, "Token không hợp lệ / Invalid token"),
+});
+
 // ---------------------------------------------------------------------------
 // Inferred TypeScript types
 // ---------------------------------------------------------------------------
@@ -124,3 +135,4 @@ export type PasswordResetRequestInput = z.infer<
 export type PasswordResetConfirmInput = z.infer<
   typeof passwordResetConfirmSchema
 >;
+export type InviteAcceptInput = z.infer<typeof inviteAcceptSchema>;

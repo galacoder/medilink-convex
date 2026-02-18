@@ -5,6 +5,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  inviteAcceptSchema,
   orgSignUpSchema,
   passwordResetConfirmSchema,
   passwordResetRequestSchema,
@@ -244,6 +245,46 @@ describe("passwordResetConfirmSchema", () => {
         expect(
           confirmError.message.includes("không khớp") &&
             confirmError.message.includes("do not match"),
+        ).toBe(true);
+      }
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// inviteAcceptSchema
+// ---------------------------------------------------------------------------
+
+describe("inviteAcceptSchema", () => {
+  it("test_inviteAcceptSchema_accepts_valid_token", () => {
+    const result = inviteAcceptSchema.safeParse({
+      token: "invite-token-abc123",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("test_inviteAcceptSchema_rejects_empty_token", () => {
+    const result = inviteAcceptSchema.safeParse({
+      token: "",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("test_inviteAcceptSchema_rejects_missing_token", () => {
+    const result = inviteAcceptSchema.safeParse({});
+    expect(result.success).toBe(false);
+  });
+
+  it("test_inviteAcceptSchema_bilingual_error_messages", () => {
+    const result = inviteAcceptSchema.safeParse({ token: "" });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const tokenError = result.error.issues.find((i) => i.path[0] === "token");
+      expect(tokenError).toBeDefined();
+      if (tokenError) {
+        expect(
+          tokenError.message.includes("không hợp lệ") &&
+            tokenError.message.includes("Invalid token"),
         ).toBe(true);
       }
     }
