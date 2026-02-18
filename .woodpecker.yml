@@ -3,118 +3,105 @@
 # All stages use node:22-alpine to match .nvmrc (Node 22.21.0)
 # Stages 4-5 are placeholders until M1-8 (E2E) and M5-5 (VRT) activate them
 
-variables:
-  - &node_image "node:22-alpine"
-  - &pnpm_cache
-    mount:
-      - /root/.local/share/pnpm/store
-
 when:
-  - event: push
-    branch: main
-  - event: pull_request
+  event: [push, pull_request]
 
-# Stage 1: Lint + Typecheck + Build (quality gate — must pass before tests run)
-lint-typecheck-build:
-  image: *node_image
-  volumes:
-    - *pnpm_cache
-  environment:
-    - TURBO_TEAM
-    - TURBO_TOKEN
-    - CONVEX_DEPLOYMENT
-    - NEXT_PUBLIC_CONVEX_URL
-    - AUTH_SECRET
-    - AUTH_GOOGLE_ID
-    - AUTH_GOOGLE_SECRET
-    - AUTH_REDIRECT_PROXY_URL
-  commands:
-    - apk add --no-cache git
-    - corepack enable
-    - corepack prepare pnpm@10.19.0 --activate
-    - cp .env.ci .env
-    - pnpm install --frozen-lockfile
-    - pnpm lint
-    - pnpm typecheck
-    - pnpm build
+steps:
+  # Stage 1: Lint + Typecheck + Build (quality gate — must pass before tests run)
+  - name: lint-typecheck-build
+    image: node:22-alpine
+    environment:
+      TURBO_TEAM: ""
+      TURBO_TOKEN: ""
+      CONVEX_DEPLOYMENT: ""
+      NEXT_PUBLIC_CONVEX_URL: ""
+      AUTH_SECRET: ""
+      AUTH_GOOGLE_ID: ""
+      AUTH_GOOGLE_SECRET: ""
+      AUTH_REDIRECT_PROXY_URL: ""
+    commands:
+      - apk add --no-cache git
+      - corepack enable
+      - corepack prepare pnpm@10.19.0 --activate
+      - cp .env.ci .env
+      - pnpm install --frozen-lockfile
+      - pnpm lint
+      - pnpm typecheck
+      - pnpm build
 
-# Stage 2: Unit Tests (Vitest)
-unit-tests:
-  image: *node_image
-  volumes:
-    - *pnpm_cache
-  depends_on: [lint-typecheck-build]
-  environment:
-    - TURBO_TEAM
-    - TURBO_TOKEN
-  commands:
-    - corepack enable
-    - corepack prepare pnpm@10.19.0 --activate
-    - pnpm install --frozen-lockfile
-    - pnpm test
+  # Stage 2: Unit Tests (Vitest)
+  - name: unit-tests
+    image: node:22-alpine
+    depends_on: [lint-typecheck-build]
+    environment:
+      TURBO_TEAM: ""
+      TURBO_TOKEN: ""
+    commands:
+      - corepack enable
+      - corepack prepare pnpm@10.19.0 --activate
+      - pnpm install --frozen-lockfile
+      - pnpm test
 
-# Stage 3: Smoke Test (health endpoint verification)
-smoke-test:
-  image: *node_image
-  volumes:
-    - *pnpm_cache
-  depends_on: [unit-tests]
-  environment:
-    - CONVEX_DEPLOYMENT
-    - NEXT_PUBLIC_CONVEX_URL
-    - AUTH_SECRET
-    - AUTH_GOOGLE_ID
-    - AUTH_GOOGLE_SECRET
-    - AUTH_REDIRECT_PROXY_URL
-  commands:
-    - apk add --no-cache wget
-    - corepack enable
-    - corepack prepare pnpm@10.19.0 --activate
-    - cp .env.ci .env
-    - pnpm install --frozen-lockfile
-    - echo "Starting Next.js dev server..."
-    - pnpm -F @medilink/web dev &
-    - echo "Waiting for server to be ready (up to 60 seconds)..."
-    - for i in $(seq 1 30); do wget -q -O /dev/null http://localhost:3000/api/health && echo "Health check passed" && exit 0; sleep 2; echo "Attempt $i/30..."; done
-    - echo "ERROR: Health check failed after 60 seconds" && exit 1
+  # Stage 3: Smoke Test (health endpoint verification)
+  - name: smoke-test
+    image: node:22-alpine
+    depends_on: [unit-tests]
+    environment:
+      CONVEX_DEPLOYMENT: ""
+      NEXT_PUBLIC_CONVEX_URL: ""
+      AUTH_SECRET: ""
+      AUTH_GOOGLE_ID: ""
+      AUTH_GOOGLE_SECRET: ""
+      AUTH_REDIRECT_PROXY_URL: ""
+    commands:
+      - apk add --no-cache wget
+      - corepack enable
+      - corepack prepare pnpm@10.19.0 --activate
+      - cp .env.ci .env
+      - pnpm install --frozen-lockfile
+      - echo "Starting Next.js dev server..."
+      - pnpm -F @medilink/web dev &
+      - echo "Waiting for server to be ready (up to 60 seconds)..."
+      - 'for i in $(seq 1 30); do wget -q -O /dev/null http://localhost:3000/api/health && echo "Health check passed" && exit 0; sleep 2; echo "Attempt $i/30..."; done'
+      - 'echo "ERROR: Health check failed after 60 seconds" && exit 1'
 
-# Stage 4: E2E Tests (placeholder — activated by M1-8 #59)
-e2e-tests:
-  image: *node_image
-  depends_on: [smoke-test]
-  commands:
-    - echo "E2E tests: placeholder stage"
-    - echo "Will be activated by M1-8 (Playwright E2E setup, issue #59)"
-    - echo "Status: SKIP (no tests configured yet)"
+  # Stage 4: E2E Tests (placeholder — activated by M1-8 #59)
+  - name: e2e-tests
+    image: node:22-alpine
+    depends_on: [smoke-test]
+    commands:
+      - 'echo "E2E tests: placeholder stage"'
+      - echo "Will be activated by M1-8 (Playwright E2E setup, issue #59)"
+      - 'echo "Status: SKIP (no tests configured yet)"'
 
-# Stage 5: Visual Regression Testing (placeholder — activated by M5-5 #80)
-vrt:
-  image: *node_image
-  depends_on: [e2e-tests]
-  commands:
-    - echo "VRT: placeholder stage"
-    - echo "Will be activated by M5-5 (VRT baseline setup, issue #80)"
-    - echo "Status: SKIP (no baselines configured yet)"
+  # Stage 5: Visual Regression Testing (placeholder — activated by M5-5 #80)
+  - name: vrt
+    image: node:22-alpine
+    depends_on: [e2e-tests]
+    commands:
+      - 'echo "VRT: placeholder stage"'
+      - echo "Will be activated by M5-5 (VRT baseline setup, issue #80)"
+      - 'echo "Status: SKIP (no baselines configured yet)"'
 
-# Stage 6: Summary Report
-summary:
-  image: *node_image
-  depends_on:
-    - lint-typecheck-build
-    - unit-tests
-    - smoke-test
-    - e2e-tests
-    - vrt
-  when:
-    - status: [success, failure]
-  commands:
-    - echo "================================"
-    - echo "MediLink CI Pipeline Summary"
-    - echo "================================"
-    - echo "Stage 1 (Lint+Typecheck+Build): completed"
-    - echo "Stage 2 (Unit Tests): completed"
-    - echo "Stage 3 (Smoke Test): completed"
-    - echo "Stage 4 (E2E): placeholder (activated by M1-8 #59)"
-    - echo "Stage 5 (VRT): placeholder (activated by M5-5 #80)"
-    - echo "================================"
-    - echo "Pipeline complete"
+  # Stage 6: Summary Report
+  - name: summary
+    image: node:22-alpine
+    depends_on:
+      - lint-typecheck-build
+      - unit-tests
+      - smoke-test
+      - e2e-tests
+      - vrt
+    when:
+      - status: [success, failure]
+    commands:
+      - echo "================================"
+      - echo "MediLink CI Pipeline Summary"
+      - echo "================================"
+      - 'echo "Stage 1 (Lint+Typecheck+Build): completed"'
+      - 'echo "Stage 2 (Unit Tests): completed"'
+      - 'echo "Stage 3 (Smoke Test): completed"'
+      - 'echo "Stage 4 (E2E): placeholder (activated by M1-8 #59)"'
+      - 'echo "Stage 5 (VRT): placeholder (activated by M5-5 #80)"'
+      - echo "================================"
+      - echo "Pipeline complete"
