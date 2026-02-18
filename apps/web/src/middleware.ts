@@ -87,10 +87,7 @@ async function getSessionData(
       platformRole: data.user?.platformRole ?? null,
       activeOrganizationId: data.session?.activeOrganizationId ?? null,
       // Extract org_type from metadata to enforce cross-portal access boundaries
-      orgType:
-        (data.session?.activeOrganization?.metadata?.org_type as
-          | string
-          | undefined) ?? null,
+      orgType: data.session?.activeOrganization?.metadata?.org_type ?? null,
     };
   } catch {
     // If session fetch fails, treat as no session

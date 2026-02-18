@@ -87,7 +87,8 @@ export default function SignUpPage() {
     // WHY: Without setActive(), activeOrganizationId stays null. Middleware Branch 3
     // would redirect back to /sign-up causing an infinite redirect loop.
     const setActiveResult = await organization.setActive({
-      organizationId: orgResult.data!.id,
+      // orgResult.error was checked above, so data is present
+      organizationId: orgResult.data.id,
     });
 
     if (setActiveResult.error) {

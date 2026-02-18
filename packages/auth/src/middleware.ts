@@ -23,34 +23,10 @@ export const PUBLIC_PATHS = [
 ] as const;
 
 /**
- * Protected route patterns and their required roles.
- * Used by the middleware to enforce role-based access control.
- *
- * Route groups in Next.js:
- * - (platform-admin): Platform admin/support only → /admin/*
- * - (hospital): Hospital org members → /hospital/*
- * - (provider): Provider org members → /provider/*
- * - (auth): Public auth pages → /sign-in, /sign-up, etc.
- * - (marketing): Public pages → /, /about, etc.
- */
-export const PROTECTED_ROUTES = {
-  admin: "/admin",
-  hospital: "/hospital",
-  provider: "/provider",
-} as const;
-
-/**
  * Check if a pathname is a public path that doesn't require auth.
  */
 export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`),
   );
-}
-
-/**
- * Check if a pathname requires authentication.
- */
-export function requiresAuth(pathname: string): boolean {
-  return !isPublicPath(pathname);
 }
