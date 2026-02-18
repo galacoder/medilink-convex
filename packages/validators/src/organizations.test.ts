@@ -3,7 +3,13 @@
  * These run via: node --import tsx packages/validators/src/organizations.test.ts
  * or are checked at typecheck time for type-safety assertions.
  */
-import { createOrganizationSchema, memberRoleSchema, orgTypeSchema, platformRoleSchema, updateOrganizationSchema } from "./organizations";
+import {
+  createOrganizationSchema,
+  memberRoleSchema,
+  orgTypeSchema,
+  platformRoleSchema,
+  updateOrganizationSchema,
+} from "./organizations";
 
 // ---------------------------------------------------------------------------
 // Runtime validation tests (pure Node, no test runner required)
@@ -27,7 +33,9 @@ function expect<T>(value: T) {
   return {
     toBe: (expected: T) => {
       if (value !== expected) {
-        throw new Error(`Expected ${JSON.stringify(expected)}, got ${JSON.stringify(value)}`);
+        throw new Error(
+          `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(value)}`,
+        );
       }
     },
     toBeTrue: () => {
@@ -131,7 +139,7 @@ test("bilingual error message for short name", () => {
   if (!nameError) throw new Error("No name error found");
   expect(
     nameError.message.includes("ít nhất 2 ký tự") &&
-    nameError.message.includes("at least 2 characters"),
+      nameError.message.includes("at least 2 characters"),
   ).toBeTrue();
 });
 

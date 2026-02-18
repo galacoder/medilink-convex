@@ -35,14 +35,16 @@ export const platformRoleSchema = z.enum([
 export const createOrganizationSchema = z.object({
   // vi: "Tên tổ chức phải có ít nhất 2 ký tự" / en: "Name must be at least 2 characters"
   name: z.string().min(2, {
-    message: "Tên tổ chức phải có ít nhất 2 ký tự (Name must be at least 2 characters)",
+    message:
+      "Tên tổ chức phải có ít nhất 2 ký tự (Name must be at least 2 characters)",
   }),
   // vi: "Slug chỉ được chứa chữ thường, số và dấu gạch ngang"
   // en: "Slug may only contain lowercase letters, numbers, and hyphens"
   slug: z
     .string()
     .min(2, {
-      message: "Slug phải có ít nhất 2 ký tự (Slug must be at least 2 characters)",
+      message:
+        "Slug phải có ít nhất 2 ký tự (Slug must be at least 2 characters)",
     })
     .regex(/^[a-z0-9-]+$/, {
       message:

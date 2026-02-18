@@ -5,8 +5,8 @@ import { cn } from "@medilink/ui";
 import { ThemeProvider, ThemeToggle } from "@medilink/ui/theme";
 import { Toaster } from "@medilink/ui/toast";
 
-import { env } from "~/env";
 import { ConvexClientProvider } from "~/app/convex-client-provider";
+import { env } from "~/env";
 import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/styles.css";

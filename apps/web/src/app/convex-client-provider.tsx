@@ -1,7 +1,7 @@
 "use client";
 
-import { ConvexProvider, ConvexReactClient } from "convex/react";
 import type { ReactNode } from "react";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
 
 import { env } from "~/env";
 
