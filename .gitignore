@@ -60,3 +60,4 @@ convex/_generated/
 # claude code task state (local only)
 .claude/tasks/
 agent-os/
+!.claude/agent-os/

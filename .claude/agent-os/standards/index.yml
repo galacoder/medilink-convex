@@ -1,0 +1,49 @@
+# AgentOS Standards - MediLink Convex
+# Stack: T3 Turbo + Next.js 15 App Router + Convex + Better Auth + Zod v4 bilingual Vi/En + shadcn/ui
+# Packages: @medilink/* scope. Three organization layers: Platform / Hospital / Provider.
+# Generated: 2026-02-18 by /pm-execute AgentOS Standards task
+
+architecture:
+  org-model: "THREE organization layers: (1) Platform — SangLeTech staff (platform_admin, platform_support roles). (2) Hospital orgs — teams managing medical equipment (owner, admin, member roles). (3) Provider orgs — maintenance/repair businesses (owner, admin, member roles). Organization table MUST have orgType: v.union(v.literal('hospital'), v.literal('provider')). Both hospitals and providers are Convex organizations but with different roles and permissions."
+  route-groups: "Route groups in app/: (auth)/ public auth pages, (marketing)/ public landing pages, (admin)/ SangLeTech platform staff routes, (hospital)/ hospital tenant routes, (provider)/ provider tenant routes. ONE Next.js app handles ALL user types. NEVER split hospital and provider into separate apps."
+  feature-modules: "Features in apps/web/src/features/: equipment/, service-requests/, providers/, qr-code/, consumables/, consumer-mgmt/, disputes/, audit-log/, automation/, notifications/, ai-assistant/, analytics/, payment/, support/, templates/. Each directory has: components/, hooks/, actions/, types.ts, index.ts."
+  package-scope: "ALL packages use @medilink/* scope exclusively. NEVER use @acme/* (that is ProX Convex's scope). Packages: @medilink/api, @medilink/auth, @medilink/db, @medilink/ui, @medilink/validators. Tooling: @medilink/eslint-config, @medilink/tsconfig."
+
+convex.schema:
+  enum-validators: "ALWAYS use v.union(v.literal()) for categorical fields. Critical examples: orgType: v.union(v.literal('hospital'), v.literal('provider')), equipmentStatus: v.union(v.literal('active'), v.literal('maintenance'), v.literal('retired')), serviceStatus: v.union(v.literal('pending'), v.literal('quoted'), v.literal('in_progress'), v.literal('completed'), v.literal('disputed')). NEVER use v.string() for these fixed-value fields."
+  timestamps: "ALL tables: createdAt: v.number() and updatedAt: v.number() (Unix epoch milliseconds, use Date.now() in mutations). Never store timestamps as ISO strings in Convex — they become unsortable and break time-based queries."
+  multi-tenancy: "ALL domain tables MUST have organizationId: v.id('organization'). Service request table MUST have BOTH hospitalOrgId: v.id('organization') AND providerOrgId: v.id('organization'). Equipment belongs to hospital org. Service records link both orgs."
+  index-naming: "Index names MUST start with by_ prefix. Key indexes: by_organization, by_hospital_org, by_provider_org, by_status, by_equipment_id, by_org_and_status. Field ORDER in compound indexes determines query capability — cannot skip fields."
+  qr-code-ids: "Equipment records MUST have qrCodeId: v.string() field for QR scanning. Add .index('by_qr_code_id', ['qrCodeId']) for O(1) lookup when technicians scan QR codes. qrCodeId must be unique per equipment item."
+
+convex.functions:
+  function-types: "query() for reads (real-time equipment status, service request updates, notification feed). mutation() for writes (equipment registration, service request creation, status transitions). action() for external calls (AI assistant queries, SMS/email notifications). internalMutation() for webhook handlers and scheduled maintenance jobs."
+  arg-validation: "ALL function args validated via args: {} object with Convex validators. NEVER use v.any(). For bilingual validation errors, throw: throw new ConvexError({vi: 'Tin nhan loi', en: 'Error message'}) from Convex functions."
+  access-control: "ALL mutations MUST check: (1) user is authenticated, (2) user belongs to the relevant organization, (3) orgType matches expected type (hospital vs provider), (4) user role has required permission. Hospital staff CANNOT access provider data. Provider staff CANNOT access hospital internal data."
+  cross-org: "Service requests span both hospital and provider orgs. Use internalQuery for cross-org data access within actions. Pass both hospitalOrgId and providerOrgId as separately validated args when a function needs cross-org context."
+
+data-fetching:
+  reactive-data: "useQuery() for all real-time data: equipment status changes, service request updates, notification feed, chat messages. Convex WebSocket subscriptions auto-update all connected clients when data changes in real-time."
+  split-rule: "Reactive (equipment tracking, service status, real-time notifications) → Convex useQuery. Non-reactive (Stripe billing, PDF report exports, external system integrations) → tRPC. Both are necessary — Convex does NOT replace tRPC."
+  cross-org-queries: "Service requests link hospital and provider orgs. Queries returning cross-org data must verify the requesting user belongs to AT LEAST ONE of the relevant organizations. Use internalQuery for trusted cross-org reads within Convex actions."
+
+auth:
+  organization-plugin: "Better Auth MUST use the organization() plugin from 'better-auth/plugins'. THREE org participation types: SangLeTech platform staff (global access), hospital org members, provider org members. Plugin handles invitations, membership management, and role enforcement per org."
+  convex-adapter: "Use convexAdapter() from 'better-auth/adapters/convex'. Syncs auth session, user, and membership data to Convex automatically. Configure in @medilink/auth package."
+  three-layer-rbac: "Layer 1 — Platform: user.platformRole: v.union(v.literal('platform_admin'), v.literal('platform_support'), v.literal('member')). Layer 2 — Hospital: organizationMembership.role: 'owner' | 'admin' | 'member' where organization.orgType='hospital'. Layer 3 — Provider: organizationMembership.role: 'owner' | 'admin' | 'member' where organization.orgType='provider'."
+  custom-permissions: "Use createAccessControl() for service-request specific permissions: create (hospital members), quote (provider members), approve (hospital admins), start_work (provider members), complete (provider members), dispute (both orgs), close (platform admin). Map permissions explicitly to roles."
+  server-side-validation: "EVERY mutation must validate all four layers: (1) auth session exists, (2) user belongs to organization, (3) orgType matches expected value, (4) user role has the required permission. NEVER trust client-side permission checks. Validate server-side on every sensitive operation."
+
+i18n:
+  bilingual-zod: "ALL Zod schemas for user-facing forms MUST provide bilingual error messages. Example: z.string().min(1, {message: {vi: 'Truong nay la bat buoc', en: 'This field is required'}}). NEVER use English-only error messages in any user-facing validation."
+  translation-keys: "All UI text uses useTranslation() hook. Keys in /lib/i18n/vi.ts and /lib/i18n/en.ts. Use domain.feature.element pattern: equipment.status.active, serviceRequest.action.submit, error.auth.unauthorized."
+  language-detection: "Detect language from browser Accept-Language header on first visit. Allow user to override and save preference (user.preferredLanguage field in Convex). Preference persists across sessions."
+  date-formatting: "Vietnamese date: DD/MM/YYYY using Intl.DateTimeFormat with locale 'vi-VN'. English: MM/DD/YYYY with locale 'en-US'. Always respect user's preferredLanguage setting for all date/time display."
+
+anti-patterns:
+  no-plugin-architecture: "NEVER create plugins, plugin manifests, or plugin registries. Features are flat directories in src/features/. Flat monorepo complexity is 200x lower than plugin architecture."
+  no-english-only-errors: "NEVER write Zod error messages, API error responses, validation messages, or toast notifications in English only. ALL user-facing text must support both Vietnamese (vi) and English (en) simultaneously."
+  no-single-org-queries: "NEVER query equipment, service requests, or user data without filtering by organizationId. Every query MUST enforce tenant isolation. Missing orgId filter = data leak across hospital/provider organizations."
+  no-hospital-provider-mixing: "Hospital staff CANNOT directly access provider data (rates, internal notes). Provider staff CANNOT directly access hospital internal data. Cross-org access is ONLY via service-request records where BOTH organizations are explicitly linked."
+  no-sql-orm: "NEVER add Prisma, Drizzle, or Supabase to medilink-convex. This project uses Convex exclusively. project-medilink (legacy) uses Supabase+Prisma — it is READ-ONLY historical reference, not the pattern to follow."
+  no-acme-scope: "NEVER import from @acme/* packages. Use @medilink/* scope for all internal packages. @acme/* is ProX Convex's scope — importing it creates an incorrect cross-project dependency."
