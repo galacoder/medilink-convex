@@ -15,7 +15,7 @@ import type {
 } from "convex/server";
 
 import { authComponent } from "../auth";
-import type { DataModel } from "../_generated/dataModel";
+import type { DataModel, Id } from "../_generated/dataModel";
 
 /**
  * Context type that works for both queries and mutations.
@@ -76,7 +76,7 @@ export async function getAuthenticatedUser(ctx: AnyCtx): Promise<AuthUser> {
  */
 export async function requireOrgMembership(
   ctx: AnyCtx,
-  orgId: string,
+  orgId: Id<"organizations">,
   requiredRoles: OrgRole[] = ["owner", "admin", "member"],
 ) {
   const user = await getAuthenticatedUser(ctx);
@@ -101,7 +101,7 @@ export async function requireOrgMembership(
   const membership = await ctx.db
     .query("organizationMemberships")
     .withIndex("by_org_and_user", (q) =>
-      q.eq("orgId", orgId as any).eq("userId", convexUser._id),
+      q.eq("orgId", orgId).eq("userId", convexUser._id),
     )
     .first();
 
@@ -136,8 +136,8 @@ export async function requireOrgMembership(
  *
  * @throws ConvexError if the org does not exist or is not a provider org
  */
-export async function requireProviderOrg(ctx: AnyCtx, orgId: string) {
-  const org = await ctx.db.get(orgId as any);
+export async function requireProviderOrg(ctx: AnyCtx, orgId: Id<"organizations">) {
+  const org = await ctx.db.get(orgId);
 
   if (!org) {
     throw new ConvexError({
@@ -148,7 +148,7 @@ export async function requireProviderOrg(ctx: AnyCtx, orgId: string) {
     });
   }
 
-  if ((org as any).org_type !== "provider") {
+  if (org.org_type !== "provider") {
     throw new ConvexError({
       code: "NOT_PROVIDER_ORG",
       // vi: "Tổ chức này không phải nhà cung cấp dịch vụ"
@@ -168,9 +168,9 @@ export async function requireProviderOrg(ctx: AnyCtx, orgId: string) {
  *
  * vi: "Lấy nhà cung cấp theo tổ chức" / en: "Get provider for org"
  */
-export async function getProviderForOrg(ctx: AnyCtx, orgId: string) {
+export async function getProviderForOrg(ctx: AnyCtx, orgId: Id<"organizations">) {
   return await ctx.db
     .query("providers")
-    .withIndex("by_org", (q) => q.eq("organizationId", orgId as any))
+    .withIndex("by_org", (q) => q.eq("organizationId", orgId))
     .first();
 }

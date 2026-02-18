@@ -71,7 +71,7 @@ export async function findProvidersBySpecialty(
   specialty: ServiceSpecialty,
 ): Promise<ProviderWithOfferings[]> {
   // Step 1: Collect all serviceOfferings with the matching specialty
-  const allOfferings = await ctx.db.query("serviceOfferings").collect();
+  const allOfferings = await ctx.db.query("serviceOfferings").take(100);
   const matchingOfferings = allOfferings.filter(
     (o) => o.specialty === specialty,
   );
@@ -126,7 +126,7 @@ export async function findProvidersByRegion(
   district?: string,
 ): Promise<ProviderWithCoverage[]> {
   // Step 1: Get all active coverage areas matching the region
-  const allAreas = await ctx.db.query("coverageAreas").collect();
+  const allAreas = await ctx.db.query("coverageAreas").take(100);
   let matchingAreas = allAreas.filter(
     (a) => a.isActive && a.region === region,
   );
