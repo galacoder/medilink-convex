@@ -12,6 +12,7 @@ export async function AuthShowcase() {
       <form>
         <Button
           size="lg"
+          // eslint-disable-next-line @typescript-eslint/require-await
           formAction={async () => {
             "use server";
             // Redirect to the sign-in page
@@ -35,6 +36,7 @@ export async function AuthShowcase() {
       <form>
         <Button
           size="lg"
+          // eslint-disable-next-line @typescript-eslint/require-await
           formAction={async () => {
             "use server";
             // Sign out via the Better Auth API route
