@@ -12,7 +12,7 @@ export async function AuthShowcase() {
       <form>
         <Button
           size="lg"
-          formAction={() => {
+          formAction={async () => {
             "use server";
             // Redirect to the sign-in page
             // WHY: With the Convex component model, social sign-in is handled
@@ -35,7 +35,7 @@ export async function AuthShowcase() {
       <form>
         <Button
           size="lg"
-          formAction={() => {
+          formAction={async () => {
             "use server";
             // Sign out via the Better Auth API route
             // WHY: The Convex Better Auth handler at /api/auth/[...all]
