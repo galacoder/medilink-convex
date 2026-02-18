@@ -7,10 +7,8 @@
 export default function ProviderDashboardPage() {
   return (
     <div>
-      <h1 className="text-2xl font-semibold">
-        Tổng quan {/* Dashboard */}
-      </h1>
-      <p className="mt-2 text-muted-foreground">
+      <h1 className="text-2xl font-semibold">Tổng quan {/* Dashboard */}</h1>
+      <p className="text-muted-foreground mt-2">
         Chào mừng đến Cổng thông tin Nhà cung cấp MediLink
         {/* Welcome to MediLink Provider Portal */}
       </p>

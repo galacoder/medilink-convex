@@ -99,7 +99,7 @@ export default function SignUpPage() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div className="bg-destructive/10 text-destructive rounded-md px-3 py-2 text-sm">
               {error}
             </div>
           )}
@@ -155,7 +155,7 @@ export default function SignUpPage() {
               disabled={isLoading}
             >
               <div
-                className={`flex cursor-pointer items-center gap-2 rounded-md border p-3 transition-colors hover:bg-accent ${
+                className={`hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md border p-3 transition-colors ${
                   orgType === "hospital"
                     ? "border-primary bg-accent"
                     : "border-input"
@@ -164,13 +164,13 @@ export default function SignUpPage() {
                 <RadioGroupItem value="hospital" id="hospital" />
                 <Label
                   htmlFor="hospital"
-                  className="cursor-pointer font-normal text-sm"
+                  className="cursor-pointer text-sm font-normal"
                 >
                   {labels.hospital.vi}
                 </Label>
               </div>
               <div
-                className={`flex cursor-pointer items-center gap-2 rounded-md border p-3 transition-colors hover:bg-accent ${
+                className={`hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md border p-3 transition-colors ${
                   orgType === "provider"
                     ? "border-primary bg-accent"
                     : "border-input"
@@ -179,7 +179,7 @@ export default function SignUpPage() {
                 <RadioGroupItem value="provider" id="provider" />
                 <Label
                   htmlFor="provider"
-                  className="cursor-pointer font-normal text-sm"
+                  className="cursor-pointer text-sm font-normal"
                 >
                   {labels.provider.vi}
                 </Label>
@@ -210,11 +210,11 @@ export default function SignUpPage() {
             {isLoading ? labels.loading.vi : labels.submit.vi}
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-center text-sm">
             {labels.hasAccount.vi}{" "}
             <Link
               href="/sign-in"
-              className="underline underline-offset-4 hover:text-primary"
+              className="hover:text-primary underline underline-offset-4"
             >
               {labels.signInLink.vi}
             </Link>

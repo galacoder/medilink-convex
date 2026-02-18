@@ -39,7 +39,7 @@ export function Sidebar({ navItems, locale = "vi" }: SidebarProps) {
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "hidden h-screen flex-col border-r bg-background transition-all duration-300 lg:flex",
+          "bg-background hidden h-screen flex-col border-r transition-all duration-300 lg:flex",
           isCollapsed ? "w-16" : "w-64",
         )}
       >
@@ -75,8 +75,7 @@ export function Sidebar({ navItems, locale = "vi" }: SidebarProps) {
           <nav className="space-y-1 px-2">
             {navItems.map((item) => {
               const isActive =
-                pathname === item.href ||
-                pathname.startsWith(`${item.href}/`);
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
 
               if (isCollapsed) {
@@ -86,7 +85,7 @@ export function Sidebar({ navItems, locale = "vi" }: SidebarProps) {
                       <Link
                         href={item.href}
                         className={cn(
-                          "flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground",
+                          "hover:bg-accent hover:text-accent-foreground flex h-10 w-10 items-center justify-center rounded-md transition-colors",
                           isActive
                             ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                             : "text-muted-foreground",
@@ -108,7 +107,7 @@ export function Sidebar({ navItems, locale = "vi" }: SidebarProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground",
+                    "hover:bg-accent hover:text-accent-foreground flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
                       : "text-muted-foreground",
@@ -117,7 +116,7 @@ export function Sidebar({ navItems, locale = "vi" }: SidebarProps) {
                   <Icon className="h-5 w-5 shrink-0" />
                   <span className="truncate">{item.label[locale]}</span>
                   {item.badge && (
-                    <span className="ml-auto rounded-full bg-primary/20 px-2 py-0.5 text-xs font-medium">
+                    <span className="bg-primary/20 ml-auto rounded-full px-2 py-0.5 text-xs font-medium">
                       {item.badge}
                     </span>
                   )}

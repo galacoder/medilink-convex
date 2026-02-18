@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 
+import type { NavItem } from "./nav-config";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
 import { Sidebar } from "./sidebar";
-import type { NavItem } from "./nav-config";
 
 interface PortalLayoutProps {
   children: ReactNode;

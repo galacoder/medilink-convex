@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { PortalLayout } from "~/components/layout/portal-layout";
 import { hospitalNavItems } from "~/components/layout/nav-config";
+import { PortalLayout } from "~/components/layout/portal-layout";
 
 /**
  * Hospital portal layout — wraps all /hospital/* pages with sidebar + header.
@@ -11,9 +11,5 @@ import { hospitalNavItems } from "~/components/layout/nav-config";
  * provider and admin portals while sharing the PortalLayout component.
  */
 export default function HospitalLayout({ children }: { children: ReactNode }) {
-  return (
-    <PortalLayout navItems={hospitalNavItems}>
-      {children}
-    </PortalLayout>
-  );
+  return <PortalLayout navItems={hospitalNavItems}>{children}</PortalLayout>;
 }

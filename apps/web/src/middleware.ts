@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 
 import { isPublicPath } from "@medilink/auth/middleware";
 
-import { getPortalFromPathname } from "~/lib/portal-routing";
 import type { MiddlewareSessionData } from "~/lib/portal-routing";
+import { getPortalFromPathname } from "~/lib/portal-routing";
 
 /**
  * Next.js middleware for portal-based route protection.
@@ -129,14 +129,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     sessionData.platformRole === "platform_support"
   ) {
     if (pathname === "/" || currentPortal === "unknown") {
-      return NextResponse.redirect(
-        new URL("/admin/dashboard", request.url),
-      );
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
     if (currentPortal !== "platform-admin") {
-      return NextResponse.redirect(
-        new URL("/admin/dashboard", request.url),
-      );
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
     return NextResponse.next();
   }

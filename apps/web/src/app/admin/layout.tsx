@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { PortalLayout } from "~/components/layout/portal-layout";
 import { adminNavItems } from "~/components/layout/nav-config";
+import { PortalLayout } from "~/components/layout/portal-layout";
 
 /**
  * Platform admin layout — wraps all /admin/* pages with sidebar + header.
@@ -15,9 +15,5 @@ export default function PlatformAdminLayout({
 }: {
   children: ReactNode;
 }) {
-  return (
-    <PortalLayout navItems={adminNavItems}>
-      {children}
-    </PortalLayout>
-  );
+  return <PortalLayout navItems={adminNavItems}>{children}</PortalLayout>;
 }
