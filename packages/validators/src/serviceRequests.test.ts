@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
-  serviceRequestTypeSchema,
-  serviceRequestStatusSchema,
-  serviceRequestPrioritySchema,
-  quoteStatusSchema,
-  createServiceRequestSchema,
-  updateServiceRequestSchema,
   createQuoteSchema,
   createServiceRatingSchema,
+  createServiceRequestSchema,
+  quoteStatusSchema,
+  serviceRequestPrioritySchema,
+  serviceRequestStatusSchema,
+  serviceRequestTypeSchema,
+  updateServiceRequestSchema,
 } from "./serviceRequests";
 
 // ---------------------------------------------------------------------------
@@ -98,8 +99,7 @@ describe("createServiceRequestSchema", () => {
     type: "repair" as const,
     status: "pending" as const,
     priority: "high" as const,
-    descriptionVi:
-      "Máy siêu âm bị lỗi màn hình, cần kiểm tra và sửa chữa ngay",
+    descriptionVi: "Máy siêu âm bị lỗi màn hình, cần kiểm tra và sửa chữa ngay",
   };
 
   it("test_createServiceRequestSchema_accepts_valid_input", () => {
@@ -210,9 +210,7 @@ describe("createServiceRatingSchema", () => {
   };
 
   it("test_createServiceRatingSchema_accepts_valid_rating", () => {
-    expect(createServiceRatingSchema.safeParse(validRating).success).toBe(
-      true,
-    );
+    expect(createServiceRatingSchema.safeParse(validRating).success).toBe(true);
   });
 
   it("test_createServiceRatingSchema_rejects_rating_above_5", () => {

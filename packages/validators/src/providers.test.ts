@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
+  createCertificationSchema,
+  createCoverageAreaSchema,
+  createProviderSchema,
+  createServiceOfferingSchema,
   providerStatusSchema,
   providerVerificationStatusSchema,
   serviceSpecialtySchema,
-  createProviderSchema,
   updateProviderSchema,
-  createServiceOfferingSchema,
-  createCertificationSchema,
-  createCoverageAreaSchema,
 } from "./providers";
 
 // ---------------------------------------------------------------------------
@@ -36,16 +37,11 @@ describe("providerStatusSchema", () => {
 // ---------------------------------------------------------------------------
 describe("providerVerificationStatusSchema", () => {
   it("test_providerVerificationStatusSchema_accepts_all_values", () => {
-    const valid = [
-      "pending",
-      "in_review",
-      "verified",
-      "rejected",
-    ] as const;
+    const valid = ["pending", "in_review", "verified", "rejected"] as const;
     for (const status of valid) {
-      expect(
-        providerVerificationStatusSchema.safeParse(status).success,
-      ).toBe(true);
+      expect(providerVerificationStatusSchema.safeParse(status).success).toBe(
+        true,
+      );
     }
   });
 });

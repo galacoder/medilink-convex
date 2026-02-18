@@ -1,17 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
-  equipmentStatusSchema,
-  equipmentConditionSchema,
-  criticalitySchema,
-  maintenanceTypeSchema,
-  maintenanceStatusSchema,
-  recurringPatternSchema,
-  failureUrgencySchema,
-  failureStatusSchema,
   createEquipmentSchema,
-  updateEquipmentSchema,
-  createMaintenanceSchema,
   createFailureReportSchema,
+  createMaintenanceSchema,
+  criticalitySchema,
+  equipmentConditionSchema,
+  equipmentStatusSchema,
+  failureStatusSchema,
+  failureUrgencySchema,
+  maintenanceStatusSchema,
+  maintenanceTypeSchema,
+  recurringPatternSchema,
+  updateEquipmentSchema,
 } from "./equipment";
 
 // ---------------------------------------------------------------------------

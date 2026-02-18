@@ -1,10 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import {
+  createDisputeMessageSchema,
+  createDisputeSchema,
   disputeStatusSchema,
   disputeTypeSchema,
-  createDisputeSchema,
   updateDisputeSchema,
-  createDisputeMessageSchema,
 } from "./disputes";
 
 // ---------------------------------------------------------------------------
