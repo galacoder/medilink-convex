@@ -5,6 +5,7 @@ import { cn } from "@medilink/ui";
 import { ThemeProvider, ThemeToggle } from "@medilink/ui/theme";
 import { Toaster } from "@medilink/ui/toast";
 
+import { ConvexClientProvider } from "~/app/convex-client-provider";
 import { env } from "~/env";
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -58,7 +59,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ThemeProvider>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
+          <ConvexClientProvider>
+            <TRPCReactProvider>{props.children}</TRPCReactProvider>
+          </ConvexClientProvider>
           <div className="absolute right-4 bottom-4">
             <ThemeToggle />
           </div>
