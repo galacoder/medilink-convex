@@ -31,6 +31,11 @@ export function middleware(request: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
+  // Allow health check endpoint (used by smoke test in CI)
+  if (pathname === "/api/health") {
+    return NextResponse.next();
+  }
+
   // Allow public paths without auth check
   if (isPublicPath(pathname)) {
     return NextResponse.next();
