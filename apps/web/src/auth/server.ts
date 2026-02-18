@@ -1,10 +1,9 @@
 import "server-only";
 
 import { cache } from "react";
-import { headers } from "next/headers";
 
 import { env } from "~/env";
-import { getToken } from "~/lib/convex";
+import { getToken, isAuthenticated } from "~/lib/convex";
 
 /**
  * Get the current authenticated session token for use in Server Components.
@@ -16,18 +15,12 @@ import { getToken } from "~/lib/convex";
  * Cached with React's cache() so the token is only fetched once per request
  * even if multiple Server Components call getSession().
  */
-export const getSession = cache(async () => {
-  const token = await getToken();
-  return token ?? null;
-});
+export const getSession = cache(getToken);
 
 /**
  * Check if the current request is from an authenticated user.
  */
-export const isUserAuthenticated = cache(async (): Promise<boolean> => {
-  const token = await getToken();
-  return token !== null;
-});
+export const isUserAuthenticated = cache(isAuthenticated);
 
 /**
  * Auth API shim for backward compatibility with tRPC context.
@@ -48,10 +41,9 @@ export const auth = {
     getSession: async ({ headers: reqHeaders }: { headers: Headers }) => {
       // Resolve base URL from environment (Vercel or local)
       const baseUrl =
-        typeof env.VERCEL_PROJECT_PRODUCTION_URL === "string" &&
-        env.VERCEL_ENV === "production"
+        env.VERCEL_ENV === "production" && env.VERCEL_PROJECT_PRODUCTION_URL
           ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
-          : typeof env.VERCEL_URL === "string" && env.VERCEL_ENV === "preview"
+          : env.VERCEL_ENV === "preview" && env.VERCEL_URL
             ? `https://${env.VERCEL_URL}`
             : "http://localhost:3000";
 

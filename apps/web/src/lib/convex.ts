@@ -17,17 +17,14 @@ import { convexBetterAuthNextJs } from "@convex-dev/better-auth/nextjs";
 
 import { env } from "~/env";
 
-// Derive site URL from deployment URL if not explicitly set.
+// Derive the Convex site URL from the deployment URL if not explicitly set.
 // Convex site URL format: https://<deployment>.convex.site
-// Convex URL format: https://<deployment>.convex.cloud
+// Convex URL format:      https://<deployment>.convex.cloud
+// WHY: The site URL is used for server-side auth token validation. If not
+// explicitly configured, we derive it from the deployment URL.
 const convexSiteUrl =
   env.NEXT_PUBLIC_CONVEX_SITE_URL ??
-  (env.NEXT_PUBLIC_CONVEX_URL
-    ? (env.NEXT_PUBLIC_CONVEX_URL as string).replace(
-        ".convex.cloud",
-        ".convex.site",
-      )
-    : "http://localhost:3210");
+  env.NEXT_PUBLIC_CONVEX_URL.replace(".convex.cloud", ".convex.site");
 
 export const {
   getToken,
@@ -38,6 +35,6 @@ export const {
   fetchAuthAction,
   preloadAuthQuery,
 } = convexBetterAuthNextJs({
-  convexUrl: env.NEXT_PUBLIC_CONVEX_URL as string,
+  convexUrl: env.NEXT_PUBLIC_CONVEX_URL,
   convexSiteUrl,
 });
