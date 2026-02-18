@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Menu, Settings, User } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@medilink/ui/avatar";
@@ -30,9 +30,24 @@ interface HeaderProps {
  * (settings, sign-out). Mobile users trigger the Sheet-based MobileNav
  * via the onMobileMenuOpen callback.
  */
+/**
+ * Derives the settings page path from the current portal URL.
+ * WHY: The header is shared across hospital, provider, and admin portals.
+ * The settings link must point to the correct portal's settings page.
+ */
+function getSettingsPath(pathname: string): string {
+  if (pathname.startsWith("/hospital")) return "/hospital/settings";
+  if (pathname.startsWith("/provider")) return "/provider/settings";
+  if (pathname.startsWith("/admin")) return "/admin/settings";
+  return "/settings";
+}
+
 export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session } = useSession();
+
+  const settingsPath = getSettingsPath(pathname);
 
   const user = session?.user;
   const userInitials = user?.name
@@ -109,7 +124,7 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
             <span>Hồ sơ cá nhân</span> {/* Profile */}
           </DropdownMenuItem>
 
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push(settingsPath)}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Cài đặt</span> {/* Settings */}
           </DropdownMenuItem>
