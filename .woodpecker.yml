@@ -17,8 +17,8 @@ steps:
     image: node:22-alpine
     environment:
       # Turborepo remote caching (set via Woodpecker CI secrets)
-      - TURBO_TEAM
-      - TURBO_TOKEN
+      TURBO_TEAM: ""
+      TURBO_TOKEN: ""
     commands:
       - apk add --no-cache git
       - corepack enable
@@ -35,8 +35,8 @@ steps:
     image: node:22-alpine
     depends_on: [lint-typecheck-build]
     environment:
-      - TURBO_TEAM
-      - TURBO_TOKEN
+      TURBO_TEAM: ""
+      TURBO_TOKEN: ""
     commands:
       - corepack enable
       - corepack prepare pnpm@10.19.0 --activate
