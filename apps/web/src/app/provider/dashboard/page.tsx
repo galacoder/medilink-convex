@@ -28,8 +28,8 @@ export default function ProviderDashboardPage() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-8 w-64 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-48 animate-pulse rounded bg-muted" />
+        <div className="bg-muted h-8 w-64 animate-pulse rounded" />
+        <div className="bg-muted h-4 w-48 animate-pulse rounded" />
       </div>
     );
   }
@@ -43,10 +43,8 @@ export default function ProviderDashboardPage() {
     <div className="space-y-6">
       {/* Welcome header */}
       <div>
-        <h1 className="text-2xl font-semibold">
-          Tổng quan {/* Dashboard */}
-        </h1>
-        <p className="mt-1 text-muted-foreground">
+        <h1 className="text-2xl font-semibold">Tổng quan {/* Dashboard */}</h1>
+        <p className="text-muted-foreground mt-1">
           Chào mừng trở lại, {userName}!{/* Welcome back, [name]! */}
         </p>
       </div>
@@ -63,9 +61,7 @@ export default function ProviderDashboardPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              Tên {/* Name */}
-            </span>
+            <span className="text-muted-foreground">Tên {/* Name */}</span>
             <span className="font-medium">{userName}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -75,9 +71,7 @@ export default function ProviderDashboardPage() {
             <span className="font-medium">{orgName}</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              Vai trò {/* Role */}
-            </span>
+            <span className="text-muted-foreground">Vai trò {/* Role */}</span>
             <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
               {userRole}
             </span>
@@ -95,7 +89,7 @@ export default function ProviderDashboardPage() {
             <CardTitle className="text-3xl">--</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Dữ liệu sẽ hiển thị sau {/* Data coming soon */}
             </p>
           </CardContent>
@@ -108,7 +102,7 @@ export default function ProviderDashboardPage() {
             <CardTitle className="text-3xl">--</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Dữ liệu sẽ hiển thị sau {/* Data coming soon */}
             </p>
           </CardContent>
@@ -121,7 +115,7 @@ export default function ProviderDashboardPage() {
             <CardTitle className="text-3xl">--</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Dữ liệu sẽ hiển thị sau {/* Data coming soon */}
             </p>
           </CardContent>

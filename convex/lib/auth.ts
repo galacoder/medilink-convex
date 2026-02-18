@@ -2,8 +2,11 @@
  * Auth helper utilities for Convex queries and mutations.
  *
  * WHY: Centralizes authentication and authorization checks so every query/mutation
- * follows the same pattern. This is the first Convex auth helper in the project,
- * establishing patterns for all future milestones.
+ * follows the same pattern. Two auth patterns coexist:
+ *   1. JWT-based (requireAuth / requireOrgAuth) — used by service-request workflow
+ *      (M1-5) to extract userId + organizationId from the Better Auth JWT payload.
+ *   2. Component-based (getAuthenticatedUser / requireOrgMembership / requireProviderOrg)
+ *      — used by provider management (M1-6) via the authComponent Better Auth adapter.
  *
  * vi: "Tiện ích xác thực" / en: "Auth helper utilities"
  */
@@ -13,12 +16,18 @@ import type {
   GenericMutationCtx,
   GenericQueryCtx,
 } from "convex/server";
+import type { QueryCtx, MutationCtx } from "../_generated/server";
 
 import { authComponent } from "../auth";
 import type { DataModel, Id } from "../_generated/dataModel";
 
+// ---------------------------------------------------------------------------
+// Shared types
+// ---------------------------------------------------------------------------
+
 /**
  * Context type that works for both queries and mutations.
+ * Used by the component-based auth helpers (M1-6 pattern).
  * vi: "Loại ngữ cảnh" / en: "Context type"
  */
 export type AnyCtx = GenericQueryCtx<DataModel> | GenericMutationCtx<DataModel>;
@@ -34,6 +43,92 @@ export type OrgRole = "owner" | "admin" | "member";
  * WHY: Provides a named type for clarity across helper functions.
  */
 export type AuthUser = Awaited<ReturnType<typeof authComponent.getAuthUser>>;
+
+/**
+ * JWT auth context extracted from the Convex identity token.
+ * Used by the JWT-based auth helpers (M1-5 pattern).
+ */
+export interface AuthContext {
+  /** Better Auth user subject (matches users._id in Convex). */
+  userId: string;
+  /**
+   * The active organization ID embedded in the JWT by Better Auth's Convex
+   * plugin. May be null for users without an active organization session.
+   */
+  organizationId: string | null;
+  /**
+   * Platform-level role. Only set for platform_admin / platform_support.
+   * Null for regular hospital / provider users.
+   */
+  platformRole: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// JWT-based helpers (M1-5 pattern — service requests, quotes, ratings)
+// ---------------------------------------------------------------------------
+
+/**
+ * Extracts and returns the authenticated user's context from the Convex JWT.
+ *
+ * WHY: Every service-request mutation needs to extract the userId and
+ * organizationId from the JWT payload injected by Better Auth. Centralising
+ * that logic here eliminates boilerplate and ensures a consistent, bilingual
+ * error message is thrown whenever a request arrives without a valid session.
+ *
+ * Throws a bilingual ConvexError if the request is unauthenticated.
+ *
+ * vi: "Yêu cầu xác thực" / en: "Require authentication"
+ *
+ * @throws ConvexError with "UNAUTHENTICATED" if no active session exists
+ */
+export async function requireAuth(
+  ctx: QueryCtx | MutationCtx,
+): Promise<AuthContext> {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) {
+    throw new ConvexError({
+      message:
+        "Xác thực thất bại. Vui lòng đăng nhập lại. (Authentication required. Please sign in.)",
+      code: "UNAUTHENTICATED",
+    });
+  }
+
+  return {
+    userId: identity.subject,
+    organizationId: (identity.organizationId as string | null) ?? null,
+    platformRole: (identity.platformRole as string | null) ?? null,
+  };
+}
+
+/**
+ * Like requireAuth, but also asserts that the authenticated user has an active
+ * organization session. Throws a bilingual ConvexError if organizationId is
+ * missing from the JWT (e.g. the user hasn't selected an org yet).
+ *
+ * vi: "Yêu cầu xác thực tổ chức" / en: "Require organization authentication"
+ *
+ * @throws ConvexError with "NO_ACTIVE_ORGANIZATION" if no org in JWT
+ */
+export async function requireOrgAuth(
+  ctx: QueryCtx | MutationCtx,
+): Promise<AuthContext & { organizationId: string }> {
+  const auth = await requireAuth(ctx);
+
+  if (!auth.organizationId) {
+    throw new ConvexError({
+      message:
+        "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization before performing this action.)",
+      code: "NO_ACTIVE_ORGANIZATION",
+    });
+  }
+
+  return auth as AuthContext & { organizationId: string };
+}
+
+// ---------------------------------------------------------------------------
+// Component-based helpers (M1-6 pattern — provider management)
+// ---------------------------------------------------------------------------
 
 /**
  * Get the currently authenticated user, or throw a ConvexError if unauthenticated.
