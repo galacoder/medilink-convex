@@ -14,6 +14,7 @@
     "@types/node": "catalog:",
     "convex-test": "catalog:",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   }
 }

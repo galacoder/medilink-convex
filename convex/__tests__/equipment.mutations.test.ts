@@ -104,7 +104,7 @@ describe("equipment.create", () => {
       categoryId: catId as any,
     });
 
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment).not.toBeNull();
     expect(equipment!.nameVi).toBe("Máy thở");
     expect(equipment!.nameEn).toBe("Ventilator");
@@ -125,7 +125,7 @@ describe("equipment.create", () => {
       categoryId: catId as any,
     });
 
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.organizationId).toBe(orgId);
   });
 
@@ -141,7 +141,7 @@ describe("equipment.create", () => {
       categoryId: catId as any,
     });
 
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.status).toBe("available");
     expect(equipment!.condition).toBe("good");
     expect(equipment!.criticality).toBe("B");
@@ -201,7 +201,7 @@ describe("equipment.update", () => {
       location: "Phòng A101",
     });
 
-    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(updated!.nameVi).toBe("Máy thở cập nhật");
     expect(updated!.location).toBe("Phòng A101");
     expect(updated!.updatedAt).toBeGreaterThanOrEqual(before);
@@ -223,7 +223,7 @@ describe("equipment.update", () => {
       nameVi: "Updated name",
     });
 
-    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     // Status should remain in_use
     expect(updated!.status).toBe("in_use");
   });
@@ -265,7 +265,7 @@ describe("equipment.updateStatus", () => {
       newStatus: "in_use",
     });
 
-    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const updated = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(updated!.status).toBe("in_use");
   });
 
@@ -382,7 +382,7 @@ describe("equipment.addHistoryEntry", () => {
       performedBy: userId as any,
     });
 
-    const history = await t.run(async (ctx) => ctx.db.get(historyId as any));
+    const history = await t.run(async (ctx) => ctx.db.get(historyId as any)) as any;
     expect(history).not.toBeNull();
     expect(history!.actionType).toBe("inspection");
     expect(history!.notes).toBe("Annual inspection completed");
@@ -456,7 +456,7 @@ describe("equipment.scheduleMaintenance", () => {
       },
     );
 
-    const record = await t.run(async (ctx) => ctx.db.get(maintenanceId as any));
+    const record = await t.run(async (ctx) => ctx.db.get(maintenanceId as any)) as any;
     expect(record).not.toBeNull();
     expect(record!.type).toBe("preventive");
     expect(record!.status).toBe("scheduled");
@@ -481,7 +481,7 @@ describe("equipment.scheduleMaintenance", () => {
       },
     );
 
-    const record = await t.run(async (ctx) => ctx.db.get(maintenanceId as any));
+    const record = await t.run(async (ctx) => ctx.db.get(maintenanceId as any)) as any;
     expect(record!.recurringPattern).toBe("quarterly");
     expect(record!.type).toBe("calibration");
   });
@@ -524,7 +524,7 @@ describe("equipment.reportFailure", () => {
       reportedBy: userId as any,
     });
 
-    const report = await t.run(async (ctx) => ctx.db.get(reportId as any));
+    const report = await t.run(async (ctx) => ctx.db.get(reportId as any)) as any;
     expect(report).not.toBeNull();
     expect(report!.urgency).toBe("low");
     expect(report!.status).toBe("open");
@@ -549,7 +549,7 @@ describe("equipment.reportFailure", () => {
     });
 
     // Equipment should now be "damaged"
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.status).toBe("damaged");
 
     // History entry should exist for the auto-transition
@@ -582,7 +582,7 @@ describe("equipment.reportFailure", () => {
     });
 
     // in_use -> damaged via high urgency
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.status).toBe("damaged");
   });
 
@@ -613,7 +613,7 @@ describe("equipment.reportFailure", () => {
     expect(history).toHaveLength(0);
 
     // Status should still be damaged
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.status).toBe("damaged");
   });
 
@@ -635,7 +635,7 @@ describe("equipment.reportFailure", () => {
     });
 
     // Status should remain available for low urgency
-    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any));
+    const equipment = await t.run(async (ctx) => ctx.db.get(equipId as any)) as any;
     expect(equipment!.status).toBe("available");
   });
 });
