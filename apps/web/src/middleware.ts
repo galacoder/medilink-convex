@@ -3,57 +3,164 @@ import { NextResponse } from "next/server";
 
 import { isPublicPath } from "@medilink/auth/middleware";
 
+import {
+  getDefaultRedirectForPortal,
+  getPortalFromPathname,
+} from "~/lib/portal-routing";
+import type { MiddlewareSessionData } from "~/lib/portal-routing";
+
 /**
- * Next.js middleware for route protection.
+ * Next.js middleware for portal-based route protection.
  *
- * WHY: Protects route groups from unauthenticated access and ensures
- * users are redirected to the appropriate sign-in page. Without this,
- * any user could access protected route groups regardless of auth status.
+ * WHY: Routes users to the correct portal based on their role and organization type.
+ * Without this, authenticated users would land on the generic homepage instead
+ * of their role-specific dashboard. This is the security boundary that gates
+ * all portal access.
  *
- * Route groups:
- * - (admin): Platform admin only — /admin/*
- * - (staff): Staff members — /staff/*
- * - (student): Students — /student/*
- * - (auth): Public — /sign-in, /sign-up, etc.
- * - (marketing): Public — /, /about, etc.
- * - /api/auth/*: Better Auth routes (always public)
+ * Routing state machine:
+ * 1. Static/API/public paths → pass through
+ * 2. No session cookie → redirect to /sign-in
+ * 3. Has session → fetch session data from auth API
+ *    a. Platform admin/support → /admin/* only
+ *    b. No active organization → redirect to /sign-up
+ *    c. Has org → allow current portal access
  */
-export function middleware(request: NextRequest): NextResponse {
+
+/** Paths that bypass middleware entirely (static files, Next.js internals, API routes). */
+const BYPASS_PREFIXES = [
+  "/api/auth",
+  "/api/trpc",
+  "/api/health",
+  "/_next",
+  "/favicon.ico",
+];
+
+function shouldBypass(pathname: string): boolean {
+  return BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+function getSessionCookie(request: NextRequest): string | undefined {
+  return (
+    request.cookies.get("better-auth.session_token")?.value ??
+    request.cookies.get("__Secure-better-auth.session_token")?.value
+  );
+}
+
+/**
+ * Fetch session data from the Better Auth API.
+ *
+ * WHY: Edge middleware cannot query Convex directly. We fetch the session
+ * from the Better Auth API route, which has access to the database.
+ * This gives us platformRole and activeOrganizationId for routing decisions.
+ */
+async function getSessionData(
+  request: NextRequest,
+): Promise<MiddlewareSessionData | null> {
+  try {
+    const sessionUrl = new URL("/api/auth/get-session", request.url);
+    const response = await fetch(sessionUrl.toString(), {
+      headers: {
+        cookie: request.headers.get("cookie") ?? "",
+      },
+    });
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      user?: {
+        id?: string;
+        platformRole?: string | null;
+      } | null;
+      session?: {
+        id?: string;
+        activeOrganizationId?: string | null;
+      } | null;
+    } | null;
+
+    if (!data) return null;
+
+    return {
+      platformRole: data.user?.platformRole ?? null,
+      activeOrganizationId: data.session?.activeOrganizationId ?? null,
+    };
+  } catch {
+    // If session fetch fails, treat as no session
+    return null;
+  }
+}
+
+export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
-  // Allow all Better Auth API routes through
-  if (pathname.startsWith("/api/auth/")) {
+  // Bypass: API routes, static files, Next.js internals
+  if (shouldBypass(pathname)) {
     return NextResponse.next();
   }
 
-  // Allow all tRPC API routes through (auth checked in tRPC context)
-  if (pathname.startsWith("/api/trpc/")) {
-    return NextResponse.next();
-  }
-
-  // Allow health check endpoint (used by smoke test in CI)
-  if (pathname === "/api/health") {
-    return NextResponse.next();
-  }
-
-  // Allow public paths without auth check
+  // Bypass: Public auth paths (sign-in, sign-up, etc.)
+  // WHY: isPublicPath from auth middleware handles the canonical public path list
+  // NOTE: /api/health and /api/trpc are already handled by shouldBypass() above
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }
 
-  // For protected routes, check for the Better Auth session cookie
-  // Better Auth sets a cookie with the session token
-  const sessionCookie =
-    request.cookies.get("better-auth.session_token") ??
-    request.cookies.get("__Secure-better-auth.session_token");
+  const sessionToken = getSessionCookie(request);
 
-  if (!sessionCookie) {
-    // Redirect unauthenticated users to sign-in
-    // WHY: Preserving the original URL as a returnTo param enables
-    // redirecting back after successful sign-in.
+  // Branch 1: No session → redirect to sign-in
+  // WHY: Preserving returnTo enables redirecting back after successful sign-in
+  if (!sessionToken) {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(signInUrl);
+  }
+
+  // Session exists — fetch session data for role-based routing
+  const sessionData = await getSessionData(request);
+
+  if (!sessionData) {
+    // Session cookie exists but is invalid/expired → redirect to sign-in
+    const signInUrl = new URL("/sign-in", request.url);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  const currentPortal = getPortalFromPathname(pathname);
+
+  // Branch 2: Platform admin/support → allow only /admin routes
+  // WHY: Platform admins (SangLeTech staff) should never access hospital/provider portals
+  if (
+    sessionData.platformRole === "platform_admin" ||
+    sessionData.platformRole === "platform_support"
+  ) {
+    if (pathname === "/" || currentPortal === "unknown") {
+      return NextResponse.redirect(
+        new URL("/admin/dashboard", request.url),
+      );
+    }
+    if (currentPortal !== "platform-admin") {
+      return NextResponse.redirect(
+        new URL("/admin/dashboard", request.url),
+      );
+    }
+    return NextResponse.next();
+  }
+
+  // Branch 3: No active organization → redirect to sign-up
+  // WHY: Users without an org haven't completed the onboarding flow.
+  // They need to select their org type (hospital/provider) and create an org.
+  if (!sessionData.activeOrganizationId) {
+    if (pathname !== "/sign-up") {
+      return NextResponse.redirect(new URL("/sign-up", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // Branch 4: Has active org → allow portal access
+  // WHY: Users are in the correct portal if they have an active organization.
+  // The sign-up flow set the correct callbackURL (hospital or provider dashboard),
+  // so we trust the session's portal routing. Root path redirects to sign-in
+  // to re-establish portal context.
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
   return NextResponse.next();
@@ -63,18 +170,10 @@ export function middleware(request: NextRequest): NextResponse {
  * Middleware matcher configuration.
  *
  * WHY: We exclude static files, _next internals, and favicon to avoid
- * unnecessary middleware overhead on non-page requests. Only page routes
- * and API routes (except Convex/static) go through the middleware.
+ * unnecessary middleware overhead on non-page requests.
  */
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon)
-     * - public folder files
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
