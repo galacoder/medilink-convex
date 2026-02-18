@@ -66,7 +66,7 @@ steps:
     depends_on: [smoke-test]
     commands:
       - 'echo "E2E tests: placeholder stage"'
-      - echo "Will be activated by M1-8 (Playwright E2E setup, issue #59)"
+      - 'echo "Will be activated by M1-8 (Playwright E2E setup, issue #59)"'
       - 'echo "Status: SKIP (no tests configured yet)"'
 
   # Stage 5: Visual Regression Testing (placeholder — activated by M5-5 #80)
@@ -75,7 +75,7 @@ steps:
     depends_on: [e2e-tests]
     commands:
       - 'echo "VRT: placeholder stage"'
-      - echo "Will be activated by M5-5 (VRT baseline setup, issue #80)"
+      - 'echo "Will be activated by M5-5 (VRT baseline setup, issue #80)"'
       - 'echo "Status: SKIP (no baselines configured yet)"'
 
   # Stage 6: Summary Report
