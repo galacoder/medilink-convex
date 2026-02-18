@@ -34,8 +34,16 @@ function SignInForm() {
   // WHY: Middleware sets returnTo when redirecting unauthenticated users.
   // Using it as callbackURL ensures users land on the page they originally
   // intended to visit instead of always going to /hospital/dashboard.
+  //
+  // Security: validate that returnTo is a safe relative path before using it.
+  // Accepting arbitrary values enables open redirect attacks (e.g., ?returnTo=https://evil.com
+  // or ?returnTo=//evil.com which the browser interprets as protocol-relative).
+  // Only allow paths that start with '/' but NOT '//' (protocol-relative URLs).
   const returnTo = searchParams.get("returnTo");
-  const callbackURL = returnTo ?? "/";
+  const callbackURL =
+    returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")
+      ? returnTo
+      : "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

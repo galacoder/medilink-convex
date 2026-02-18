@@ -160,6 +160,19 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // WHY: Enforce that hospital users can only access /hospital/* and
   // provider users can only access /provider/*. A user at the root path
   // is redirected to their correct dashboard based on orgType.
+  //
+  // Security: if orgType is null, the Better Auth get-session response did not
+  // include activeOrganization.metadata (the field may not be returned by the
+  // organization plugin in all session shapes). Defaulting to hospital when
+  // orgType is unknown would silently misroute all provider users — a
+  // cross-portal enforcement failure. Instead, force re-authentication so
+  // the user lands with a fresh session that will be re-fetched.
+  if (sessionData.orgType === null) {
+    const signInUrl = new URL("/sign-in", request.url);
+    signInUrl.searchParams.set("returnTo", pathname);
+    return NextResponse.redirect(signInUrl);
+  }
+
   if (pathname === "/") {
     const dashboard =
       sessionData.orgType === "provider"
