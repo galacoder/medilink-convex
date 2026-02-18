@@ -16,15 +16,19 @@ import {
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
 
-import { signIn } from "~/auth/client";
+import { authClient, signIn } from "~/auth/client";
 import { authLabels } from "~/lib/i18n/auth-labels";
+import { getPostAuthRedirect } from "~/lib/portal-routing";
 
 /**
  * Inner sign-in form that reads the returnTo search param.
  *
- * WHY: useSearchParams() requires a Suspense boundary in Next.js App Router.
- * Extracted here so the outer SignInPage can wrap it in Suspense without
- * making the entire page a loading state.
+ * WHY: Single sign-in entry point for all users (hospital, provider, platform admin).
+ * After sign-in, we fetch the session to determine platformRole and org_type,
+ * then redirect to the correct portal dashboard using getPostAuthRedirect().
+ *
+ * The returnTo query param is respected to restore deep-link navigation context.
+ * useSearchParams() requires a Suspense boundary in Next.js App Router.
  */
 function SignInForm() {
   const router = useRouter();
@@ -32,18 +36,18 @@ function SignInForm() {
   const labels = authLabels.signIn;
 
   // WHY: Middleware sets returnTo when redirecting unauthenticated users.
-  // Using it as callbackURL ensures users land on the page they originally
-  // intended to visit instead of always going to /hospital/dashboard.
+  // Using it as a safe fallback ensures users land on the page they originally
+  // intended to visit instead of always going to a default dashboard.
   //
   // Security: validate that returnTo is a safe relative path before using it.
   // Accepting arbitrary values enables open redirect attacks (e.g., ?returnTo=https://evil.com
   // or ?returnTo=//evil.com which the browser interprets as protocol-relative).
   // Only allow paths that start with '/' but NOT '//' (protocol-relative URLs).
   const returnTo = searchParams.get("returnTo");
-  const callbackURL =
+  const safeReturnTo =
     returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")
       ? returnTo
-      : "/";
+      : null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +62,6 @@ function SignInForm() {
     const result = await signIn.email({
       email,
       password,
-      callbackURL,
     });
 
     if (result.error) {
@@ -67,8 +70,32 @@ function SignInForm() {
       return;
     }
 
-    // Middleware will redirect to the correct portal based on session
-    router.push(callbackURL);
+    // Fetch session to determine correct portal based on platformRole and org_type
+    const sessionResult = await authClient.getSession();
+
+    const sessionData = sessionResult.data
+      ? {
+          platformRole:
+            (
+              sessionResult.data.user as {
+                platformRole?: string | null;
+              }
+            ).platformRole ?? null,
+          orgType: null, // org_type is not in the basic session; middleware handles further routing
+          activeOrganizationId:
+            (
+              sessionResult.data.session as {
+                activeOrganizationId?: string | null;
+              }
+            ).activeOrganizationId ?? null,
+        }
+      : null;
+
+    // Honor returnTo param if user was redirected here from a protected route,
+    // otherwise use session-based routing to the correct portal dashboard.
+    const redirect = safeReturnTo ?? getPostAuthRedirect(sessionData);
+
+    router.push(redirect);
   }
 
   return (

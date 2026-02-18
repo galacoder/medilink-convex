@@ -32,3 +32,34 @@ export type Auth = typeof _authShape;
  * Session type inferred from the auth instance.
  */
 export type Session = Auth["$Infer"]["Session"];
+
+/**
+ * Organization type for portal routing.
+ * Maps to the org_type metadata field set during org creation.
+ */
+export type OrgType = "hospital" | "provider";
+
+/**
+ * Enriched session type that includes platform role and org context.
+ *
+ * WHY: Post-auth routing decisions require knowing platformRole and org_type.
+ * This typed contract ensures consuming code handles all routing cases correctly.
+ */
+export interface EnrichedSession {
+  /** User info from the session */
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    /** Platform-level role (set by platform admin seeding, not org membership) */
+    platformRole?: string | null;
+  };
+  /** Session metadata */
+  session: {
+    id: string;
+    /** The currently active organization ID */
+    activeOrganizationId?: string | null;
+  };
+  /** Organization type derived from the active org's metadata */
+  orgType?: OrgType | null;
+}

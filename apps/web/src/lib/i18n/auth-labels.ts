@@ -50,6 +50,38 @@ export const authLabels = {
       en: "Sign up failed. Please try again.",
     },
   },
+  invite: {
+    title: { vi: "Chấp nhận lời mời", en: "Accept Invitation" },
+    subtitle: {
+      vi: "Bạn được mời tham gia tổ chức trên MediLink",
+      en: "You have been invited to join an organization on MediLink",
+    },
+    accept: { vi: "Chấp nhận lời mời", en: "Accept Invitation" },
+    loading: { vi: "Đang xử lý...", en: "Processing..." },
+    accepted: {
+      vi: "Lời mời đã được chấp nhận thành công!",
+      en: "Invitation accepted successfully!",
+    },
+    goToDashboard: { vi: "Đến trang tổng quan", en: "Go to Dashboard" },
+    error: {
+      vi: "Không thể chấp nhận lời mời. Vui lòng thử lại.",
+      en: "Unable to accept invitation. Please try again.",
+    },
+    invalidToken: {
+      vi: "Lời mời không hợp lệ hoặc đã hết hạn.",
+      en: "Invalid or expired invitation.",
+    },
+    backToSignIn: { vi: "Quay lại đăng nhập", en: "Back to Sign In" },
+  },
+  signOut: {
+    button: { vi: "Đăng xuất", en: "Sign Out" },
+    confirmTitle: { vi: "Xác nhận đăng xuất", en: "Confirm Sign Out" },
+    confirmMessage: {
+      vi: "Bạn có chắc chắn muốn đăng xuất không?",
+      en: "Are you sure you want to sign out?",
+    },
+    loading: { vi: "Đang đăng xuất...", en: "Signing out..." },
+  },
 } as const;
 
 export type AuthLabels = typeof authLabels;

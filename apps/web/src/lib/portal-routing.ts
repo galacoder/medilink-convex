@@ -98,3 +98,42 @@ export function getExpectedOrgTypeForPortal(portal: PortalType): string | null {
       return null;
   }
 }
+
+/**
+ * Determine the correct post-authentication redirect URL based on session data.
+ *
+ * WHY: After sign-in, users must be routed to the correct portal dashboard
+ * based on their role and organization type. This centralizes that logic
+ * so both the sign-in page and middleware share the same routing rules.
+ *
+ * Priority order:
+ * 1. Platform admin/support → /admin/dashboard
+ * 2. Hospital org → /hospital/dashboard
+ * 3. Provider org → /provider/dashboard
+ * 4. No active org → /sign-up (complete onboarding)
+ * 5. Has org but unknown type → /hospital/dashboard (safe default)
+ * 6. Null session → /sign-in
+ */
+export function getPostAuthRedirect(
+  session: MiddlewareSessionData | null,
+): string {
+  if (!session) return "/sign-in";
+
+  // Platform admin/support always go to admin portal
+  if (
+    session.platformRole === "platform_admin" ||
+    session.platformRole === "platform_support"
+  ) {
+    return "/admin/dashboard";
+  }
+
+  // User has an active organization — route to their portal by org type
+  if (session.activeOrganizationId) {
+    if (session.orgType === "provider") return "/provider/dashboard";
+    // Hospital is the default for known hospital orgs or unknown org type
+    return "/hospital/dashboard";
+  }
+
+  // No active org — send to sign-up to complete onboarding
+  return "/sign-up";
+}
