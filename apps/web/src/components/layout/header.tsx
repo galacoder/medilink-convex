@@ -16,6 +16,7 @@ import {
 import { ThemeToggle } from "@medilink/ui/theme";
 
 import { signOut, useSession } from "~/auth/client";
+import { OrgSwitcher } from "~/components/org-switcher";
 
 interface HeaderProps {
   orgName?: string;
@@ -42,7 +43,7 @@ function getSettingsPath(pathname: string): string {
   return "/settings";
 }
 
-export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
+export function Header({ orgName: _orgName, onMobileMenuOpen }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -77,12 +78,21 @@ export function Header({ orgName, onMobileMenuOpen }: HeaderProps) {
         <Menu className="h-5 w-5" />
       </Button>
 
-      {/* Org name — shows the current organization context */}
-      {orgName && (
-        <span className="text-muted-foreground hidden text-sm font-medium lg:block">
-          {orgName}
-        </span>
-      )}
+      {/* Org context — OrgSwitcher for multi-org users, plain text for single-org */}
+      {/* WHY: OrgSwitcher internally detects single vs multi-org and renders appropriately */}
+      <div className="hidden lg:block">
+        <OrgSwitcher
+          currentPortal={
+            pathname.startsWith("/hospital")
+              ? "hospital"
+              : pathname.startsWith("/provider")
+                ? "provider"
+                : pathname.startsWith("/admin")
+                  ? "admin"
+                  : undefined
+          }
+        />
+      </div>
 
       {/* Spacer */}
       <div className="flex-1" />

@@ -99,13 +99,13 @@ export const organizationRouter = {
       }
 
       const data = (await response.json()) as {
-        invitations?: Array<{
+        invitations?: {
           id: string;
           email: string;
           role: string;
           status: string;
           expiresAt: string | null;
-        }>;
+        }[];
       };
 
       return { invitations: data.invitations ?? [] };
