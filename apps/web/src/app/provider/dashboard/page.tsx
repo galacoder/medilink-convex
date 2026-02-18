@@ -36,7 +36,8 @@ export default function ProviderDashboardPage() {
 
   const userName = session?.user.name ?? "Người dùng"; // Người dùng = User
   const orgName = activeOrg?.name ?? "Tổ chức của bạn"; // Your organization
-  const userRole = activeOrg?.members?.[0]?.role ?? "member";
+  const members = activeOrg?.members;
+  const userRole = members?.[0]?.role ?? "member";
 
   return (
     <div className="space-y-6">

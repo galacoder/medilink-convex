@@ -30,7 +30,7 @@ import { getPostAuthRedirect } from "~/lib/portal-routing";
  * Unauthenticated users are prompted to sign in first.
  */
 
-type InviteState = "loading" | "success" | "error" | "unauthenticated";
+type AcceptanceState = "idle" | "accepting" | "success" | "error";
 
 interface InvitePageProps {
   params: Promise<{ token: string }>;
@@ -42,43 +42,29 @@ export default function InvitePage({ params }: InvitePageProps) {
   const labels = authLabels.invite;
 
   const [token, setToken] = useState<string | null>(null);
-  const [state, setState] = useState<InviteState>("loading");
-  const [isAccepting, setIsAccepting] = useState(false);
+  const [acceptanceState, setAcceptanceState] =
+    useState<AcceptanceState>("idle");
 
   // Resolve async params (Next.js 15)
   useEffect(() => {
     void params.then((p) => setToken(p.token));
   }, [params]);
 
-  // After session resolves, check if user is authenticated
-  useEffect(() => {
-    if (sessionPending || !token) return;
-
-    if (!session) {
-      // Unauthenticated: prompt to sign in with returnTo so they come back here
-      setState("unauthenticated");
-    } else {
-      // Authenticated and have token: ready to accept
-      setState("loading");
-    }
-  }, [session, sessionPending, token]);
-
   async function handleAccept() {
     if (!token) return;
 
-    setIsAccepting(true);
+    setAcceptanceState("accepting");
 
     const result = await organization.acceptInvitation({
       invitationId: token,
     });
 
     if (result.error) {
-      setState("error");
-      setIsAccepting(false);
+      setAcceptanceState("error");
       return;
     }
 
-    setState("success");
+    setAcceptanceState("success");
 
     // Fetch updated session to get correct portal redirect
     const sessionResult = await authClient.getSession();
@@ -123,7 +109,7 @@ export default function InvitePage({ params }: InvitePageProps) {
   }
 
   // Unauthenticated — prompt to sign in
-  if (state === "unauthenticated") {
+  if (!session) {
     return (
       <Card>
         <CardHeader className="space-y-1">
@@ -151,7 +137,7 @@ export default function InvitePage({ params }: InvitePageProps) {
   }
 
   // Success state
-  if (state === "success") {
+  if (acceptanceState === "success") {
     return (
       <Card>
         <CardHeader className="space-y-1">
@@ -168,7 +154,7 @@ export default function InvitePage({ params }: InvitePageProps) {
   }
 
   // Error state
-  if (state === "error") {
+  if (acceptanceState === "error") {
     return (
       <Card>
         <CardHeader className="space-y-1">
@@ -205,9 +191,9 @@ export default function InvitePage({ params }: InvitePageProps) {
         <Button
           className="w-full"
           onClick={handleAccept}
-          disabled={isAccepting}
+          disabled={acceptanceState === "accepting"}
         >
-          {isAccepting ? labels.loading.vi : labels.accept.vi}
+          {acceptanceState === "accepting" ? labels.loading.vi : labels.accept.vi}
         </Button>
         <Button variant="ghost" asChild className="w-full">
           <Link href="/sign-in">{labels.backToSignIn.vi}</Link>

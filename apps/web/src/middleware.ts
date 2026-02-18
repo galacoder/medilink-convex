@@ -52,16 +52,21 @@ function getSessionCookie(request: NextRequest): string | undefined {
  *
  * WHY: Edge middleware cannot query Convex directly. We fetch the session
  * from the Better Auth API route, which has access to the database.
- * This gives us platformRole and activeOrganizationId for routing decisions.
+ * This gives us platformRole, activeOrganizationId, and orgType for routing decisions.
+ *
+ * When there's an active organization, we fetch the full organization to get
+ * org_type from its metadata. This enables portal-aware routing at the root path.
  */
 async function getSessionData(
   request: NextRequest,
 ): Promise<MiddlewareSessionData | null> {
+  const cookieHeader = request.headers.get("cookie") ?? "";
+
   try {
     const sessionUrl = new URL("/api/auth/get-session", request.url);
     const response = await fetch(sessionUrl.toString(), {
       headers: {
-        cookie: request.headers.get("cookie") ?? "",
+        cookie: cookieHeader,
       },
     });
 
@@ -83,11 +88,40 @@ async function getSessionData(
 
     if (!data) return null;
 
+    const platformRole = data.user?.platformRole ?? null;
+    const activeOrganizationId = data.session?.activeOrganizationId ?? null;
+
+    // If user has an active org, fetch org details to get org_type for portal routing
+    // WHY: org_type is stored in organization metadata and needed for root path redirect
+    let orgType: string | null = null;
+    if (activeOrganizationId) {
+      try {
+        const orgUrl = new URL(
+          "/api/auth/organization/get-full-organization",
+          request.url,
+        );
+        const orgResponse = await fetch(orgUrl.toString(), {
+          headers: {
+            cookie: cookieHeader,
+          },
+        });
+
+        if (orgResponse.ok) {
+          const orgData = (await orgResponse.json()) as {
+            metadata?: { org_type?: string | null } | null;
+          } | null;
+          orgType = orgData?.metadata?.org_type ?? null;
+        }
+      } catch {
+        // Graceful fallback: if org fetch fails, orgType stays null
+        // Middleware will route to hospital portal (safe default)
+      }
+    }
+
     return {
-      platformRole: data.user?.platformRole ?? null,
-      activeOrganizationId: data.session?.activeOrganizationId ?? null,
-      // Extract org_type from metadata to enforce cross-portal access boundaries
-      orgType: data.session?.activeOrganization?.metadata?.org_type ?? null,
+      platformRole,
+      activeOrganizationId,
+      orgType,
     };
   } catch {
     // If session fetch fails, treat as no session
@@ -161,12 +195,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // provider users can only access /provider/*. A user at the root path
   // is redirected to their correct dashboard based on orgType.
   //
-  // Security: if orgType is null, the Better Auth get-session response did not
-  // include activeOrganization.metadata (the field may not be returned by the
-  // organization plugin in all session shapes). Defaulting to hospital when
-  // orgType is unknown would silently misroute all provider users — a
-  // cross-portal enforcement failure. Instead, force re-authentication so
-  // the user lands with a fresh session that will be re-fetched.
+  // Security: if orgType is null, the org fetch failed or returned no metadata.
+  // Defaulting to hospital when orgType is unknown would silently misroute all
+  // provider users — a cross-portal enforcement failure. Instead, force
+  // re-authentication so the user lands with a fresh session.
   if (sessionData.orgType === null) {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("returnTo", pathname);
