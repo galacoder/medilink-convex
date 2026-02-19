@@ -11,9 +11,8 @@
 import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const providersApi = api.providers as any;
-/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
 export interface UseProviderMutationsResult {
   addServiceOffering: ReturnType<typeof useMutation>;

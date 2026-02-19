@@ -26,17 +26,17 @@ export interface UseProviderProfileResult {
 export function useProviderProfile(
   organizationId: string,
 ): UseProviderProfileResult {
-  /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const profile = useQuery(
-    (api.providers as any).getProfile,
+    api.providers.getProfile as any,
     organizationId ? { organizationId } : "skip",
   ) as ProviderProfile | null | undefined;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications = useQuery(
-    (api.providers as any).getCertifications,
+    api.providers.getCertifications as any,
     organizationId ? { organizationId } : "skip",
   ) as Certification[] | undefined;
-  /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
   const isLoading = profile === undefined || certifications === undefined;
 

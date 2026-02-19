@@ -9,7 +9,9 @@
 import type { LucideIcon } from "lucide-react";
 import {
   AlertCircle,
+  Award,
   BarChart3,
+  Briefcase,
   Building2,
   ClipboardList,
   FileText,
@@ -20,6 +22,7 @@ import {
   Shield,
   Stethoscope,
   Truck,
+  User,
   Users,
   Wrench,
 } from "lucide-react";
@@ -91,8 +94,18 @@ export const providerNavItems: NavItem[] = [
   },
   {
     href: "/provider/offerings",
-    icon: Package,
-    label: { vi: "Dịch vụ cung cấp", en: "Service Offerings" },
+    icon: Briefcase,
+    label: { vi: "Dịch vụ", en: "Offerings" },
+  },
+  {
+    href: "/provider/certifications",
+    icon: Award,
+    label: { vi: "Chứng chỉ", en: "Certifications" },
+  },
+  {
+    href: "/provider/profile",
+    icon: User,
+    label: { vi: "Hồ sơ", en: "Profile" },
   },
   {
     href: "/provider/quotes",

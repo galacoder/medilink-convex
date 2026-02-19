@@ -29,12 +29,11 @@ export interface UseProviderOfferingsResult {
 export function useProviderOfferings(
   organizationId: string,
 ): UseProviderOfferingsResult {
-  /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const offerings = useQuery(
-    (api.providers as any).listServiceOfferings,
+    api.providers.listServiceOfferings as any,
     organizationId ? { organizationId } : "skip",
   ) as ServiceOffering[] | undefined;
-  /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
 
   return {
     offerings: offerings ?? [],

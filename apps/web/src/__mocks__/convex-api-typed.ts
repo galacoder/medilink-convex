@@ -30,4 +30,29 @@ export const api = {
     list: makeFunctionReference<"query">("equipment:list"),
     getById: makeFunctionReference<"query">("equipment:getById"),
   },
+  providers: {
+    getProfile: makeFunctionReference<"query">("providers:getProfile"),
+    listServiceOfferings: makeFunctionReference<"query">(
+      "providers:listServiceOfferings",
+    ),
+    getCertifications: makeFunctionReference<"query">(
+      "providers:getCertifications",
+    ),
+    addServiceOffering: makeFunctionReference<"mutation">(
+      "providers:addServiceOffering",
+    ),
+    updateServiceOffering: makeFunctionReference<"mutation">(
+      "providers:updateServiceOffering",
+    ),
+    removeServiceOffering: makeFunctionReference<"mutation">(
+      "providers:removeServiceOffering",
+    ),
+    addCertification: makeFunctionReference<"mutation">(
+      "providers:addCertification",
+    ),
+    setCoverageArea: makeFunctionReference<"mutation">(
+      "providers:setCoverageArea",
+    ),
+    updateProfile: makeFunctionReference<"mutation">("providers:updateProfile"),
+  },
 } as const;

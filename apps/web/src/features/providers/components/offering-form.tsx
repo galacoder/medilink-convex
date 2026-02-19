@@ -27,9 +27,8 @@ import type { ServiceOffering, Specialty } from "../types";
 import { SPECIALTY_OPTIONS } from "../types";
 import { providerLabels } from "../labels";
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const providersApi = api.providers as any;
-/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
 interface OfferingFormProps {
   mode: "create" | "edit";
