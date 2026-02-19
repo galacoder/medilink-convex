@@ -15,6 +15,7 @@ const equipmentApi = api.equipment as any;
 
 import { Button } from "@medilink/ui/button";
 
+import { EquipmentCard } from "~/features/equipment/components/equipment-card";
 import { EquipmentFiltersBar } from "~/features/equipment/components/equipment-filters";
 import { EquipmentTable } from "~/features/equipment/components/equipment-table";
 import { useEquipment } from "~/features/equipment/hooks/use-equipment";
@@ -27,6 +28,8 @@ import type { EquipmentFilters } from "~/features/equipment/types";
  * WHY: This is the primary entry point for equipment management. Staff see
  * real-time equipment status via Convex subscriptions, can filter by status,
  * and navigate to create new equipment or view details.
+ *
+ * Responsive: DataTable on tablet/desktop, card grid on mobile (< md).
  */
 export default function EquipmentListPage() {
   const [filters, setFilters] = useState<EquipmentFilters>({});
@@ -64,7 +67,8 @@ export default function EquipmentListPage() {
         <Button asChild>
           <Link href="/hospital/equipment/new">
             <PlusIcon className="mr-2 h-4 w-4" />
-            {equipmentLabels.addEquipment.vi}
+            <span className="hidden sm:inline">{equipmentLabels.addEquipment.vi}</span>
+            <span className="sm:hidden">+</span>
           </Link>
         </Button>
       </div>
@@ -72,15 +76,58 @@ export default function EquipmentListPage() {
       {/* Filters */}
       <EquipmentFiltersBar filters={filters} onChange={setFilters} />
 
-      {/* Equipment table */}
-      <EquipmentTable
-        equipment={equipment}
-        isLoading={isLoading}
-        canLoadMore={canLoadMore}
-        isLoadingMore={isLoadingMore}
-        onLoadMore={loadMore}
-        onBulkUpdateStatus={handleBulkUpdateStatus}
-      />
+      {/* Mobile card view (shown on small screens) */}
+      <div className="md:hidden">
+        {isLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-muted h-40 animate-pulse rounded-lg" />
+            ))}
+          </div>
+        ) : equipment.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-md border border-dashed px-6 py-16 text-center">
+            <p className="text-muted-foreground text-lg font-medium">
+              {equipmentLabels.noEquipment.vi}
+            </p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {equipmentLabels.noEquipmentDesc.vi}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {equipment.map((item) => (
+              <EquipmentCard key={item._id} equipment={item} />
+            ))}
+          </div>
+        )}
+
+        {/* Load more for mobile */}
+        {canLoadMore && (
+          <div className="mt-4 flex justify-center">
+            <Button
+              variant="outline"
+              onClick={loadMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore
+                ? equipmentLabels.loading.vi
+                : equipmentLabels.loadMore.vi}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop/tablet table view */}
+      <div className="hidden md:block">
+        <EquipmentTable
+          equipment={equipment}
+          isLoading={isLoading}
+          canLoadMore={canLoadMore}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={loadMore}
+          onBulkUpdateStatus={handleBulkUpdateStatus}
+        />
+      </div>
     </div>
   );
 }

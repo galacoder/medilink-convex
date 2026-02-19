@@ -9,6 +9,7 @@ import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 
 import { EquipmentDetail } from "~/features/equipment/components/equipment-detail";
+import { EquipmentQR } from "~/features/equipment/components/equipment-qr";
 import { HistoryTimeline } from "~/features/equipment/components/history-timeline";
 import { useEquipmentDetail } from "~/features/equipment/hooks/use-equipment-detail";
 import { equipmentLabels } from "~/features/equipment/labels";
@@ -108,19 +109,28 @@ export default function EquipmentDetailPage() {
           <EquipmentDetail equipment={equipment} />
         </div>
 
-        {/* History timeline (right column) */}
-        <div className="space-y-4">
-          <h2 className="text-base font-semibold">
-            {equipmentLabels.history.vi}{" "}
-            <span className="text-muted-foreground font-normal">
-              ({equipmentLabels.history.en})
-            </span>
-          </h2>
-          <HistoryTimeline
-            history={history}
-            isLoading={historyLoading}
-            onLoadMore={loadMoreHistory}
+        {/* Right column: QR code + History timeline */}
+        <div className="space-y-6">
+          {/* QR Code */}
+          <EquipmentQR
+            equipmentId={equipment._id}
+            equipmentName={equipment.nameVi}
           />
+
+          {/* History timeline */}
+          <div className="space-y-4">
+            <h2 className="text-base font-semibold">
+              {equipmentLabels.history.vi}{" "}
+              <span className="text-muted-foreground font-normal">
+                ({equipmentLabels.history.en})
+              </span>
+            </h2>
+            <HistoryTimeline
+              history={history}
+              isLoading={historyLoading}
+              onLoadMore={loadMoreHistory}
+            />
+          </div>
         </div>
       </div>
     </div>
