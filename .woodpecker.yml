@@ -69,7 +69,7 @@ steps:
     image: mcr.microsoft.com/playwright:v1.50.0-noble
     depends_on: [smoke-test]
     environment:
-      - NEXTAUTH_URL=http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000
     commands:
       - corepack enable
       - corepack prepare pnpm@10.19.0 --activate
