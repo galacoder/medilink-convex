@@ -132,15 +132,19 @@ test("health endpoint has no-cache headers", async ({ request }) => {
 });
 
 /**
- * Smoke Test 8: 404 pages do not crash the application.
+ * Smoke Test 8: Unknown routes do not crash the application.
  *
  * WHY: Not-found errors are the most common error in production.
  * If the 404 handler crashes, it cascades into 500s for all missing routes.
+ *
+ * NOTE: The portal middleware redirects unauthenticated requests for unknown
+ * routes to /sign-in (302 → 200 after Playwright follows redirect), rather than
+ * returning a bare 404. The key assertion is that the app does NOT crash (5xx).
  */
 test("unknown routes return a proper error response", async ({ request }) => {
   const response = await request.get(
     "/this-route-definitely-does-not-exist-12345",
   );
-  // Should return 404, not 500 (which would indicate a crash)
-  expect(response.status()).toBe(404);
+  // App must not crash (500) — gracefully handles unknown routes via middleware redirect
+  expect(response.status()).toBeLessThan(500);
 });

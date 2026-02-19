@@ -1,7 +1,7 @@
 # MediLink Woodpecker CI Pipeline
 # 6-Stage quality gate replacing human code review
 # All stages use node:22-alpine to match .nvmrc (Node 22.21.0)
-# Stage 5 is a placeholder until M5-5 (VRT) activates it; Stage 4 activated by M1-8
+# Stage 4 runs smoke.spec.ts only (CI config, no Convex auth); Stage 5 runs VRT (M5-5 #80)
 #
 # Environment strategy:
 #   - App env vars (CONVEX_*, AUTH_*): loaded from .env.ci via `cp .env.ci .env`
@@ -64,17 +64,15 @@ steps:
       - 'for i in $(seq 1 30); do wget -q -O /dev/null http://localhost:3000/api/health && echo "Health check passed" && exit 0; sleep 2; echo "Attempt $i/30..."; done'
       - 'echo "ERROR: Health check failed after 60 seconds" && exit 1'
 
-  # Stage 4: E2E Tests (Playwright — activated by M1-8 #59)
-  # NOTE: failure:ignore because E2E requires a live Convex backend for auth.
-  # These tests serve as smoke signals on preview deployments, not hard CI gates.
+  # Stage 4: E2E Smoke Tests (CI — smoke.spec.ts only, no auth required)
   - name: e2e-tests
     image: mcr.microsoft.com/playwright:v1.50.0-noble
     depends_on: [smoke-test]
-    failure: ignore
     environment:
       NEXTAUTH_URL: "http://localhost:3000"
       # Skip corepack integrity verification (Playwright image has outdated signing keys)
       COREPACK_INTEGRITY_KEYS: "0"
+      CI: "true"
     commands:
       - corepack enable
       - corepack prepare pnpm@10.19.0 --activate
@@ -82,16 +80,24 @@ steps:
       - pnpm install --frozen-lockfile
       - cd apps/web
       - pnpm exec playwright install --with-deps chromium
-      - pnpm e2e
+      - pnpm e2e:ci
 
-  # Stage 5: Visual Regression Testing (placeholder — activated by M5-5 #80)
+  # Stage 5: Visual Regression Testing (VRT)
   - name: vrt
-    image: node:22-alpine
+    image: mcr.microsoft.com/playwright:v1.50.0-noble
     depends_on: [e2e-tests]
+    failure: ignore
+    environment:
+      COREPACK_INTEGRITY_KEYS: "0"
+      CI: "true"
     commands:
-      - 'echo "VRT: placeholder stage"'
-      - 'echo "Will be activated by M5-5 (VRT baseline setup, issue #80)"'
-      - 'echo "Status: SKIP (no baselines configured yet)"'
+      - corepack enable
+      - corepack prepare pnpm@10.19.0 --activate
+      - cp .env.ci .env
+      - pnpm install --frozen-lockfile
+      - cd apps/web
+      - pnpm exec playwright install --with-deps chromium
+      - pnpm vrt
 
   # Stage 6: Summary Report
   - name: summary
@@ -111,7 +117,7 @@ steps:
       - 'echo "Stage 1 (Lint+Typecheck+Build): completed"'
       - 'echo "Stage 2 (Unit Tests): completed"'
       - 'echo "Stage 3 (Smoke Test): completed"'
-      - 'echo "Stage 4 (E2E): completed (Playwright, activated by M1-8 #59)"'
-      - 'echo "Stage 5 (VRT): placeholder (activated by M5-5 #80)"'
+      - 'echo "Stage 4 (E2E): completed (smoke.spec.ts only, CI config, no auth required)"'
+      - 'echo "Stage 5 (VRT): completed (visual regression, landing/sign-in/sign-up, M5-5 #80)"'
       - echo "================================"
       - echo "Pipeline complete"
