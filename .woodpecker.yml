@@ -6,7 +6,11 @@
 # Environment strategy:
 #   - App env vars (CONVEX_*, AUTH_*): loaded from .env.ci via `cp .env.ci .env`
 #   - Turbo cache (TURBO_TEAM, TURBO_TOKEN): set via Woodpecker CI secrets
+#   - CI=true is set per-stage where needed (smoke-test, e2e-tests, vrt)
 #   - Do NOT declare app vars in environment: section (avoids overriding .env.ci)
+#
+# Build uses Turborepo: `pnpm build` at root → `turbo run build` (turbo.json task graph)
+# Turborepo remote cache enabled via TURBO_TEAM + TURBO_TOKEN secrets for faster CI
 
 when:
   event: [push, pull_request]
@@ -30,6 +34,8 @@ steps:
       - pnpm install --frozen-lockfile
       - pnpm lint
       - pnpm typecheck
+      # turbo run build — Turborepo builds all workspaces in dependency order
+      # Equivalent to: pnpm exec turbo run build (root package.json delegates to turbo)
       - pnpm build
 
   # Stage 2: Unit Tests (Vitest)
@@ -52,6 +58,11 @@ steps:
   - name: smoke-test
     image: node:22-alpine
     depends_on: [unit-tests]
+    environment:
+      # CI=true is required so the /api/health route skips the CI-placeholder CONVEX_URL
+      # check (which was added in PR #122). Without CI=true, the health route returns 503
+      # for placeholder URLs, causing the wget health check loop to never succeed.
+      CI: "true"
     commands:
       - apk add --no-cache wget
       - corepack enable
