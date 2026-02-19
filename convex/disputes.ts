@@ -241,8 +241,10 @@ export const addMessage = mutation({
     attachmentUrls: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    // 1. Authenticate
-    const auth = await localRequireAuth(ctx);
+    // 1. Authenticate with org context — required to verify dispute ownership.
+    // WHY: Without an org check, any authenticated user can add messages to any
+    // dispute by guessing a disputeId — a CRITICAL cross-org write vulnerability.
+    const auth = await localRequireOrgAuth(ctx);
 
     // 2. Load the dispute to verify it exists
     const dispute = await ctx.db.get(args.disputeId);
@@ -253,7 +255,31 @@ export const addMessage = mutation({
       });
     }
 
-    // 3. Insert the message
+    // 3. Verify access: caller's org must be the hospital that raised the dispute
+    // OR the provider org assigned to the linked service request.
+    // WHY: Without this check any authenticated user from any org can inject
+    // messages into disputes they have no relationship to.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền thêm tin nhắn vào khiếu nại này. (You do not have access to add messages to this dispute.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    // 5. Insert the message
     const now = Date.now();
     const messageId = await ctx.db.insert("disputeMessages", {
       disputeId: args.disputeId,
@@ -265,12 +291,12 @@ export const addMessage = mutation({
       updatedAt: now,
     });
 
-    // 4. Update the dispute's updatedAt timestamp
+    // 6. Update the dispute's updatedAt timestamp
     await ctx.db.patch(args.disputeId, {
       updatedAt: now,
     });
 
-    // 5. Create audit log entry (Vietnamese medical device 5-year retention requirement).
+    // 7. Create audit log entry (Vietnamese medical device 5-year retention requirement).
     // WHY: addMessage was the only mutation in this file not calling createAuditEntry,
     // creating a compliance gap. All dispute communications must be auditable.
     await createAuditEntry(ctx, {

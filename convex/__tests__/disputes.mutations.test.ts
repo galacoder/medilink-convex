@@ -441,6 +441,29 @@ describe("disputes.addMessage", () => {
     expect(auditLogs.length).toBeGreaterThan(0);
     expect(auditLogs[0].resourceType).toBe("disputeMessages");
   });
+
+  it("test_addMessage_rejects_cross_org_access", async () => {
+    // WHY: Without org verification any authenticated user from an unrelated org
+    // could inject messages into disputes they have no relationship to —
+    // a CRITICAL cross-org write vulnerability.
+    const t = convexTest(schema, modules);
+    const ownerOrgId = await seedOrganization(t, "SPMET Hospital A");
+    const attackerOrgId = await seedOrganization(t, "Unrelated Org B");
+    const userId = await seedUser(t);
+    const equipId = await seedEquipment(t, ownerOrgId);
+    const srId = await seedServiceRequest(t, ownerOrgId, equipId, userId);
+    const disputeId = await seedDispute(t, ownerOrgId, srId, userId);
+
+    // Caller is authenticated but belongs to a completely different organization.
+    const asAttacker = t.withIdentity({ organizationId: attackerOrgId, subject: userId });
+
+    await expect(
+      asAttacker.mutation(api.disputes.addMessage, {
+        disputeId: disputeId as any,
+        contentVi: "Tin nhắn trái phép từ tổ chức khác",
+      }),
+    ).rejects.toThrow();
+  });
 });
 
 // ===========================================================================
