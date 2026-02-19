@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useId } from "react";
+
 import { Button } from "@medilink/ui/button";
+
 import { useQRScanner } from "../hooks/useQRScanner";
 
 /**

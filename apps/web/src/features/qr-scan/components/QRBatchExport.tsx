@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import { Button } from "@medilink/ui/button";
 
 /**
@@ -48,8 +49,7 @@ export function QRBatchExport({
       const result = await onBatchGenerate(categoryId);
       setBatchState({ status: "done", result });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Unknown error";
+      const message = err instanceof Error ? err.message : "Unknown error";
       setBatchState({
         status: "error",
         // vi: "Lỗi tạo mã QR hàng loạt" / en: "Batch generation error"
@@ -112,13 +112,11 @@ export function QRBatchExport({
           {/* vi: "Đã tạo X mã QR, bỏ qua Y (đã có)" */}
           {/* en: "Generated X QR codes, skipped Y (already exist)" */}
           <p>
-            Đã tạo:{" "}
-            <strong>{batchState.result.generated}</strong> mã QR{" "}
+            Đã tạo: <strong>{batchState.result.generated}</strong> mã QR{" "}
             {/* Generated: X QR codes */}
           </p>
           <p>
-            Bỏ qua:{" "}
-            <strong>{batchState.result.skipped}</strong> (đã có mã QR){" "}
+            Bỏ qua: <strong>{batchState.result.skipped}</strong> (đã có mã QR){" "}
             {/* Skipped: Y (already have QR codes) */}
           </p>
         </div>

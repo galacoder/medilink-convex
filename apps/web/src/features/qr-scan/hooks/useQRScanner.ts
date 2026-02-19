@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import type { Html5Qrcode } from "html5-qrcode";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Custom hook for managing the html5-qrcode scanner lifecycle.

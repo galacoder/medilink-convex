@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import { Button } from "@medilink/ui/button";
 
 /**
@@ -94,9 +95,7 @@ export function QRCodeDisplay({
       data-testid="qr-code-display"
     >
       {/* vi: "Mã QR" / en: "QR Code" */}
-      <h3 className="text-sm font-medium">
-        Mã QR {/* QR Code */}
-      </h3>
+      <h3 className="text-sm font-medium">Mã QR {/* QR Code */}</h3>
 
       {error ? (
         <div className="text-destructive text-sm" data-testid="qr-code-error">

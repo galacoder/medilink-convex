@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 
@@ -62,10 +63,7 @@ export function QROfflineFallback({ onSubmit }: QROfflineFallbackProps) {
           autoCorrect="off"
           spellCheck={false}
         />
-        <Button
-          type="submit"
-          data-testid="qr-fallback-submit"
-        >
+        <Button type="submit" data-testid="qr-fallback-submit">
           {/* vi: "Tìm thiết bị" / en: "Find Equipment" */}
           Tìm thiết bị {/* Find Equipment */}
         </Button>
