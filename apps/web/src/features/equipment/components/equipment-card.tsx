@@ -103,9 +103,8 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
           <Badge
             className={`border text-xs ${getCriticalityColor(equipment.criticality)}`}
           >
-            {equipmentLabels.criticalityValues[
-              equipment.criticality as keyof typeof equipmentLabels.criticalityValues
-            ]?.vi ?? equipment.criticality}
+            {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+            {equipmentLabels.criticalityValues[equipment.criticality]?.vi ?? equipment.criticality}
           </Badge>
         </div>
 

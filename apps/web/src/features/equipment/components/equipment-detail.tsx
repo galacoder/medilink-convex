@@ -35,8 +35,11 @@ import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
 import { StatusBadge } from "./status-badge";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const equipmentApi = api.equipment as any;
+// Pre-cast to avoid per-call unsafe-member-access errors
+const updateStatusFn: FunctionReference<"mutation"> = equipmentApi.updateStatus;
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 // Valid transitions map (mirrors convex/lib/statusMachine.ts)
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -82,9 +85,7 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
   const [notes, setNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const updateStatus = useMutation(
-    equipmentApi.updateStatus as FunctionReference<"mutation">,
-  );
+  const updateStatus = useMutation(updateStatusFn);
 
   const validTransitions = VALID_TRANSITIONS[equipment.status] ?? [];
 
@@ -107,15 +108,15 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const conditionLabel =
-    equipmentLabels.conditionValues[
-      equipment.condition as keyof typeof equipmentLabels.conditionValues
-    ]?.vi ?? equipment.condition;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    equipmentLabels.conditionValues[equipment.condition]?.vi ?? equipment.condition;
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const criticalityLabel =
-    equipmentLabels.criticalityValues[
-      equipment.criticality as keyof typeof equipmentLabels.criticalityValues
-    ]?.vi ?? equipment.criticality;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    equipmentLabels.criticalityValues[equipment.criticality]?.vi ?? equipment.criticality;
 
   return (
     <div className="space-y-6">
@@ -229,9 +230,8 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
                 <SelectContent>
                   {validTransitions.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {equipmentLabels.statusValues[
-                        status as EquipmentStatus
-                      ]?.vi ?? status}
+                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
+                      {equipmentLabels.statusValues[status as EquipmentStatus]?.vi ?? status}
                     </SelectItem>
                   ))}
                 </SelectContent>

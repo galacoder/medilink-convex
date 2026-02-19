@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightIcon, ClipboardIcon, WrenchIcon, SearchIcon, AlertCircleIcon } from "lucide-react";
+import { ArrowRightIcon, WrenchIcon, SearchIcon, AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 
@@ -59,6 +59,7 @@ function getActionLabel(actionType: HistoryActionType): string {
     repair: { vi: "Sửa chữa", en: "Repaired" },
     inspection: { vi: "Kiểm tra", en: "Inspected" },
   };
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return map[actionType]?.vi ?? actionType;
 }
 
@@ -78,7 +79,7 @@ export function HistoryTimeline({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} className="flex gap-3">
             <div className="bg-muted h-8 w-8 animate-pulse rounded-full" />
             <div className="flex-1 space-y-2">
@@ -108,9 +109,11 @@ export function HistoryTimeline({
             <div className="flex flex-col items-center">
               <div
                 className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
+                  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                   actionColorMap[entry.actionType] ?? "bg-gray-100 text-gray-600"
                 }`}
               >
+                {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
                 {actionIconMap[entry.actionType] ?? (
                   <AlertCircleIcon className="h-4 w-4" />
                 )}

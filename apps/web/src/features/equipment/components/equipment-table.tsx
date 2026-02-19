@@ -3,18 +3,18 @@
 import { useState } from "react";
 
 import {
-  type ColumnDef,
-  type RowSelectionState,
+  
+  
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  type SortingState,
-  useReactTable,
+  
+  useReactTable
 } from "@tanstack/react-table";
+import type {ColumnDef, RowSelectionState, SortingState} from "@tanstack/react-table";
 import { ChevronDownIcon, ChevronUpIcon, MoreHorizontalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import { Checkbox } from "@medilink/ui/checkbox";
 import {
@@ -243,17 +243,17 @@ export function EquipmentTable({
     return (
       <div className="overflow-hidden rounded-md border">
         <div className="bg-muted/50 grid grid-cols-[40px_1fr_140px_120px_120px_40px] gap-4 px-4 py-3">
-          {[...Array(6)].map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-4 w-full" />
           ))}
         </div>
         <div className="divide-y">
-          {[...Array(5)].map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
               className="grid grid-cols-[40px_1fr_140px_120px_120px_40px] items-center gap-4 px-4 py-4"
             >
-              {[...Array(6)].map((_, j) => (
+              {Array.from({ length: 6 }).map((_, j) => (
                 <Skeleton key={j} className="h-5 w-full" />
               ))}
             </div>
@@ -305,6 +305,7 @@ export function EquipmentTable({
                     key={status}
                     onClick={() => handleBulkUpdateStatus(status)}
                   >
+                    {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
                     {equipmentLabels.statusValues[status as keyof typeof equipmentLabels.statusValues]?.vi ?? status}
                   </DropdownMenuItem>
                 ))}

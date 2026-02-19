@@ -28,7 +28,7 @@ export default function EquipmentListLoading() {
           <Skeleton className="h-4 w-full" />
         </div>
         <div className="divide-y">
-          {[...Array(5)].map((_, i) => (
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-4 px-4 py-4">
               <Skeleton className="h-4 w-4" />
               <Skeleton className="h-5 flex-1" />

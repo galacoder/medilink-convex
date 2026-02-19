@@ -90,19 +90,21 @@ describe("EquipmentForm", () => {
   });
 
   it("does not show status field in edit mode", () => {
+    // Use type assertions at the object level to avoid per-field any casts
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const mockEquipment = {
-      _id: "eq1" as any,
+      _id: "eq1",
       _creationTime: Date.now(),
       nameVi: "Test",
       nameEn: "Test EN",
-      categoryId: "cat1" as any,
-      organizationId: "org1" as any,
+      categoryId: "cat1",
+      organizationId: "org1",
       status: "available" as const,
       condition: "good" as const,
       criticality: "B" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    };
+    } as import("../types").Equipment;
     render(
       <EquipmentForm
         mode="edit"
@@ -116,19 +118,20 @@ describe("EquipmentForm", () => {
   });
 
   it("shows 'Lưu' button in edit mode", () => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const mockEquipment = {
-      _id: "eq1" as any,
+      _id: "eq1",
       _creationTime: Date.now(),
       nameVi: "Test",
       nameEn: "Test EN",
-      categoryId: "cat1" as any,
-      organizationId: "org1" as any,
+      categoryId: "cat1",
+      organizationId: "org1",
       status: "available" as const,
       condition: "good" as const,
       criticality: "B" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    };
+    } as import("../types").Equipment;
     render(
       <EquipmentForm
         mode="edit"
