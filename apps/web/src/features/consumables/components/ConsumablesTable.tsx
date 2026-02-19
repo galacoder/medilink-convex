@@ -97,7 +97,7 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
           value={categoryFilter ?? ""}
           onChange={(e) =>
             setCategoryFilter(
-              (e.target.value as ConsumableCategoryType) || undefined,
+              e.target.value ? (e.target.value as ConsumableCategoryType) : undefined,
             )
           }
           className="rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -118,7 +118,7 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
           value={stockFilter ?? ""}
           onChange={(e) =>
             setStockFilter(
-              (e.target.value as ConsumableStockLevel) || undefined,
+              e.target.value ? (e.target.value as ConsumableStockLevel) : undefined,
             )
           }
           className="rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -185,8 +185,7 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    {CATEGORY_LABELS[consumable.categoryType as ConsumableCategoryType]?.[locale] ??
-                      consumable.categoryType}
+                    {CATEGORY_LABELS[consumable.categoryType][locale]}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
                     {consumable.currentStock}

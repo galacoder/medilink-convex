@@ -80,7 +80,7 @@ export function ReorderForm({
       setQuantity("");
       setNotes("");
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setError(LABELS.error[locale]);
     } finally {
       setIsSubmitting(false);

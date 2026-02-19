@@ -9,7 +9,9 @@
  *
  * vi: "Trang chi tiết vật tư tiêu hao" / en: "Consumable Detail Page"
  */
+import { use } from "react";
 import Link from "next/link";
+import { useSession } from "~/auth/client";
 import { useConsumable } from "~/features/consumables/hooks/useConsumables";
 import { StockAlertBadge } from "~/features/consumables/components/StockAlertBadge";
 import { UsageLogTable } from "~/features/consumables/components/UsageLogTable";
@@ -32,16 +34,20 @@ const LABELS = {
   sku: { vi: "Mã SKU", en: "SKU" },
   manufacturer: { vi: "Nhà sản xuất", en: "Manufacturer" },
   loading: { vi: "Đang tải...", en: "Loading..." },
+  signInToReorder: {
+    vi: "Đăng nhập để tạo yêu cầu đặt hàng",
+    en: "Sign in to create reorder request",
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
-// Props
+// Props — Next.js 15: params is a Promise
 // ---------------------------------------------------------------------------
 
 interface ConsumableDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -56,9 +62,15 @@ interface ConsumableDetailPageProps {
 export default function ConsumableDetailPage({
   params,
 }: ConsumableDetailPageProps) {
+  // FIX 6: Next.js 15 async params — use React.use() to unwrap the Promise
+  const { id } = use(params);
   const locale = "vi" as const;
-  const consumableId = params.id as Id<"consumables">;
+  const consumableId = id as Id<"consumables">;
   const consumable = useConsumable(consumableId);
+
+  // FIX 1: Get authenticated user to pass as requestedBy to ReorderForm
+  const { data: session } = useSession();
+  const currentUserId = session?.user.id as Id<"users"> | undefined;
 
   if (consumable === undefined) {
     return (
@@ -75,7 +87,7 @@ export default function ConsumableDetailPage({
           href="/hospital/consumables"
           className="text-sm text-muted-foreground hover:underline"
         >
-          ← {LABELS.back[locale]}
+          &larr; {LABELS.back[locale]}
         </Link>
         <div className="rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">{LABELS.notFound[locale]}</p>
@@ -91,7 +103,7 @@ export default function ConsumableDetailPage({
         href="/hospital/consumables"
         className="text-sm text-muted-foreground hover:underline"
       >
-        ← {LABELS.back[locale]}
+        &larr; {LABELS.back[locale]}
       </Link>
 
       {/* Page heading with stock badge */}
@@ -158,11 +170,18 @@ export default function ConsumableDetailPage({
           <UsageLogTable consumableId={consumableId} locale={locale} />
         </div>
         <div>
-          {/* WHY: requestedBy needs the authenticated user ID - placeholder for auth integration */}
-          {/* The ReorderForm will be wired to the actual user ID once auth provides it */}
-          <div className="rounded-lg border p-4 text-sm text-muted-foreground">
-            Đăng nhập để tạo yêu cầu đặt hàng {/* Sign in to create reorder request */}
-          </div>
+          {/* FIX 1: Render ReorderForm when the user is authenticated */}
+          {currentUserId ? (
+            <ReorderForm
+              consumableId={consumableId}
+              requestedBy={currentUserId}
+              locale={locale}
+            />
+          ) : (
+            <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+              {LABELS.signInToReorder[locale]}
+            </div>
+          )}
         </div>
       </div>
     </div>

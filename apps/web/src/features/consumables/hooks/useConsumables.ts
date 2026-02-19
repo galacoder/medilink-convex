@@ -4,21 +4,48 @@
  * Hook for consumables data access.
  * Wraps Convex useQuery for list/getById and useMutation for CRUD operations.
  *
+ * WHY: The generated api.d.ts declares `api` as `AnyApi` until `npx convex dev`
+ * runs in CI/prod. We import `anyApi` from convex/server — the official typed
+ * alternative — to avoid `as any` casts and keep `no-unsafe-*` rules clean.
+ * We then cast return values to our manually-defined interfaces so the rest of
+ * the codebase is fully typed.
+ *
  * vi: "Hook dữ liệu vật tư tiêu hao" / en: "Consumables data hook"
  */
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-import { api as _api } from "../../../../../../convex/_generated/api";
+import type { FunctionReference } from "convex/server";
+import { anyApi } from "convex/server";
 import type { Id } from "../../../../../../convex/_generated/dataModel";
 
-// WHY: convex dev hasn't been run in this environment so _generated/api.d.ts
-// uses AnyApi which makes property access possibly undefined. Cast to any to
-// allow TypeScript to resolve function references. At runtime anyApi works correctly.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const api = _api as any;
+// ---------------------------------------------------------------------------
+// Module-level function references (typed once, reused across hooks)
+// WHY: anyApi.consumables is Record<string, T> | undefined in strict mode.
+// We extract references once with non-null assertion (!) — safe because
+// anyApi always has the consumables module at runtime.
+// ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const consumablesModule = anyApi.consumables!;
+
+const consumablesRefs = {
+  // Queries
+  list: consumablesModule.list as FunctionReference<"query">,
+  getById: consumablesModule.getById as FunctionReference<"query">,
+  getUsageLog: consumablesModule.getUsageLog as FunctionReference<"query">,
+  getReorderRequests: consumablesModule.getReorderRequests as FunctionReference<"query">,
+  getLowStock: consumablesModule.getLowStock as FunctionReference<"query">,
+  // Mutations
+  create: consumablesModule.create as FunctionReference<"mutation">,
+  update: consumablesModule.update as FunctionReference<"mutation">,
+  recordUsage: consumablesModule.recordUsage as FunctionReference<"mutation">,
+  receiveStock: consumablesModule.receiveStock as FunctionReference<"mutation">,
+  adjustStock: consumablesModule.adjustStock as FunctionReference<"mutation">,
+  createReorderRequest: consumablesModule.createReorderRequest as FunctionReference<"mutation">,
+  updateReorderStatus: consumablesModule.updateReorderStatus as FunctionReference<"mutation">,
+};
 
 // ---------------------------------------------------------------------------
-// Type aliases for common filter args
+// Domain types matching convex/schema.ts consumables tables
 // ---------------------------------------------------------------------------
 
 export type ConsumableCategoryType =
@@ -31,6 +58,56 @@ export type ConsumableCategoryType =
   | "other";
 
 export type ConsumableStockLevel = "in_stock" | "low" | "out_of_stock";
+
+export type ConsumableTransactionType =
+  | "RECEIVE"
+  | "USAGE"
+  | "ADJUSTMENT"
+  | "WRITE_OFF"
+  | "EXPIRED";
+
+export interface ConsumableDoc {
+  _id: Id<"consumables">;
+  _creationTime: number;
+  organizationId: Id<"organizations">;
+  nameVi: string;
+  nameEn: string;
+  descriptionVi?: string;
+  descriptionEn?: string;
+  sku?: string;
+  manufacturer?: string;
+  unitOfMeasure: string;
+  categoryType: ConsumableCategoryType;
+  currentStock: number;
+  parLevel: number;
+  maxLevel?: number;
+  reorderPoint: number;
+  unitCost?: number;
+  relatedEquipmentId?: Id<"equipment">;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface ConsumableWithEquipment extends ConsumableDoc {
+  relatedEquipment: {
+    _id: Id<"equipment">;
+    nameVi: string;
+    nameEn: string;
+  } | null;
+}
+
+export interface ConsumableUsageLogDoc {
+  _id: Id<"consumableUsageLog">;
+  _creationTime: number;
+  consumableId: Id<"consumables">;
+  quantity: number;
+  transactionType: ConsumableTransactionType;
+  usedBy: Id<"users">;
+  equipmentId?: Id<"equipment">;
+  notes?: string;
+  createdAt: number;
+  updatedAt: number;
+}
 
 // ---------------------------------------------------------------------------
 // Paginated list hook
@@ -49,8 +126,8 @@ export function useConsumablesList(
   } = {},
   numItems = 20,
 ) {
-  return usePaginatedQuery(
-    api.consumables.list,
+  const result = usePaginatedQuery(
+    consumablesRefs.list,
     {
       categoryType: filters.categoryType,
       stockLevel: filters.stockLevel,
@@ -58,6 +135,11 @@ export function useConsumablesList(
     },
     { initialNumItems: numItems },
   );
+
+  return {
+    ...result,
+    results: result.results as ConsumableDoc[],
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -70,7 +152,11 @@ export function useConsumablesList(
  * vi: "Lấy vật tư theo ID" / en: "Get consumable by ID"
  */
 export function useConsumable(id: Id<"consumables"> | null) {
-  return useQuery(api.consumables.getById, id ? { id } : "skip");
+  // WHY: AnyFunctionReference return type boundary — result is `any` until
+  // convex dev generates full types. Cast immediately to our typed interface.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const raw = useQuery(consumablesRefs.getById, id ? { id } : "skip");
+  return raw as ConsumableWithEquipment | null | undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -86,11 +172,16 @@ export function useConsumableUsageLog(
   consumableId: Id<"consumables"> | null,
   numItems = 20,
 ) {
-  return usePaginatedQuery(
-    api.consumables.getUsageLog,
+  const result = usePaginatedQuery(
+    consumablesRefs.getUsageLog,
     consumableId ? { consumableId } : "skip",
     { initialNumItems: numItems },
   );
+
+  return {
+    ...result,
+    results: result.results as ConsumableUsageLogDoc[],
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -110,7 +201,9 @@ export function useReorderRequests(
     | "received"
     | "cancelled",
 ) {
-  return useQuery(api.consumables.getReorderRequests, { status });
+  // WHY: AnyFunctionReference return type boundary — cast handled at call sites
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return useQuery(consumablesRefs.getReorderRequests, { status });
 }
 
 // ---------------------------------------------------------------------------
@@ -122,7 +215,7 @@ export function useReorderRequests(
  * vi: "Tạo vật tư mới" / en: "Create consumable"
  */
 export function useCreateConsumable() {
-  return useMutation(api.consumables.create);
+  return useMutation(consumablesRefs.create);
 }
 
 /**
@@ -130,7 +223,7 @@ export function useCreateConsumable() {
  * vi: "Cập nhật vật tư" / en: "Update consumable"
  */
 export function useUpdateConsumable() {
-  return useMutation(api.consumables.update);
+  return useMutation(consumablesRefs.update);
 }
 
 /**
@@ -138,7 +231,7 @@ export function useUpdateConsumable() {
  * vi: "Ghi nhận sử dụng" / en: "Record usage"
  */
 export function useRecordUsage() {
-  return useMutation(api.consumables.recordUsage);
+  return useMutation(consumablesRefs.recordUsage);
 }
 
 /**
@@ -146,7 +239,7 @@ export function useRecordUsage() {
  * vi: "Nhận hàng" / en: "Receive stock"
  */
 export function useReceiveStock() {
-  return useMutation(api.consumables.receiveStock);
+  return useMutation(consumablesRefs.receiveStock);
 }
 
 /**
@@ -154,7 +247,7 @@ export function useReceiveStock() {
  * vi: "Điều chỉnh tồn kho" / en: "Adjust stock"
  */
 export function useAdjustStock() {
-  return useMutation(api.consumables.adjustStock);
+  return useMutation(consumablesRefs.adjustStock);
 }
 
 /**
@@ -162,7 +255,7 @@ export function useAdjustStock() {
  * vi: "Tạo yêu cầu đặt hàng" / en: "Create reorder request"
  */
 export function useCreateReorderRequest() {
-  return useMutation(api.consumables.createReorderRequest);
+  return useMutation(consumablesRefs.createReorderRequest);
 }
 
 /**
@@ -170,5 +263,5 @@ export function useCreateReorderRequest() {
  * vi: "Cập nhật trạng thái đặt hàng" / en: "Update reorder status"
  */
 export function useUpdateReorderStatus() {
-  return useMutation(api.consumables.updateReorderStatus);
+  return useMutation(consumablesRefs.updateReorderStatus);
 }

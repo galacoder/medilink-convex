@@ -115,16 +115,16 @@ export function UsageLogTable({
               </tr>
             ) : (
               results.map((entry) => {
-                const txType = entry.transactionType as keyof typeof TRANSACTION_LABELS;
+                const txType = entry.transactionType;
                 const txLabel = TRANSACTION_LABELS[txType];
 
                 return (
                   <tr key={entry._id} className="hover:bg-muted/30">
                     <td className="px-4 py-3">
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${txLabel?.color ?? "bg-gray-100 text-gray-800"}`}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${txLabel.color}`}
                       >
-                        {txLabel?.[locale] ?? txType}
+                        {txLabel[locale]}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums font-medium">

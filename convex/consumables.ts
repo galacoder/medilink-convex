@@ -376,6 +376,13 @@ export const recordUsage = mutation({
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
 
+    // FIX 5: Reject non-positive quantity
+    if (args.quantity <= 0) {
+      throw new ConvexError(
+        "Số lượng phải lớn hơn 0 (Quantity must be greater than 0)",
+      );
+    }
+
     const consumable = await ctx.db.get(args.consumableId);
     if (!consumable || consumable.organizationId !== organizationId) {
       throw new ConvexError(
@@ -426,6 +433,13 @@ export const receiveStock = mutation({
   },
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
+
+    // FIX 5: Reject non-positive quantity
+    if (args.quantity <= 0) {
+      throw new ConvexError(
+        "Số lượng nhận phải lớn hơn 0 (Received quantity must be greater than 0)",
+      );
+    }
 
     const consumable = await ctx.db.get(args.consumableId);
     if (!consumable || consumable.organizationId !== organizationId) {
@@ -521,6 +535,13 @@ export const createReorderRequest = mutation({
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
 
+    // FIX 5: Reject non-positive quantity
+    if (args.quantity <= 0) {
+      throw new ConvexError(
+        "Số lượng đặt hàng phải lớn hơn 0 (Order quantity must be greater than 0)",
+      );
+    }
+
     const consumable = await ctx.db.get(args.consumableId);
     if (!consumable || consumable.organizationId !== organizationId) {
       throw new ConvexError(
@@ -586,25 +607,37 @@ export const updateReorderStatus = mutation({
 
     // Auto-receive stock when status transitions to "received"
     if (args.status === "received") {
-      const consumable = await ctx.db.get(request.consumableId);
-      if (consumable) {
-        // ATOMIC: increase stock + log receipt
-        await ctx.db.patch(request.consumableId, {
-          currentStock: consumable.currentStock + request.quantity,
-          updatedAt: now,
-        });
-
-        const performedBy = args.approvedBy ?? request.requestedBy;
-        await ctx.db.insert("consumableUsageLog", {
-          consumableId: request.consumableId,
-          quantity: request.quantity,
-          transactionType: "RECEIVE",
-          usedBy: performedBy,
-          notes: `Nhận hàng từ yêu cầu đặt hàng lại (Received from reorder request)`,
-          createdAt: now,
-          updatedAt: now,
-        });
+      // FIX 3: Idempotency guard — prevent double-receiving stock
+      if (request.status === "received") {
+        throw new ConvexError(
+          "Yêu cầu đặt hàng đã được nhận (Reorder request already received)",
+        );
       }
+
+      const consumable = await ctx.db.get(request.consumableId);
+      // FIX 4: Explicit error when consumable doesn't exist (instead of silent skip)
+      if (!consumable) {
+        throw new ConvexError(
+          "Vật tư không tồn tại (Consumable not found)",
+        );
+      }
+
+      // ATOMIC: increase stock + log receipt
+      await ctx.db.patch(request.consumableId, {
+        currentStock: consumable.currentStock + request.quantity,
+        updatedAt: now,
+      });
+
+      const performedBy = args.approvedBy ?? request.requestedBy;
+      await ctx.db.insert("consumableUsageLog", {
+        consumableId: request.consumableId,
+        quantity: request.quantity,
+        transactionType: "RECEIVE",
+        usedBy: performedBy,
+        notes: `Nhận hàng từ yêu cầu đặt hàng lại (Received from reorder request)`,
+        createdAt: now,
+        updatedAt: now,
+      });
     }
 
     return args.id;
