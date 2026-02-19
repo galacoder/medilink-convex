@@ -34,6 +34,16 @@ export const api = {
     list: makeFunctionReference<"query">("equipment:list"),
     getById: makeFunctionReference<"query">("equipment:getById"),
   },
+  disputes: {
+    listByHospital: makeFunctionReference<"query">("disputes:listByHospital"),
+    getById: makeFunctionReference<"query">("disputes:getById"),
+    getMessages: makeFunctionReference<"query">("disputes:getMessages"),
+    create: makeFunctionReference<"mutation">("disputes:create"),
+    updateStatus: makeFunctionReference<"mutation">("disputes:updateStatus"),
+    addMessage: makeFunctionReference<"mutation">("disputes:addMessage"),
+    escalate: makeFunctionReference<"mutation">("disputes:escalate"),
+    resolve: makeFunctionReference<"mutation">("disputes:resolve"),
+  },
   providers: {
     getProfile: makeFunctionReference<"query">("providers:getProfile"),
     listServiceOfferings: makeFunctionReference<"query">(
