@@ -190,7 +190,29 @@ export const updateStatus = mutation({
       });
     }
 
-    // 3. Enforce state machine
+    // 3. Verify org ownership: caller must belong to the hospital org that raised
+    // the dispute OR the provider org assigned to the linked service request.
+    // WHY: Without this check any authenticated user can modify any dispute by
+    // guessing a disputeId — a CRITICAL cross-org write vulnerability.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền cập nhật trạng thái khiếu nại này. (You do not have access to update this dispute.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    // 4. Enforce state machine
     const currentStatus = dispute.status as DisputeStatus;
     const targetStatus = args.status as DisputeStatus;
 
@@ -203,14 +225,14 @@ export const updateStatus = mutation({
       });
     }
 
-    // 4. Update status
+    // 5. Update status
     const now = Date.now();
     await ctx.db.patch(args.id, {
       status: targetStatus,
       updatedAt: now,
     });
 
-    // 5. Create audit log
+    // 6. Create audit log
     await createAuditEntry(ctx, {
       organizationId: dispute.organizationId,
       actorId: auth.userId as Id<"users">,
@@ -338,7 +360,29 @@ export const escalate = mutation({
       });
     }
 
-    // 3. Enforce state machine
+    // 3. Verify org ownership: caller must belong to the hospital org that raised
+    // the dispute OR the provider org assigned to the linked service request.
+    // WHY: Without this check any authenticated user can escalate any dispute by
+    // guessing a disputeId — a CRITICAL cross-org write vulnerability.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền leo thang khiếu nại này. (You do not have access to escalate this dispute.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    // 4. Enforce state machine
     const currentStatus = dispute.status as DisputeStatus;
     if (!canTransitionDispute(currentStatus, "escalated")) {
       throw new ConvexError({
@@ -349,14 +393,14 @@ export const escalate = mutation({
       });
     }
 
-    // 4. Update status to escalated
+    // 5. Update status to escalated
     const now = Date.now();
     await ctx.db.patch(args.id, {
       status: "escalated",
       updatedAt: now,
     });
 
-    // 5. Create audit entry
+    // 6. Create audit entry
     await createAuditEntry(ctx, {
       organizationId: dispute.organizationId,
       actorId: auth.userId as Id<"users">,
@@ -397,7 +441,29 @@ export const resolve = mutation({
       });
     }
 
-    // 3. Enforce state machine
+    // 3. Verify org ownership: caller must belong to the hospital org that raised
+    // the dispute OR the provider org assigned to the linked service request.
+    // WHY: Without this check any authenticated user can resolve any dispute by
+    // guessing a disputeId — a CRITICAL cross-org write vulnerability.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền giải quyết khiếu nại này. (You do not have access to resolve this dispute.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    // 4. Enforce state machine
     const currentStatus = dispute.status as DisputeStatus;
     if (!canTransitionDispute(currentStatus, "resolved")) {
       throw new ConvexError({
@@ -408,7 +474,7 @@ export const resolve = mutation({
       });
     }
 
-    // 4. Update to resolved with resolvedAt timestamp
+    // 5. Update to resolved with resolvedAt timestamp
     const now = Date.now();
     await ctx.db.patch(args.id, {
       status: "resolved",
@@ -417,7 +483,7 @@ export const resolve = mutation({
       updatedAt: now,
     });
 
-    // 5. Create audit entry
+    // 6. Create audit entry
     await createAuditEntry(ctx, {
       organizationId: dispute.organizationId,
       actorId: auth.userId as Id<"users">,

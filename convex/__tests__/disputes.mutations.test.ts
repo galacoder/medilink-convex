@@ -348,6 +348,28 @@ describe("disputes.updateStatus", () => {
     const disputeAfter = await t.run(async (ctx) => ctx.db.get(disputeId as any)) as any;
     expect(disputeAfter!.updatedAt).toBeGreaterThanOrEqual(before);
   });
+
+  it("test_updateStatus_rejects_cross_org_access", async () => {
+    // WHY: Without org verification any authenticated user from an unrelated org
+    // can change the status of disputes they have no relationship to —
+    // a CRITICAL cross-org write vulnerability.
+    const t = convexTest(schema, modules);
+    const ownerOrgId = await seedOrganization(t, "SPMET Hospital A");
+    const attackerOrgId = await seedOrganization(t, "Unrelated Org B");
+    const userId = await seedUser(t);
+    const equipId = await seedEquipment(t, ownerOrgId);
+    const srId = await seedServiceRequest(t, ownerOrgId, equipId, userId);
+    const disputeId = await seedDispute(t, ownerOrgId, srId, userId, "open");
+
+    const asAttacker = t.withIdentity({ organizationId: attackerOrgId, subject: userId });
+
+    await expect(
+      asAttacker.mutation(api.disputes.updateStatus, {
+        id: disputeId as any,
+        status: "investigating",
+      }),
+    ).rejects.toThrow();
+  });
 });
 
 // ===========================================================================
@@ -522,6 +544,27 @@ describe("disputes.escalate", () => {
     );
     expect(auditLogs.length).toBeGreaterThan(0);
   });
+
+  it("test_escalate_rejects_cross_org_access", async () => {
+    // WHY: Without org verification any authenticated user from an unrelated org
+    // can escalate disputes they have no relationship to —
+    // a CRITICAL cross-org write vulnerability.
+    const t = convexTest(schema, modules);
+    const ownerOrgId = await seedOrganization(t, "SPMET Hospital A");
+    const attackerOrgId = await seedOrganization(t, "Unrelated Org B");
+    const userId = await seedUser(t);
+    const equipId = await seedEquipment(t, ownerOrgId);
+    const srId = await seedServiceRequest(t, ownerOrgId, equipId, userId);
+    const disputeId = await seedDispute(t, ownerOrgId, srId, userId, "open");
+
+    const asAttacker = t.withIdentity({ organizationId: attackerOrgId, subject: userId });
+
+    await expect(
+      asAttacker.mutation(api.disputes.escalate, {
+        id: disputeId as any,
+      }),
+    ).rejects.toThrow();
+  });
 });
 
 // ===========================================================================
@@ -548,5 +591,27 @@ describe("disputes.resolve", () => {
     expect(dispute!.status).toBe("resolved");
     expect(dispute!.resolvedAt).toBeGreaterThanOrEqual(before);
     expect(dispute!.resolutionNotes).toBe("Vấn đề đã được giải quyết sau khi xem xét kỹ.");
+  });
+
+  it("test_resolve_rejects_cross_org_access", async () => {
+    // WHY: Without org verification any authenticated user from an unrelated org
+    // can resolve disputes they have no relationship to —
+    // a CRITICAL cross-org write vulnerability.
+    const t = convexTest(schema, modules);
+    const ownerOrgId = await seedOrganization(t, "SPMET Hospital A");
+    const attackerOrgId = await seedOrganization(t, "Unrelated Org B");
+    const userId = await seedUser(t);
+    const equipId = await seedEquipment(t, ownerOrgId);
+    const srId = await seedServiceRequest(t, ownerOrgId, equipId, userId);
+    const disputeId = await seedDispute(t, ownerOrgId, srId, userId, "investigating");
+
+    const asAttacker = t.withIdentity({ organizationId: attackerOrgId, subject: userId });
+
+    await expect(
+      asAttacker.mutation(api.disputes.resolve, {
+        id: disputeId as any,
+        resolutionNotes: "Unauthorized resolution attempt",
+      }),
+    ).rejects.toThrow();
   });
 });
