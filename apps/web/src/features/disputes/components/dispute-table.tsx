@@ -1,16 +1,19 @@
 "use client";
 
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
-import { ChevronDownIcon, ChevronUpIcon, MoreHorizontalIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  MoreHorizontalIcon,
+} from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 import {
@@ -29,8 +32,8 @@ import {
   TableRow,
 } from "@medilink/ui/table";
 
-import { disputeLabels } from "../labels";
 import type { DisputeWithRef } from "../types";
+import { disputeLabels } from "../labels";
 import { DisputeStatusBadge } from "./dispute-status-badge";
 
 interface DisputeTableProps {
@@ -98,7 +101,8 @@ export function DisputeTable({
       header: disputeLabels.fields.serviceRequest.vi,
       cell: ({ row }) => {
         const ref = row.original.serviceRequestRef;
-        if (!ref) return <span className="text-muted-foreground text-sm">—</span>;
+        if (!ref)
+          return <span className="text-muted-foreground text-sm">—</span>;
         return (
           <span className="text-muted-foreground max-w-[200px] truncate text-sm">
             {ref.description}
@@ -236,7 +240,9 @@ export function DisputeTable({
               <TableRow
                 key={row.id}
                 className="cursor-pointer"
-                onClick={() => router.push(`/hospital/disputes/${row.original._id}`)}
+                onClick={() =>
+                  router.push(`/hospital/disputes/${row.original._id}`)
+                }
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

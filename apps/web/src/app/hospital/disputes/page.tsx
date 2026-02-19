@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
-
 import type { Id } from "convex/_generated/dataModel";
-import { AlertCircleIcon } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
+import { AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 import {
@@ -15,12 +14,12 @@ import {
   DialogTrigger,
 } from "@medilink/ui/dialog";
 
+import type { DisputeStatus } from "~/features/disputes/types";
 import { useActiveOrganization } from "~/auth/client";
 import { DisputeForm } from "~/features/disputes/components/dispute-form";
 import { DisputeTable } from "~/features/disputes/components/dispute-table";
 import { useDisputes } from "~/features/disputes/hooks/use-disputes";
 import { disputeLabels } from "~/features/disputes/labels";
-import type { DisputeStatus } from "~/features/disputes/types";
 
 const STATUS_TABS: { key: "all" | DisputeStatus; label: string }[] = [
   { key: "all", label: disputeLabels.filterTabs.all.vi },
@@ -46,7 +45,9 @@ const STATUS_TABS: { key: "all" | DisputeStatus; label: string }[] = [
  */
 export default function DisputesListPage() {
   const { data: activeOrg, isPending: isOrgLoading } = useActiveOrganization();
-  const [activeStatus, setActiveStatus] = useState<"all" | DisputeStatus>("all");
+  const [activeStatus, setActiveStatus] = useState<"all" | DisputeStatus>(
+    "all",
+  );
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const organizationId = activeOrg?.id as Id<"organizations"> | undefined;
@@ -79,7 +80,9 @@ export default function DisputesListPage() {
           <DialogTrigger asChild>
             <Button>
               <AlertCircleIcon className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">{disputeLabels.actions.create.vi}</span>
+              <span className="hidden sm:inline">
+                {disputeLabels.actions.create.vi}
+              </span>
               <span className="sm:hidden">+</span>
             </Button>
           </DialogTrigger>
@@ -104,7 +107,7 @@ export default function DisputesListPage() {
           <button
             key={tab.key}
             onClick={() => setActiveStatus(tab.key)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+            className={`rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
               activeStatus === tab.key
                 ? "bg-primary text-primary-foreground"
                 : "text-muted-foreground hover:bg-muted"
@@ -129,7 +132,10 @@ export default function DisputesListPage() {
             {isLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="bg-muted h-20 animate-pulse rounded-lg" />
+                  <div
+                    key={i}
+                    className="bg-muted h-20 animate-pulse rounded-lg"
+                  />
                 ))}
               </div>
             ) : disputes.length === 0 ? (
@@ -153,7 +159,8 @@ export default function DisputesListPage() {
                       <div>
                         <p className="font-medium">
                           {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                          {disputeLabels.types[dispute.type]?.vi ?? dispute.type}
+                          {disputeLabels.types[dispute.type]?.vi ??
+                            dispute.type}
                         </p>
                         {dispute.serviceRequestRef && (
                           <p className="text-muted-foreground mt-0.5 line-clamp-2 text-sm">
@@ -162,7 +169,9 @@ export default function DisputesListPage() {
                         )}
                       </div>
                       <span className="text-muted-foreground text-xs">
-                        {new Date(dispute.createdAt).toLocaleDateString("vi-VN")}
+                        {new Date(dispute.createdAt).toLocaleDateString(
+                          "vi-VN",
+                        )}
                       </span>
                     </div>
                   </Link>

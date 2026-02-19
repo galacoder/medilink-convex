@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-
-import { useMutation } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import {
   AlertDialog,
@@ -22,8 +21,8 @@ import { Button } from "@medilink/ui/button";
 import { Label } from "@medilink/ui/label";
 import { Textarea } from "@medilink/ui/textarea";
 
-import { disputeLabels } from "../labels";
 import type { DisputeStatus } from "../types";
+import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const disputesApi = api.disputes as any;
@@ -122,9 +121,7 @@ export function EscalationButton({
           />
         </div>
 
-        {error && (
-          <p className="text-destructive text-sm">{error}</p>
-        )}
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setReason("")}>
@@ -135,7 +132,9 @@ export function EscalationButton({
             disabled={isEscalating}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isEscalating ? disputeLabels.loading.vi : disputeLabels.escalation.confirm.vi}
+            {isEscalating
+              ? disputeLabels.loading.vi
+              : disputeLabels.escalation.confirm.vi}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

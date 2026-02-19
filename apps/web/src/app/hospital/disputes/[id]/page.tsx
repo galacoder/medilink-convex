@@ -1,20 +1,19 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import Link from "next/link";
-
 import type { Id } from "convex/_generated/dataModel";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 
+import type { DisputeStatus } from "~/features/disputes/types";
 import { useSession } from "~/auth/client";
-import { EscalationButton } from "~/features/disputes/components/escalation-button";
 import { DisputeStatusBadge } from "~/features/disputes/components/dispute-status-badge";
+import { EscalationButton } from "~/features/disputes/components/escalation-button";
 import { MessageThread } from "~/features/disputes/components/message-thread";
 import { useDisputeDetail } from "~/features/disputes/hooks/use-dispute-detail";
 import { disputeLabels } from "~/features/disputes/labels";
-import type { DisputeStatus } from "~/features/disputes/types";
 
 /**
  * Hospital dispute detail page.
@@ -71,9 +70,7 @@ export default function DisputeDetailPage() {
           </span>
         </p>
         <Button asChild className="mt-4" variant="outline">
-          <Link href="/hospital/disputes">
-            {disputeLabels.backToList.vi}
-          </Link>
+          <Link href="/hospital/disputes">{disputeLabels.backToList.vi}</Link>
         </Button>
       </div>
     );
@@ -100,7 +97,9 @@ export default function DisputeDetailPage() {
           {disputeLabels.backToList.vi}
         </Link>
         <span className="text-muted-foreground">/</span>
-        <span className="font-medium truncate max-w-[300px]">{breadcrumbDesc}</span>
+        <span className="max-w-[300px] truncate font-medium">
+          {breadcrumbDesc}
+        </span>
       </nav>
 
       {/* Page header */}
@@ -121,22 +120,24 @@ export default function DisputeDetailPage() {
         {/* Main column (col-span-2): Dispute info + message thread */}
         <div className="space-y-6 lg:col-span-2">
           {/* Dispute info card */}
-          <div className="rounded-lg border p-5 space-y-4">
+          <div className="space-y-4 rounded-lg border p-5">
             <h2 className="text-base font-semibold">
               {disputeLabels.detail.disputeInfo.vi}{" "}
-              <span className="text-muted-foreground font-normal text-sm">
+              <span className="text-muted-foreground text-sm font-normal">
                 ({disputeLabels.detail.disputeInfo.en})
               </span>
             </h2>
 
             {/* Description */}
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">
+              <p className="text-muted-foreground mb-1 text-sm font-medium">
                 {disputeLabels.fields.descriptionVi.vi}
               </p>
-              <p className="text-sm whitespace-pre-wrap">{dispute.descriptionVi}</p>
+              <p className="text-sm whitespace-pre-wrap">
+                {dispute.descriptionVi}
+              </p>
               {dispute.descriptionEn && (
-                <p className="text-sm text-muted-foreground mt-1 italic">
+                <p className="text-muted-foreground mt-1 text-sm italic">
                   {dispute.descriptionEn}
                 </p>
               )}
@@ -145,12 +146,14 @@ export default function DisputeDetailPage() {
             {/* Linked service request */}
             {dispute.serviceRequest && (
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
+                <p className="text-muted-foreground mb-1 text-sm font-medium">
                   {disputeLabels.detail.linkedRequest.vi}
                 </p>
-                <p className="text-sm">{dispute.serviceRequest.descriptionVi}</p>
+                <p className="text-sm">
+                  {dispute.serviceRequest.descriptionVi}
+                </p>
                 {dispute.equipmentName && (
-                  <p className="text-muted-foreground text-xs mt-0.5">
+                  <p className="text-muted-foreground mt-0.5 text-xs">
                     {disputeLabels.fields.equipment.vi}: {dispute.equipmentName}
                   </p>
                 )}
@@ -160,10 +163,12 @@ export default function DisputeDetailPage() {
             {/* Resolution notes */}
             {dispute.resolutionNotes && (
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
+                <p className="text-muted-foreground mb-1 text-sm font-medium">
                   {disputeLabels.fields.resolutionNotes.vi}
                 </p>
-                <p className="text-sm whitespace-pre-wrap">{dispute.resolutionNotes}</p>
+                <p className="text-sm whitespace-pre-wrap">
+                  {dispute.resolutionNotes}
+                </p>
               </div>
             )}
           </div>
@@ -172,7 +177,7 @@ export default function DisputeDetailPage() {
           <div className="space-y-3">
             <h2 className="text-base font-semibold">
               {disputeLabels.thread.title.vi}{" "}
-              <span className="text-muted-foreground font-normal text-sm">
+              <span className="text-muted-foreground text-sm font-normal">
                 ({disputeLabels.thread.title.en})
               </span>
             </h2>
@@ -186,14 +191,14 @@ export default function DisputeDetailPage() {
         {/* Sidebar: Status + Escalation + Timestamps */}
         <div className="space-y-4">
           {/* Status card */}
-          <div className="rounded-lg border p-4 space-y-3">
+          <div className="space-y-3 rounded-lg border p-4">
             <h2 className="text-sm font-semibold">
               {disputeLabels.detail.statusInfo.vi}
             </h2>
 
             {/* Current status */}
             <div>
-              <p className="text-xs text-muted-foreground mb-1">
+              <p className="text-muted-foreground mb-1 text-xs">
                 {disputeLabels.fields.status.vi}
               </p>
               <DisputeStatusBadge status={dispute.status as DisputeStatus} />
@@ -202,17 +207,19 @@ export default function DisputeDetailPage() {
             {/* Organization */}
             {dispute.organizationName && (
               <div>
-                <p className="text-xs text-muted-foreground mb-0.5">
+                <p className="text-muted-foreground mb-0.5 text-xs">
                   {disputeLabels.fields.organization.vi}
                 </p>
-                <p className="text-sm font-medium">{dispute.organizationName}</p>
+                <p className="text-sm font-medium">
+                  {dispute.organizationName}
+                </p>
               </div>
             )}
 
             {/* Assigned to */}
             {dispute.assignedToName && (
               <div>
-                <p className="text-xs text-muted-foreground mb-0.5">
+                <p className="text-muted-foreground mb-0.5 text-xs">
                   {disputeLabels.fields.assignedTo.vi}
                 </p>
                 <p className="text-sm">{dispute.assignedToName}</p>
@@ -220,9 +227,9 @@ export default function DisputeDetailPage() {
             )}
 
             {/* Timestamps */}
-            <div className="border-t pt-3 space-y-2">
+            <div className="space-y-2 border-t pt-3">
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {disputeLabels.fields.createdAt.vi}
                 </p>
                 <p className="text-sm">
@@ -234,7 +241,7 @@ export default function DisputeDetailPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {disputeLabels.fields.updatedAt.vi}
                 </p>
                 <p className="text-sm">
@@ -247,7 +254,7 @@ export default function DisputeDetailPage() {
               </div>
               {dispute.resolvedAt && (
                 <div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     {disputeLabels.fields.resolvedAt.vi}
                   </p>
                   <p className="text-sm">

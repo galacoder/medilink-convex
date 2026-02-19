@@ -1,20 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
-import { useMutation } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useEffect, useRef, useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 import { SendIcon } from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 import { Textarea } from "@medilink/ui/textarea";
 
-import { disputeLabels } from "../labels";
 import type { DisputeMessageWithAuthor } from "../types";
 import { useDisputeMessages } from "../hooks/use-dispute-detail";
+import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const disputesApi = api.disputes as any;
@@ -36,7 +35,10 @@ interface MessageThreadProps {
  *
  * vi: "Luồng tin nhắn tranh chấp" / en: "Dispute message thread"
  */
-export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) {
+export function MessageThread({
+  disputeId,
+  currentUserId,
+}: MessageThreadProps) {
   const { messages, isLoading } = useDisputeMessages(disputeId);
   const [content, setContent] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -79,7 +81,9 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
             key={i}
             className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
           >
-            <Skeleton className={`h-12 w-48 rounded-xl ${i % 2 === 0 ? "" : "bg-primary/20"}`} />
+            <Skeleton
+              className={`h-12 w-48 rounded-xl ${i % 2 === 0 ? "" : "bg-primary/20"}`}
+            />
           </div>
         ))}
       </div>
@@ -89,7 +93,7 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
   return (
     <div className="flex flex-col">
       {/* Message list */}
-      <div className="min-h-[200px] max-h-[400px] overflow-y-auto space-y-3 p-4 border rounded-t-md">
+      <div className="max-h-[400px] min-h-[200px] space-y-3 overflow-y-auto rounded-t-md border p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <p className="text-muted-foreground text-sm">
@@ -109,15 +113,15 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
               >
                 <div
                   className={`max-w-[75%] rounded-xl px-4 py-2 ${
-                    isOwn
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                    isOwn ? "bg-primary text-primary-foreground" : "bg-muted"
                   }`}
                 >
                   {/* Author + timestamp */}
                   <div
                     className={`mb-1 flex items-center gap-2 text-xs ${
-                      isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                      isOwn
+                        ? "text-primary-foreground/70"
+                        : "text-muted-foreground"
                     }`}
                   >
                     <span className="font-medium">
@@ -131,11 +135,13 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
                     </span>
                   </div>
                   {/* Content */}
-                  <p className="whitespace-pre-wrap text-sm">{msg.contentVi}</p>
+                  <p className="text-sm whitespace-pre-wrap">{msg.contentVi}</p>
                   {msg.contentEn && msg.contentEn !== msg.contentVi && (
                     <p
                       className={`mt-1 text-xs italic ${
-                        isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                        isOwn
+                          ? "text-primary-foreground/70"
+                          : "text-muted-foreground"
                       }`}
                     >
                       {msg.contentEn}
@@ -152,7 +158,7 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
       {/* New message form */}
       <form
         onSubmit={handleSend}
-        className="flex gap-2 border border-t-0 rounded-b-md p-3"
+        className="flex gap-2 rounded-b-md border border-t-0 p-3"
       >
         <Textarea
           value={content}
@@ -174,13 +180,13 @@ export function MessageThread({ disputeId, currentUserId }: MessageThreadProps) 
           className="self-end"
         >
           <SendIcon className="h-4 w-4" />
-          <span className="sr-only">{disputeLabels.actions.sendMessage.vi}</span>
+          <span className="sr-only">
+            {disputeLabels.actions.sendMessage.vi}
+          </span>
         </Button>
       </form>
 
-      {error && (
-        <p className="text-destructive mt-1 text-sm px-3">{error}</p>
-      )}
+      {error && <p className="text-destructive mt-1 px-3 text-sm">{error}</p>}
     </div>
   );
 }

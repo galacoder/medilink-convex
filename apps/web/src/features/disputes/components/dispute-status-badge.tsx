@@ -1,8 +1,8 @@
-import { Badge } from "@medilink/ui/badge";
 import { cn } from "@medilink/ui";
+import { Badge } from "@medilink/ui/badge";
 
-import { disputeLabels } from "../labels";
 import type { DisputeStatus } from "../types";
+import { disputeLabels } from "../labels";
 
 /**
  * Color map for dispute statuses.
@@ -14,7 +14,8 @@ import type { DisputeStatus } from "../types";
  */
 const statusColorMap: Record<DisputeStatus, string> = {
   open: "bg-blue-100 text-blue-800 hover:bg-blue-100 border-blue-200",
-  investigating: "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200",
+  investigating:
+    "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200",
   resolved: "bg-green-100 text-green-800 hover:bg-green-100 border-green-200",
   closed: "bg-gray-100 text-gray-600 hover:bg-gray-100 border-gray-200",
   escalated: "bg-red-100 text-red-800 hover:bg-red-100 border-red-200",
@@ -42,13 +43,7 @@ export function DisputeStatusBadge({
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const label = disputeLabels.statuses[status]?.[locale] ?? status;
   return (
-    <Badge
-      className={cn(
-        "border",
-        statusColorMap[status],
-        className,
-      )}
-    >
+    <Badge className={cn("border", statusColorMap[status], className)}>
       {label}
     </Badge>
   );

@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-
-import { useMutation, useQuery } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation, useQuery } from "convex/react";
 
 import { Button } from "@medilink/ui/button";
 import { Label } from "@medilink/ui/label";
@@ -18,14 +17,15 @@ import {
 } from "@medilink/ui/select";
 import { Textarea } from "@medilink/ui/textarea";
 
-import { disputeLabels } from "../labels";
 import type { DisputeType } from "../types";
+import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const disputesApi = api.disputes as any;
 const serviceRequestsApi = api.serviceRequests as any;
 const createFn: FunctionReference<"mutation"> = disputesApi.create;
-const listByHospitalSrFn: FunctionReference<"query"> = serviceRequestsApi.listByHospital;
+const listByHospitalSrFn: FunctionReference<"query"> =
+  serviceRequestsApi.listByHospital;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 interface DisputeFormProps {
@@ -34,7 +34,12 @@ interface DisputeFormProps {
   onCancel?: () => void;
 }
 
-const DISPUTE_TYPES: DisputeType[] = ["quality", "pricing", "timeline", "other"];
+const DISPUTE_TYPES: DisputeType[] = [
+  "quality",
+  "pricing",
+  "timeline",
+  "other",
+];
 
 /**
  * Form for creating a new dispute.
@@ -106,7 +111,9 @@ export function DisputeForm({
         </Label>
         <Select value={serviceRequestId} onValueChange={setServiceRequestId}>
           <SelectTrigger id="serviceRequestId">
-            <SelectValue placeholder={disputeLabels.placeholders.selectServiceRequest.vi} />
+            <SelectValue
+              placeholder={disputeLabels.placeholders.selectServiceRequest.vi}
+            />
           </SelectTrigger>
           <SelectContent>
             {disputeableRequests.length === 0 ? (
@@ -133,9 +140,14 @@ export function DisputeForm({
           {disputeLabels.form.typeLabel.vi}
           <span className="text-destructive ml-1">*</span>
         </Label>
-        <Select value={type} onValueChange={(val) => setType(val as DisputeType)}>
+        <Select
+          value={type}
+          onValueChange={(val) => setType(val as DisputeType)}
+        >
           <SelectTrigger id="type">
-            <SelectValue placeholder={disputeLabels.placeholders.selectType.vi} />
+            <SelectValue
+              placeholder={disputeLabels.placeholders.selectType.vi}
+            />
           </SelectTrigger>
           <SelectContent>
             {DISPUTE_TYPES.map((t) => (
@@ -170,7 +182,9 @@ export function DisputeForm({
       <div className="space-y-1.5">
         <Label htmlFor="descriptionEn">
           {disputeLabels.fields.descriptionEn.vi}
-          <span className="text-muted-foreground ml-1 text-xs">(không bắt buộc)</span>
+          <span className="text-muted-foreground ml-1 text-xs">
+            (không bắt buộc)
+          </span>
         </Label>
         <Textarea
           id="descriptionEn"
@@ -182,22 +196,29 @@ export function DisputeForm({
       </div>
 
       {/* Error */}
-      {error && (
-        <p className="text-destructive text-sm">{error}</p>
-      )}
+      {error && <p className="text-destructive text-sm">{error}</p>}
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
         {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             {disputeLabels.actions.cancel.vi}
           </Button>
         )}
         <Button
           type="submit"
-          disabled={isSubmitting || !serviceRequestId || !type || !descriptionVi.trim()}
+          disabled={
+            isSubmitting || !serviceRequestId || !type || !descriptionVi.trim()
+          }
         >
-          {isSubmitting ? disputeLabels.loading.vi : disputeLabels.actions.create.vi}
+          {isSubmitting
+            ? disputeLabels.loading.vi
+            : disputeLabels.actions.create.vi}
         </Button>
       </div>
     </form>

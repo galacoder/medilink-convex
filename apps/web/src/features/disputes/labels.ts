@@ -7,7 +7,10 @@
 export const disputeLabels = {
   // Page title
   title: { vi: "Khiếu nại", en: "Disputes" },
-  subtitle: { vi: "Quản lý khiếu nại dịch vụ", en: "Service dispute management" },
+  subtitle: {
+    vi: "Quản lý khiếu nại dịch vụ",
+    en: "Service dispute management",
+  },
 
   // Status labels
   statuses: {
@@ -112,7 +115,10 @@ export const disputeLabels = {
   // Form section titles
   form: {
     title: { vi: "Tạo khiếu nại mới", en: "Raise New Dispute" },
-    serviceRequestLabel: { vi: "Yêu cầu dịch vụ liên quan", en: "Related Service Request" },
+    serviceRequestLabel: {
+      vi: "Yêu cầu dịch vụ liên quan",
+      en: "Related Service Request",
+    },
     typeLabel: { vi: "Loại khiếu nại", en: "Dispute Type" },
     descriptionLabel: { vi: "Mô tả vấn đề", en: "Problem Description" },
   },
@@ -124,7 +130,10 @@ export const disputeLabels = {
       vi: "Leo thang sẽ chuyển khiếu nại này đến quản trị viên nền tảng để can thiệp. Thao tác này không thể hoàn tác.",
       en: "Escalating will forward this dispute to platform administrators for intervention. This action cannot be undone.",
     },
-    reasonLabel: { vi: "Lý do leo thang (không bắt buộc)", en: "Escalation reason (optional)" },
+    reasonLabel: {
+      vi: "Lý do leo thang (không bắt buộc)",
+      en: "Escalation reason (optional)",
+    },
     confirm: { vi: "Leo thang", en: "Escalate" },
     cancel: { vi: "Hủy", en: "Cancel" },
     disabledTooltip: {
@@ -137,7 +146,10 @@ export const disputeLabels = {
   loading: { vi: "Đang tải...", en: "Loading..." },
 
   // Success/Error messages
-  createSuccess: { vi: "Tạo khiếu nại thành công", en: "Dispute raised successfully" },
+  createSuccess: {
+    vi: "Tạo khiếu nại thành công",
+    en: "Dispute raised successfully",
+  },
   error: { vi: "Có lỗi xảy ra", en: "An error occurred" },
 
   // Breadcrumb
@@ -154,6 +166,9 @@ export const disputeLabels = {
   detail: {
     disputeInfo: { vi: "Thông tin khiếu nại", en: "Dispute Information" },
     statusInfo: { vi: "Trạng thái & Tiến trình", en: "Status & Progress" },
-    linkedRequest: { vi: "Yêu cầu dịch vụ liên quan", en: "Linked Service Request" },
+    linkedRequest: {
+      vi: "Yêu cầu dịch vụ liên quan",
+      en: "Linked Service Request",
+    },
   },
 } as const;

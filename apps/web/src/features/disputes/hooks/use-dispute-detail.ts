@@ -1,9 +1,9 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import type { Id } from "convex/_generated/dataModel";
 import type { FunctionReference } from "convex/server";
 import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 
 import type { DisputeMessageWithAuthor, DisputeWithDetails } from "../types";
 
@@ -42,10 +42,7 @@ export function useDisputeDetail(id: Id<"disputes"> | undefined) {
  */
 export function useDisputeMessages(disputeId: Id<"disputes"> | undefined) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const messages = useQuery(
-    getMessagesFn,
-    disputeId ? { disputeId } : "skip",
-  );
+  const messages = useQuery(getMessagesFn, disputeId ? { disputeId } : "skip");
 
   return {
     messages: (messages ?? []) as DisputeMessageWithAuthor[],
