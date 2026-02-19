@@ -60,10 +60,11 @@ export function DisputeForm({
   const createMutation = useMutation(createFn);
 
   // Load service requests for this org (completed or in_progress are valid for disputes)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  // WHY: useQuery with a FunctionReference<"query"> returns unknown in strict mode.
+  // Cast once at the call site to get a properly typed result.
   const serviceRequests = useQuery(listByHospitalSrFn, {
     status: undefined, // get all, filter client-side
-  }) as Array<{ _id: string; descriptionVi: string; status: string }> | undefined;
+  }) as { _id: string; descriptionVi: string; status: string }[] | undefined;
 
   // Filter to disputeable statuses
   const disputeableRequests = (serviceRequests ?? []).filter(
@@ -78,6 +79,7 @@ export function DisputeForm({
     setError(null);
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const disputeId = await createMutation({
         organizationId,
         serviceRequestId: serviceRequestId as Id<"serviceRequests">,
