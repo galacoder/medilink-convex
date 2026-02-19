@@ -11,7 +11,7 @@ import { v } from "convex/values";
  *  - All tables: createdAt + updatedAt as v.number()
  *
  * Domain table count: 23 tables across 8 domains
- *   Base: organizations, organizationMemberships, users (3)
+ *   Base: organizations (+ optional status field for M4-1), organizationMemberships, users (3)
  *   Equipment: equipmentCategories, equipment, equipmentHistory,
  *              maintenanceRecords, failureReports (5)
  *   QR Code: qrCodes, qrScanLog (2)
@@ -29,17 +29,29 @@ export default defineSchema({
   /**
    * Organizations represent SPMET Healthcare School or any provider group.
    * org_type distinguishes between hospital facilities and equipment providers.
+   *
+   * status enum (hospital orgs only — managed by platform_admin):
+   *   active    - vi: "Đang hoạt động" / en: "Active"
+   *   suspended - vi: "Đã đình chỉ"   / en: "Suspended"
+   *   trial     - vi: "Đang dùng thử" / en: "Trial"
    */
   organizations: defineTable({
     name: v.string(),
     slug: v.string(),
     // Bilingual label: vi: "Loại tổ chức" / en: "Organization type"
     org_type: v.union(v.literal("hospital"), v.literal("provider")),
+    // Bilingual label: vi: "Trạng thái tổ chức (bệnh viện)" / en: "Hospital org status"
+    // Optional: only set for hospital orgs managed by platform_admin.
+    // Defaults to "active" if not set.
+    status: v.optional(
+      v.union(v.literal("active"), v.literal("suspended"), v.literal("trial")),
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_type", ["org_type"])
-    .index("by_slug", ["slug"]),
+    .index("by_slug", ["slug"])
+    .index("by_status", ["status"]),
 
   /**
    * Links users to organizations with a specific role.
