@@ -33,7 +33,7 @@ export function useRevenueMetrics(
   const { limit = 10 } = options;
 
   const revenueMetrics = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     (api as any).admin.analytics.getRevenueMetrics,
     { limit },
   ) as RevenueMetrics | undefined;

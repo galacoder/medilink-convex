@@ -33,7 +33,7 @@ export function useTopPerformers(
   const { limit = 5 } = options;
 
   const topPerformers = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     (api as any).admin.analytics.getTopPerformers,
     { limit },
   ) as TopPerformers | undefined;
