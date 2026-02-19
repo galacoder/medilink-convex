@@ -18,6 +18,7 @@ import type * as auth from "../auth.js";
 import type * as consumables from "../consumables.js";
 import type * as disputes from "../disputes.js";
 import type * as equipment from "../equipment.js";
+import type * as http from "../http.js";
 import type * as lib_auditLog from "../lib/auditLog.js";
 import type * as lib_auth from "../lib/auth.js";
 import type * as lib_disputeStateMachine from "../lib/disputeStateMachine.js";
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   consumables: typeof consumables;
   disputes: typeof disputes;
   equipment: typeof equipment;
+  http: typeof http;
   "lib/auditLog": typeof lib_auditLog;
   "lib/auth": typeof lib_auth;
   "lib/disputeStateMachine": typeof lib_disputeStateMachine;
