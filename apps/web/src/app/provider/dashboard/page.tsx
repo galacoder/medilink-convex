@@ -99,9 +99,11 @@ export default function ProviderDashboardPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-xs">
-              {offeringsLoading
-                ? "Đang tải..." /* Loading... */
-                : "Dịch vụ đang cung cấp" /* Active services */}
+              {
+                offeringsLoading
+                  ? "Đang tải..." /* Loading... */
+                  : "Dịch vụ đang cung cấp" /* Active services */
+              }
             </p>
           </CardContent>
         </Card>

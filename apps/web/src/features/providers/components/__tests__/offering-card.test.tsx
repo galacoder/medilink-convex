@@ -4,13 +4,13 @@
  * WHY: Verifies the card correctly renders specialty badge, bilingual
  * descriptions, optional price, turnaround days, and action button callbacks.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
+import type { ServiceOffering } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { OfferingCard } from "../offering-card";
-import type { ServiceOffering } from "../../types";
 
 const mockOffering: ServiceOffering = {
   _id: "off_001",
@@ -27,9 +27,7 @@ const mockOffering: ServiceOffering = {
 
 describe("OfferingCard", () => {
   it("test_OfferingCard_rendersSpecialtyBadge", () => {
-    renderWithProviders(
-      <OfferingCard offering={mockOffering} locale="vi" />,
-    );
+    renderWithProviders(<OfferingCard offering={mockOffering} locale="vi" />);
 
     const badge = screen.getByTestId("specialty-badge");
     expect(badge).toBeInTheDocument();
@@ -38,9 +36,7 @@ describe("OfferingCard", () => {
   });
 
   it("test_OfferingCard_rendersVietnameseDescription", () => {
-    renderWithProviders(
-      <OfferingCard offering={mockOffering} locale="vi" />,
-    );
+    renderWithProviders(<OfferingCard offering={mockOffering} locale="vi" />);
 
     expect(
       screen.getByText("Dịch vụ hiệu chỉnh thiết bị y tế chuyên nghiệp"),
@@ -48,9 +44,7 @@ describe("OfferingCard", () => {
   });
 
   it("test_OfferingCard_rendersEnglishDescription", () => {
-    renderWithProviders(
-      <OfferingCard offering={mockOffering} locale="en" />,
-    );
+    renderWithProviders(<OfferingCard offering={mockOffering} locale="en" />);
 
     expect(
       screen.getByText("Professional medical device calibration service"),
@@ -58,9 +52,7 @@ describe("OfferingCard", () => {
   });
 
   it("test_OfferingCard_rendersPriceEstimate", () => {
-    renderWithProviders(
-      <OfferingCard offering={mockOffering} locale="vi" />,
-    );
+    renderWithProviders(<OfferingCard offering={mockOffering} locale="vi" />);
 
     // Price should be formatted with VND
     expect(screen.getByText(/500\.000 VND/)).toBeInTheDocument();
@@ -84,11 +76,7 @@ describe("OfferingCard", () => {
     const user = userEvent.setup();
 
     renderWithProviders(
-      <OfferingCard
-        offering={mockOffering}
-        onDelete={onDelete}
-        locale="vi"
-      />,
+      <OfferingCard offering={mockOffering} onDelete={onDelete} locale="vi" />,
     );
 
     const deleteButton = screen.getByRole("button", { name: /Xóa/ });
@@ -112,22 +100,23 @@ describe("OfferingCard", () => {
   });
 
   it("test_OfferingCard_showsTurnaroundDays", () => {
-    renderWithProviders(
-      <OfferingCard offering={mockOffering} locale="vi" />,
-    );
+    renderWithProviders(<OfferingCard offering={mockOffering} locale="vi" />);
 
     // "3 ngày" is rendered as two sibling spans: "3" and " ngày"
     // Use a regex that matches the combined text in the parent span
-    expect(screen.getByText((_, element) => {
-      const isSpan = element?.tagName === "SPAN";
-      const hasFontMedium = element?.className.includes("font-medium") === true;
-      // textContent optional chain needed because element may be null in the
-      // getByText callback context -- suppress unnecessary-condition false positives
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      const hasThree = element?.textContent?.includes("3") === true;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      const hasNgay = element?.textContent?.includes("ngày") === true;
-      return isSpan && hasFontMedium && hasThree && hasNgay;
-    })).toBeInTheDocument();
+    expect(
+      screen.getByText((_, element) => {
+        const isSpan = element?.tagName === "SPAN";
+        const hasFontMedium =
+          element?.className.includes("font-medium") === true;
+        // textContent optional chain needed because element may be null in the
+        // getByText callback context -- suppress unnecessary-condition false positives
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        const hasThree = element?.textContent?.includes("3") === true;
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        const hasNgay = element?.textContent?.includes("ngày") === true;
+        return isSpan && hasFontMedium && hasThree && hasNgay;
+      }),
+    ).toBeInTheDocument();
   });
 });

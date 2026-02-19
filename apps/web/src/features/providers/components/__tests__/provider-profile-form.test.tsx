@@ -5,12 +5,12 @@
  * pre-filled with existing profile data, and the save action calls the
  * updateProfile mutation.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
+import type { ProviderProfile } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { ProviderProfileForm } from "../provider-profile-form";
-import type { ProviderProfile } from "../../types";
 
 const mockMutateFn = vi.fn().mockResolvedValue("prov_001");
 
@@ -73,12 +73,12 @@ describe("ProviderProfileForm", () => {
       screen.getByDisplayValue("Công ty Kỹ thuật Y tế Việt Nam"),
     ).toBeInTheDocument();
     expect(
-      screen.getByDisplayValue("Chuyên cung cấp dịch vụ sửa chữa thiết bị y tế"),
+      screen.getByDisplayValue(
+        "Chuyên cung cấp dịch vụ sửa chữa thiết bị y tế",
+      ),
     ).toBeInTheDocument();
     expect(screen.getByDisplayValue("info@vnmedeng.vn")).toBeInTheDocument();
-    expect(
-      screen.getByDisplayValue("+84-28-1234-5678"),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("+84-28-1234-5678")).toBeInTheDocument();
   });
 
   it("test_ProviderProfileForm_hasTestId", () => {
@@ -90,9 +90,7 @@ describe("ProviderProfileForm", () => {
       />,
     );
 
-    expect(
-      screen.getByTestId("provider-profile-form"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("provider-profile-form")).toBeInTheDocument();
   });
 
   it("test_ProviderProfileForm_hasSaveButton", () => {

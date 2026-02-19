@@ -7,8 +7,8 @@
  * return shape and loading state. Real-time reactivity via Convex means the
  * list updates automatically when offerings are added, updated, or removed.
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import type { ServiceOffering } from "../types";
 

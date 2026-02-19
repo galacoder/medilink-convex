@@ -100,7 +100,7 @@ export function CoverageAreaSelector({
             type="button"
             variant="ghost"
             size="sm"
-            className="h-9 w-9 p-0 text-destructive hover:text-destructive"
+            className="text-destructive hover:text-destructive h-9 w-9 p-0"
             onClick={() => handleRemoveRegion(index)}
             aria-label={providerLabels.coverage.removeRegion[locale]}
             data-testid="remove-region-btn"

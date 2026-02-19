@@ -8,7 +8,6 @@
  * dates, and document links. Expiry warnings (red text within 30 days) help
  * providers renew before hospitals lose confidence.
  */
-
 import type { Certification } from "../types";
 import { providerLabels } from "../labels";
 
@@ -110,17 +109,17 @@ export function CertificationTable({
                     )}
                   </div>
                 </td>
-                <td className="py-3 pr-4 text-muted-foreground">
+                <td className="text-muted-foreground py-3 pr-4">
                   {cert.issuingBody ?? "—"}
                 </td>
-                <td className="py-3 pr-4 text-muted-foreground">
+                <td className="text-muted-foreground py-3 pr-4">
                   {formatDate(cert.issuedAt)}
                 </td>
                 <td className="py-3 pr-4">
                   <span
                     className={
                       expired
-                        ? "font-medium text-destructive"
+                        ? "text-destructive font-medium"
                         : expiringSoon
                           ? "font-medium text-orange-600"
                           : "text-muted-foreground"

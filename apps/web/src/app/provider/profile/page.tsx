@@ -12,12 +12,12 @@
  */
 import { useState } from "react";
 
-import { useActiveOrganization } from "~/auth/client";
-import { ProviderProfileForm } from "~/features/providers/components/provider-profile-form";
-import { CoverageAreaSelector } from "~/features/providers/components/coverage-area-selector";
 import type { CoverageAreaEntry } from "~/features/providers/components/coverage-area-selector";
-import { useProviderProfile } from "~/features/providers/hooks/use-provider-profile";
+import { useActiveOrganization } from "~/auth/client";
+import { CoverageAreaSelector } from "~/features/providers/components/coverage-area-selector";
+import { ProviderProfileForm } from "~/features/providers/components/provider-profile-form";
 import { useProviderMutations } from "~/features/providers/hooks/use-provider-mutations";
+import { useProviderProfile } from "~/features/providers/hooks/use-provider-profile";
 
 export default function ProviderProfilePage() {
   const { data: activeOrg, isPending: orgPending } = useActiveOrganization();
@@ -95,9 +95,11 @@ export default function ProviderProfilePage() {
             onClick={handleSaveCoverage}
             disabled={isSavingCoverage}
           >
-            {isSavingCoverage
-              ? "Đang lưu..." /* Saving... */
-              : "Lưu khu vực" /* Save Areas */}
+            {
+              isSavingCoverage
+                ? "Đang lưu..." /* Saving... */
+                : "Lưu khu vực" /* Save Areas */
+            }
           </button>
         </div>
       </section>
