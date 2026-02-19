@@ -1,7 +1,7 @@
 # MediLink Woodpecker CI Pipeline
 # 6-Stage quality gate replacing human code review
 # All stages use node:22-alpine to match .nvmrc (Node 22.21.0)
-# Stages 4-5 are placeholders until M1-8 (E2E) and M5-5 (VRT) activate them
+# Stage 5 is a placeholder until M5-5 (VRT) activates it; Stage 4 activated by M1-8
 #
 # Environment strategy:
 #   - App env vars (CONVEX_*, AUTH_*): loaded from .env.ci via `cp .env.ci .env`
@@ -64,14 +64,20 @@ steps:
       - 'for i in $(seq 1 30); do wget -q -O /dev/null http://localhost:3000/api/health && echo "Health check passed" && exit 0; sleep 2; echo "Attempt $i/30..."; done'
       - 'echo "ERROR: Health check failed after 60 seconds" && exit 1'
 
-  # Stage 4: E2E Tests (placeholder — activated by M1-8 #59)
+  # Stage 4: E2E Tests (Playwright — activated by M1-8 #59)
   - name: e2e-tests
-    image: node:22-alpine
+    image: mcr.microsoft.com/playwright:v1.50.0-noble
     depends_on: [smoke-test]
+    environment:
+      - NEXTAUTH_URL=http://localhost:3000
     commands:
-      - 'echo "E2E tests: placeholder stage"'
-      - 'echo "Will be activated by M1-8 (Playwright E2E setup, issue #59)"'
-      - 'echo "Status: SKIP (no tests configured yet)"'
+      - corepack enable
+      - corepack prepare pnpm@10.19.0 --activate
+      - cp .env.ci .env
+      - pnpm install --frozen-lockfile
+      - cd apps/web
+      - pnpm exec playwright install --with-deps chromium
+      - pnpm e2e
 
   # Stage 5: Visual Regression Testing (placeholder — activated by M5-5 #80)
   - name: vrt
@@ -100,7 +106,7 @@ steps:
       - 'echo "Stage 1 (Lint+Typecheck+Build): completed"'
       - 'echo "Stage 2 (Unit Tests): completed"'
       - 'echo "Stage 3 (Smoke Test): completed"'
-      - 'echo "Stage 4 (E2E): placeholder (activated by M1-8 #59)"'
+      - 'echo "Stage 4 (E2E): completed (Playwright, activated by M1-8 #59)"'
       - 'echo "Stage 5 (VRT): placeholder (activated by M5-5 #80)"'
       - echo "================================"
       - echo "Pipeline complete"
