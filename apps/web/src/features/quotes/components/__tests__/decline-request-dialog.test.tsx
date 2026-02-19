@@ -5,9 +5,9 @@
  * implications. Tests verify: dialog renders when open, reason validation,
  * and submit button state based on reason length.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { DeclineRequestDialog } from "../decline-request-dialog";

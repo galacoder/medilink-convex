@@ -10,15 +10,10 @@
  * Win rate = accepted / (accepted + rejected) × 100%
  * Shows "N/A" when no decided quotes exist yet (no divide-by-zero).
  */
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 
-import { quoteLabels } from "../labels";
 import type { QuoteDashboardStats as QuoteDashboardStatsType } from "../types";
+import { quoteLabels } from "../labels";
 
 interface QuoteDashboardStatsProps {
   stats: QuoteDashboardStatsType;
@@ -47,8 +42,7 @@ function StatCard({ label, value, description }: StatCardProps) {
 }
 
 export function QuoteDashboardStats({ stats }: QuoteDashboardStatsProps) {
-  const winRateDisplay =
-    stats.winRate === -1 ? "N/A" : `${stats.winRate}%`;
+  const winRateDisplay = stats.winRate === -1 ? "N/A" : `${stats.winRate}%`;
 
   return (
     <div

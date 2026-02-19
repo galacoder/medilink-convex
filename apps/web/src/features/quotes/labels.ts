@@ -64,7 +64,10 @@ export const quoteLabels = {
     amount: { vi: "Số tiền (VNĐ)", en: "Amount (VND)" },
     amountPlaceholder: { vi: "Nhập số tiền", en: "Enter amount" },
     estimatedDays: { vi: "Số ngày ước tính", en: "Estimated Days" },
-    estimatedDaysPlaceholder: { vi: "Nhập số ngày", en: "Enter number of days" },
+    estimatedDaysPlaceholder: {
+      vi: "Nhập số ngày",
+      en: "Enter number of days",
+    },
     startDate: { vi: "Ngày bắt đầu dự kiến", en: "Available Start Date" },
     notes: { vi: "Ghi chú cho bệnh viện", en: "Notes for Hospital" },
     notesPlaceholder: {

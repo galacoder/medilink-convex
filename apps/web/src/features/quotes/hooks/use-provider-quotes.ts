@@ -7,10 +7,10 @@
  * returns typed ProviderQuote[] including the joined service request summary.
  * Real-time via Convex useQuery — updates when hospitals accept/reject quotes.
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
-import type { ProviderQuote, QuoteStatus, QuoteDashboardStats } from "../types";
+import type { ProviderQuote, QuoteDashboardStats, QuoteStatus } from "../types";
 
 export interface UseProviderQuotesOptions {
   status?: QuoteStatus | "all";
@@ -34,8 +34,7 @@ export interface UseProviderQuotesResult {
 export function useProviderQuotes(
   status?: QuoteStatus | "all",
 ): UseProviderQuotesResult {
-  const convexStatus =
-    status && status !== "all" ? status : undefined;
+  const convexStatus = status && status !== "all" ? status : undefined;
 
   // Convex useQuery returns:
   //   undefined = loading (not yet received response)

@@ -13,6 +13,7 @@
  * Validation: client-side using submitQuoteFormSchema from @medilink/validators.
  * Pattern: matches ServiceRequestForm controlled state approach.
  */
+import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
 
 import {
@@ -29,11 +30,10 @@ import {
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
-import type { Id } from "convex/_generated/dataModel";
-
 import { submitQuoteFormSchema } from "@medilink/validators";
-import { quoteLabels } from "../labels";
+
 import { useQuoteMutations } from "../hooks/use-quote-mutations";
+import { quoteLabels } from "../labels";
 
 interface FormState {
   amount: string;
@@ -182,7 +182,9 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
           data-testid="quote-amount-input"
         />
         {amountNum > 0 && (
-          <p className="text-muted-foreground text-xs">{formatVND(amountNum)}</p>
+          <p className="text-muted-foreground text-xs">
+            {formatVND(amountNum)}
+          </p>
         )}
         {errors.amount && (
           <p className="text-destructive text-xs">{errors.amount}</p>
@@ -191,7 +193,9 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
 
       {/* Estimated duration */}
       <div className="space-y-1">
-        <Label htmlFor="quote-duration">{quoteLabels.form.estimatedDays.vi}</Label>
+        <Label htmlFor="quote-duration">
+          {quoteLabels.form.estimatedDays.vi}
+        </Label>
         <Input
           id="quote-duration"
           type="number"
@@ -202,13 +206,17 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
           data-testid="quote-duration-input"
         />
         {errors.estimatedDurationDays && (
-          <p className="text-destructive text-xs">{errors.estimatedDurationDays}</p>
+          <p className="text-destructive text-xs">
+            {errors.estimatedDurationDays}
+          </p>
         )}
       </div>
 
       {/* Available start date */}
       <div className="space-y-1">
-        <Label htmlFor="quote-start-date">{quoteLabels.form.startDate.vi}</Label>
+        <Label htmlFor="quote-start-date">
+          {quoteLabels.form.startDate.vi}
+        </Label>
         <Input
           id="quote-start-date"
           type="date"
@@ -218,7 +226,9 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
           data-testid="quote-start-date-input"
         />
         {errors.availableStartDate && (
-          <p className="text-destructive text-xs">{errors.availableStartDate}</p>
+          <p className="text-destructive text-xs">
+            {errors.availableStartDate}
+          </p>
         )}
       </div>
 
@@ -230,7 +240,7 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
         </Label>
         <textarea
           id="quote-notes"
-          className="border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={quoteLabels.form.notesPlaceholder.vi}
           rows={3}
           value={formState.notes}
@@ -247,7 +257,7 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
         </Label>
         <textarea
           id="quote-terms"
-          className="border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={quoteLabels.form.termsPlaceholder.vi}
           rows={3}
           value={formState.terms}
@@ -256,9 +266,7 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
         />
       </div>
 
-      {submitError && (
-        <p className="text-destructive text-sm">{submitError}</p>
-      )}
+      {submitError && <p className="text-destructive text-sm">{submitError}</p>}
 
       {/* Submit with confirmation dialog */}
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>

@@ -23,8 +23,8 @@ import {
   CardTitle,
 } from "@medilink/ui/card";
 
-import { quoteLabels } from "../labels";
 import type { IncomingServiceRequest, ServiceRequestPriority } from "../types";
+import { quoteLabels } from "../labels";
 import { DeclineRequestDialog } from "./decline-request-dialog";
 
 interface IncomingRequestCardProps {

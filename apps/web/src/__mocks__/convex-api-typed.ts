@@ -33,7 +33,9 @@ export const api = {
     reject: makeFunctionReference<"mutation">("quotes:reject"),
     submit: makeFunctionReference<"mutation">("quotes:submit"),
     listByProvider: makeFunctionReference<"query">("quotes:listByProvider"),
-    listByServiceRequest: makeFunctionReference<"query">("quotes:listByServiceRequest"),
+    listByServiceRequest: makeFunctionReference<"query">(
+      "quotes:listByServiceRequest",
+    ),
   },
   serviceRatings: {
     create: makeFunctionReference<"mutation">("serviceRatings:create"),

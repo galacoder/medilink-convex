@@ -9,8 +9,8 @@
  */
 import { Badge } from "@medilink/ui/badge";
 
-import { quoteLabels } from "../labels";
 import type { QuoteStatus } from "../types";
+import { quoteLabels } from "../labels";
 
 interface QuoteStatusBadgeProps {
   status: QuoteStatus;
