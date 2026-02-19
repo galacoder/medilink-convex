@@ -5,8 +5,23 @@
  */
 
 // Hooks
-export { useConsumablesList, useConsumable, useConsumableUsageLog, useReorderRequests, useCreateConsumable, useUpdateConsumable, useRecordUsage, useReceiveStock, useAdjustStock, useCreateReorderRequest, useUpdateReorderStatus } from "./hooks/useConsumables";
-export type { ConsumableCategoryType, ConsumableStockLevel } from "./hooks/useConsumables";
+export {
+  useConsumablesList,
+  useConsumable,
+  useConsumableUsageLog,
+  useReorderRequests,
+  useCreateConsumable,
+  useUpdateConsumable,
+  useRecordUsage,
+  useReceiveStock,
+  useAdjustStock,
+  useCreateReorderRequest,
+  useUpdateReorderStatus,
+} from "./hooks/useConsumables";
+export type {
+  ConsumableCategoryType,
+  ConsumableStockLevel,
+} from "./hooks/useConsumables";
 
 export { useStockAlerts } from "./hooks/useStockAlerts";
 

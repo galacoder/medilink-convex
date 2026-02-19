@@ -6,9 +6,12 @@
  *
  * vi: "Biểu mẫu yêu cầu đặt hàng lại" / en: "Reorder request form"
  */
+// WHY: convex/_generated/dataModel is gitignored (generated at runtime by `npx convex dev`).
+// GenericId<T> from convex/values is the stable npm-package equivalent of the generated Id<T>.
+import type { GenericId as Id } from "convex/values";
 import { useState } from "react";
+
 import { useCreateReorderRequest } from "../hooks/useConsumables";
-import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 // ---------------------------------------------------------------------------
 // Bilingual labels
@@ -20,9 +23,18 @@ const LABELS = {
   notes: { vi: "Ghi chú (tùy chọn)", en: "Notes (optional)" },
   submit: { vi: "Gửi yêu cầu", en: "Submit Request" },
   submitting: { vi: "Đang gửi...", en: "Submitting..." },
-  success: { vi: "Yêu cầu đã được gửi thành công", en: "Request submitted successfully" },
-  error: { vi: "Có lỗi xảy ra, vui lòng thử lại", en: "An error occurred, please try again" },
-  quantityRequired: { vi: "Số lượng phải lớn hơn 0", en: "Quantity must be greater than 0" },
+  success: {
+    vi: "Yêu cầu đã được gửi thành công",
+    en: "Request submitted successfully",
+  },
+  error: {
+    vi: "Có lỗi xảy ra, vui lòng thử lại",
+    en: "An error occurred, please try again",
+  },
+  quantityRequired: {
+    vi: "Số lượng phải lớn hơn 0",
+    en: "Quantity must be greater than 0",
+  },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -88,7 +100,7 @@ export function ReorderForm({
   };
 
   return (
-    <div className="rounded-lg border p-4 space-y-4">
+    <div className="space-y-4 rounded-lg border p-4">
       <h3 className="text-base font-semibold">{LABELS.title[locale]}</h3>
 
       {success && (
@@ -105,10 +117,7 @@ export function ReorderForm({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">
-          <label
-            htmlFor="reorder-quantity"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="reorder-quantity" className="text-sm font-medium">
             {LABELS.quantity[locale]}
           </label>
           <input
@@ -119,7 +128,7 @@ export function ReorderForm({
             onChange={(e) =>
               setQuantity(e.target.value === "" ? "" : Number(e.target.value))
             }
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
             required
           />
         </div>
@@ -133,14 +142,14 @@ export function ReorderForm({
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
           />
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? LABELS.submitting[locale] : LABELS.submit[locale]}
         </button>

@@ -6,8 +6,11 @@
  *
  * vi: "Bảng lịch sử giao dịch vật tư" / en: "Consumable transaction history table"
  */
+// WHY: convex/_generated/dataModel is gitignored (generated at runtime by `npx convex dev`).
+// GenericId<T> from convex/values is the stable npm-package equivalent of the generated Id<T>.
+import type { GenericId as Id } from "convex/values";
+
 import { useConsumableUsageLog } from "../hooks/useConsumables";
-import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 // ---------------------------------------------------------------------------
 // Bilingual labels
@@ -76,10 +79,7 @@ export function UsageLogTable({
   consumableId,
   locale = "vi",
 }: UsageLogTableProps) {
-  const { results, status, loadMore } = useConsumableUsageLog(
-    consumableId,
-    20,
-  );
+  const { results, status, loadMore } = useConsumableUsageLog(consumableId, 20);
 
   return (
     <div className="space-y-4" data-testid="usage-log">
@@ -127,12 +127,14 @@ export function UsageLogTable({
                         {txLabel[locale]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums font-medium">
-                      {txType === "USAGE" || txType === "WRITE_OFF" || txType === "EXPIRED"
+                    <td className="px-4 py-3 text-right font-medium tabular-nums">
+                      {txType === "USAGE" ||
+                      txType === "WRITE_OFF" ||
+                      txType === "EXPIRED"
                         ? `-${entry.quantity}`
                         : `+${entry.quantity}`}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="text-muted-foreground px-4 py-3">
                       {new Date(entry.createdAt).toLocaleDateString(
                         locale === "vi" ? "vi-VN" : "en-US",
                         {
@@ -144,7 +146,7 @@ export function UsageLogTable({
                         },
                       )}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="text-muted-foreground px-4 py-3">
                       {entry.notes ?? "—"}
                     </td>
                   </tr>
@@ -160,7 +162,7 @@ export function UsageLogTable({
         <div className="flex justify-center">
           <button
             onClick={() => loadMore(20)}
-            className="rounded-md border px-4 py-2 text-sm hover:bg-muted/50 transition-colors"
+            className="hover:bg-muted/50 rounded-md border px-4 py-2 text-sm transition-colors"
           >
             {LABELS.loadMore[locale]}
           </button>

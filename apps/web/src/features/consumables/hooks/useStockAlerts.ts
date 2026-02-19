@@ -9,14 +9,16 @@
  *
  * vi: "Hook cảnh báo tồn kho thấp" / en: "Low stock alerts hook"
  */
-import { useQuery } from "convex/react";
 import type { FunctionReference } from "convex/server";
+import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
+
 import type { ConsumableDoc } from "./useConsumables";
 
 // Module-level ref — see useConsumables.ts for WHY pattern
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const getLowStockRef = anyApi.consumables!.getLowStock as FunctionReference<"query">;
+const getLowStockRef = anyApi.consumables!
+  .getLowStock as FunctionReference<"query">;
 
 /**
  * Returns all consumables where currentStock <= reorderPoint.

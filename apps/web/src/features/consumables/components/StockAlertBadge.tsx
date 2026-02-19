@@ -52,7 +52,7 @@ export function StockAlertBadge({
   if (currentStock === 0) {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 ${className}`}
+        className={`inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 ${className}`}
         data-testid="stock-badge"
         data-stock-status="out_of_stock"
       >
@@ -64,7 +64,7 @@ export function StockAlertBadge({
   if (currentStock <= reorderPoint) {
     return (
       <span
-        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 ${className}`}
+        className={`inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 ${className}`}
         data-testid="stock-badge"
         data-stock-status="low"
       >
@@ -75,7 +75,7 @@ export function StockAlertBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 ${className}`}
+      className={`inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 ${className}`}
       data-testid="stock-badge"
       data-stock-status="in_stock"
     >

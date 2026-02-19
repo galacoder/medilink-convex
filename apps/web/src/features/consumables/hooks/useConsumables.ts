@@ -12,10 +12,12 @@
  *
  * vi: "Hook dữ liệu vật tư tiêu hao" / en: "Consumables data hook"
  */
-import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import type { FunctionReference } from "convex/server";
+// WHY: convex/_generated/dataModel is gitignored (generated at runtime by `npx convex dev`).
+// GenericId<T> from convex/values is the stable npm-package equivalent of the generated Id<T>.
+import type { GenericId as Id } from "convex/values";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { anyApi } from "convex/server";
-import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 // ---------------------------------------------------------------------------
 // Module-level function references (typed once, reused across hooks)
@@ -32,7 +34,8 @@ const consumablesRefs = {
   list: consumablesModule.list as FunctionReference<"query">,
   getById: consumablesModule.getById as FunctionReference<"query">,
   getUsageLog: consumablesModule.getUsageLog as FunctionReference<"query">,
-  getReorderRequests: consumablesModule.getReorderRequests as FunctionReference<"query">,
+  getReorderRequests:
+    consumablesModule.getReorderRequests as FunctionReference<"query">,
   getLowStock: consumablesModule.getLowStock as FunctionReference<"query">,
   // Mutations
   create: consumablesModule.create as FunctionReference<"mutation">,
@@ -40,8 +43,10 @@ const consumablesRefs = {
   recordUsage: consumablesModule.recordUsage as FunctionReference<"mutation">,
   receiveStock: consumablesModule.receiveStock as FunctionReference<"mutation">,
   adjustStock: consumablesModule.adjustStock as FunctionReference<"mutation">,
-  createReorderRequest: consumablesModule.createReorderRequest as FunctionReference<"mutation">,
-  updateReorderStatus: consumablesModule.updateReorderStatus as FunctionReference<"mutation">,
+  createReorderRequest:
+    consumablesModule.createReorderRequest as FunctionReference<"mutation">,
+  updateReorderStatus:
+    consumablesModule.updateReorderStatus as FunctionReference<"mutation">,
 };
 
 // ---------------------------------------------------------------------------
@@ -194,12 +199,7 @@ export function useConsumableUsageLog(
  * vi: "Yêu cầu đặt hàng lại" / en: "Reorder requests"
  */
 export function useReorderRequests(
-  status?:
-    | "pending"
-    | "approved"
-    | "ordered"
-    | "received"
-    | "cancelled",
+  status?: "pending" | "approved" | "ordered" | "received" | "cancelled",
 ) {
   // WHY: AnyFunctionReference return type boundary — cast handled at call sites
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return

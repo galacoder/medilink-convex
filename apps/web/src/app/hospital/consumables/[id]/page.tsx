@@ -9,23 +9,27 @@
  *
  * vi: "Trang chi tiết vật tư tiêu hao" / en: "Consumable Detail Page"
  */
+import type { FunctionReference } from "convex/server";
+// WHY: convex/_generated/dataModel is gitignored (generated at runtime by `npx convex dev`).
+// GenericId<T> from convex/values is the stable npm-package equivalent of the generated Id<T>.
+import type { GenericId as Id } from "convex/values";
 import { use } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
-import type { FunctionReference } from "convex/server";
 import { anyApi } from "convex/server";
-import { useConsumable } from "~/features/consumables/hooks/useConsumables";
+
+import { ReorderForm } from "~/features/consumables/components/ReorderForm";
 import { StockAlertBadge } from "~/features/consumables/components/StockAlertBadge";
 import { UsageLogTable } from "~/features/consumables/components/UsageLogTable";
-import { ReorderForm } from "~/features/consumables/components/ReorderForm";
-import type { Id } from "../../../../../../../convex/_generated/dataModel";
+import { useConsumable } from "~/features/consumables/hooks/useConsumables";
 
 // WHY: anyApi.auth.getCurrentUser returns the Convex user document whose _id
 // is the correct Convex Id<"users"> for Convex mutations. The Better Auth
 // client-side session.user.id is the Better Auth internal string ID which
 // does NOT equal the Convex document _id.
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const getCurrentUserRef = anyApi.auth!.getCurrentUser as FunctionReference<"query">;
+const getCurrentUserRef = anyApi.auth!
+  .getCurrentUser as FunctionReference<"query">;
 
 // ---------------------------------------------------------------------------
 // Bilingual labels
@@ -84,12 +88,15 @@ export default function ConsumableDetailPage({
   // which returns the Convex user document with the correct _id.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const convexUser = useQuery(getCurrentUserRef, {});
-  const currentUserId = (convexUser as { _id?: Id<"users"> } | null | undefined)?._id;
+  const currentUserId = (convexUser as { _id?: Id<"users"> } | null | undefined)
+    ?._id;
 
   if (consumable === undefined) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-muted-foreground text-sm">{LABELS.loading[locale]}</div>
+        <div className="text-muted-foreground text-sm">
+          {LABELS.loading[locale]}
+        </div>
       </div>
     );
   }
@@ -99,7 +106,7 @@ export default function ConsumableDetailPage({
       <div className="space-y-4">
         <Link
           href="/hospital/consumables"
-          className="text-sm text-muted-foreground hover:underline"
+          className="text-muted-foreground text-sm hover:underline"
         >
           &larr; {LABELS.back[locale]}
         </Link>
@@ -115,7 +122,7 @@ export default function ConsumableDetailPage({
       {/* Back navigation */}
       <Link
         href="/hospital/consumables"
-        className="text-sm text-muted-foreground hover:underline"
+        className="text-muted-foreground text-sm hover:underline"
       >
         &larr; {LABELS.back[locale]}
       </Link>
@@ -124,7 +131,9 @@ export default function ConsumableDetailPage({
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold">{consumable.nameVi}</h1>
-          <p className="text-muted-foreground mt-1 text-sm">{consumable.nameEn}</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {consumable.nameEn}
+          </p>
         </div>
         <StockAlertBadge
           currentStock={consumable.currentStock}
@@ -137,32 +146,46 @@ export default function ConsumableDetailPage({
       <div className="rounded-lg border p-4">
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div>
-            <dt className="text-muted-foreground text-sm">{LABELS.currentStock[locale]}</dt>
+            <dt className="text-muted-foreground text-sm">
+              {LABELS.currentStock[locale]}
+            </dt>
             <dd className="mt-1 text-2xl font-semibold tabular-nums">
               {consumable.currentStock}
             </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">{LABELS.parLevel[locale]}</dt>
+            <dt className="text-muted-foreground text-sm">
+              {LABELS.parLevel[locale]}
+            </dt>
             <dd className="mt-1 text-lg tabular-nums">{consumable.parLevel}</dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">{LABELS.reorderPoint[locale]}</dt>
-            <dd className="mt-1 text-lg tabular-nums">{consumable.reorderPoint}</dd>
+            <dt className="text-muted-foreground text-sm">
+              {LABELS.reorderPoint[locale]}
+            </dt>
+            <dd className="mt-1 text-lg tabular-nums">
+              {consumable.reorderPoint}
+            </dd>
           </div>
           <div>
-            <dt className="text-muted-foreground text-sm">{LABELS.unit[locale]}</dt>
+            <dt className="text-muted-foreground text-sm">
+              {LABELS.unit[locale]}
+            </dt>
             <dd className="mt-1">{consumable.unitOfMeasure}</dd>
           </div>
           {consumable.sku && (
             <div>
-              <dt className="text-muted-foreground text-sm">{LABELS.sku[locale]}</dt>
+              <dt className="text-muted-foreground text-sm">
+                {LABELS.sku[locale]}
+              </dt>
               <dd className="mt-1 font-mono text-sm">{consumable.sku}</dd>
             </div>
           )}
           {consumable.manufacturer && (
             <div>
-              <dt className="text-muted-foreground text-sm">{LABELS.manufacturer[locale]}</dt>
+              <dt className="text-muted-foreground text-sm">
+                {LABELS.manufacturer[locale]}
+              </dt>
               <dd className="mt-1">{consumable.manufacturer}</dd>
             </div>
           )}
@@ -171,9 +194,15 @@ export default function ConsumableDetailPage({
         {/* Linked equipment */}
         {consumable.relatedEquipment && (
           <div className="mt-4 border-t pt-4">
-            <dt className="text-muted-foreground text-sm">{LABELS.linkedEquipment[locale]}</dt>
-            <dd className="mt-1 font-medium">{consumable.relatedEquipment.nameVi}</dd>
-            <dd className="text-muted-foreground text-xs">{consumable.relatedEquipment.nameEn}</dd>
+            <dt className="text-muted-foreground text-sm">
+              {LABELS.linkedEquipment[locale]}
+            </dt>
+            <dd className="mt-1 font-medium">
+              {consumable.relatedEquipment.nameVi}
+            </dd>
+            <dd className="text-muted-foreground text-xs">
+              {consumable.relatedEquipment.nameEn}
+            </dd>
           </div>
         )}
       </div>
@@ -192,7 +221,7 @@ export default function ConsumableDetailPage({
               locale={locale}
             />
           ) : (
-            <div className="rounded-lg border p-4 text-sm text-muted-foreground">
+            <div className="text-muted-foreground rounded-lg border p-4 text-sm">
               {LABELS.signInToReorder[locale]}
             </div>
           )}

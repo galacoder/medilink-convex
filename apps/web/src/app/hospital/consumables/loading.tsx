@@ -26,10 +26,7 @@ export default function ConsumablesLoading() {
           <div className="bg-muted h-5 w-full animate-pulse rounded" />
         </div>
         {[1, 2, 3, 4, 5].map((i) => (
-          <div
-            key={i}
-            className="border-t px-4 py-3"
-          >
+          <div key={i} className="border-t px-4 py-3">
             <div className="bg-muted h-12 animate-pulse rounded" />
           </div>
         ))}

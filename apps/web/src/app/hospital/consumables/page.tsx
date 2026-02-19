@@ -21,7 +21,8 @@ export default function HospitalConsumablesPage() {
           Vật tư tiêu hao {/* Consumables */}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Quản lý vật tư và theo dõi tồn kho {/* Manage consumables and track stock */}
+          Quản lý vật tư và theo dõi tồn kho{" "}
+          {/* Manage consumables and track stock */}
         </p>
       </div>
 

@@ -7,9 +7,13 @@
  * vi: "Bảng danh sách vật tư tiêu hao" / en: "Consumables list table"
  */
 import { useState } from "react";
+
+import type {
+  ConsumableCategoryType,
+  ConsumableStockLevel,
+} from "../hooks/useConsumables";
 import { useConsumablesList } from "../hooks/useConsumables";
 import { StockAlertBadge } from "./StockAlertBadge";
-import type { ConsumableCategoryType, ConsumableStockLevel } from "../hooks/useConsumables";
 
 // ---------------------------------------------------------------------------
 // Bilingual labels
@@ -33,7 +37,10 @@ const LABELS = {
   search: { vi: "Tìm kiếm...", en: "Search..." },
 } as const;
 
-const CATEGORY_LABELS: Record<ConsumableCategoryType, { vi: string; en: string }> = {
+const CATEGORY_LABELS: Record<
+  ConsumableCategoryType,
+  { vi: string; en: string }
+> = {
   disposables: { vi: "Dùng một lần", en: "Disposables" },
   reagents: { vi: "Hóa chất", en: "Reagents" },
   electrodes: { vi: "Điện cực", en: "Electrodes" },
@@ -88,7 +95,7 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
           placeholder={LABELS.search[locale]}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="border-input bg-background rounded-md border px-3 py-2 text-sm"
           aria-label={LABELS.search[locale]}
         />
 
@@ -97,10 +104,12 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
           value={categoryFilter ?? ""}
           onChange={(e) =>
             setCategoryFilter(
-              e.target.value ? (e.target.value as ConsumableCategoryType) : undefined,
+              e.target.value
+                ? (e.target.value as ConsumableCategoryType)
+                : undefined,
             )
           }
-          className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="border-input bg-background rounded-md border px-3 py-2 text-sm"
           aria-label={LABELS.filterAll[locale]}
         >
           <option value="">{LABELS.filterAll[locale]}</option>
@@ -118,10 +127,12 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
           value={stockFilter ?? ""}
           onChange={(e) =>
             setStockFilter(
-              e.target.value ? (e.target.value as ConsumableStockLevel) : undefined,
+              e.target.value
+                ? (e.target.value as ConsumableStockLevel)
+                : undefined,
             )
           }
-          className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+          className="border-input bg-background rounded-md border px-3 py-2 text-sm"
           aria-label={LABELS.filterAllStock[locale]}
         >
           <option value="">{LABELS.filterAllStock[locale]}</option>
@@ -213,7 +224,7 @@ export function ConsumablesTable({ locale = "vi" }: ConsumablesTableProps) {
         <div className="flex justify-center">
           <button
             onClick={() => loadMore(20)}
-            className="rounded-md border px-4 py-2 text-sm hover:bg-muted/50 transition-colors"
+            className="hover:bg-muted/50 rounded-md border px-4 py-2 text-sm transition-colors"
           >
             {LABELS.loadMore[locale]}
           </button>
