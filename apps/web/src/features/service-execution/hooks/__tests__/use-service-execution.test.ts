@@ -16,13 +16,15 @@ vi.mock("convex/react", () => ({
   useMutation: vi.fn().mockReturnValue(vi.fn()),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockUseMutation = vi.mocked(useMutation) as any;
+const mockUseMutation = vi.mocked(useMutation);
 
 describe("useServiceExecution", () => {
   it("test_useServiceExecution_returnsMutationFunctions - returns all execution mutations", () => {
     const mockMutationFn = vi.fn().mockResolvedValue("sr_id");
-    mockUseMutation.mockReturnValue(mockMutationFn);
+    // WHY: useMutation is mocked to return a mutation fn; double cast via unknown avoids `any`
+    mockUseMutation.mockReturnValue(
+      mockMutationFn as unknown as ReturnType<typeof useMutation>,
+    );
 
     const { result } = renderHook(() => useServiceExecution());
 
@@ -34,7 +36,10 @@ describe("useServiceExecution", () => {
 
   it("provides isSubmitting state for each mutation", () => {
     const mockMutationFn = vi.fn().mockResolvedValue("sr_id");
-    mockUseMutation.mockReturnValue(mockMutationFn);
+    // WHY: useMutation is mocked to return a mutation fn; double cast via unknown avoids `any`
+    mockUseMutation.mockReturnValue(
+      mockMutationFn as unknown as ReturnType<typeof useMutation>,
+    );
 
     const { result } = renderHook(() => useServiceExecution());
 

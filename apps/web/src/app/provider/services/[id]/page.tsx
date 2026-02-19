@@ -23,17 +23,61 @@ import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 
-import type { CompletionReportInput } from "~/features/service-execution/types";
+import type {
+  CompletionReportInput,
+  ServiceRequestPriority,
+  ServiceRequestStatus,
+  ServiceRequestType,
+} from "~/features/service-execution/types";
 import { CompletionReportForm } from "~/features/service-execution/components/completion-report-form";
 import { useServiceExecution } from "~/features/service-execution/hooks/use-service-execution";
 import { serviceExecutionLabels } from "~/features/service-execution/labels";
+
+/**
+ * Shape returned by api.serviceRequests.getById enriched query.
+ * WHY: The generated api.d.ts uses AnyApi so useQuery returns `any`.
+ * Explicit interface gives TypeScript the structural info it needs.
+ */
+interface ServiceDetail {
+  _id: Id<"serviceRequests">;
+  _creationTime: number;
+  organizationId: Id<"organizations">;
+  equipmentId: Id<"equipment">;
+  requestedBy: Id<"users">;
+  type: ServiceRequestType;
+  status: ServiceRequestStatus;
+  priority: ServiceRequestPriority;
+  descriptionVi: string;
+  descriptionEn?: string;
+  scheduledAt?: number;
+  completedAt?: number;
+  createdAt: number;
+  updatedAt: number;
+  assignedProviderId?: Id<"providers">;
+  equipment: {
+    nameVi: string;
+    nameEn: string;
+    status: string;
+    condition: string;
+  } | null;
+  quotes: {
+    _id: string;
+    status: string;
+    amount: number;
+    currency: string;
+  }[];
+  rating: Record<string, unknown> | null;
+  hospitalOrgName: string | null;
+}
 
 export default function ServiceExecutionDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const serviceId = params.id as Id<"serviceRequests">;
 
-  const service = useQuery(api.serviceRequests.getById, { id: serviceId });
+  const service = useQuery(api.serviceRequests.getById, {
+    id: serviceId,
+  }) as ServiceDetail | null | undefined;
   const {
     startService,
     completeService,
@@ -71,9 +115,11 @@ export default function ServiceExecutionDetailPage() {
   const isInProgress = service.status === "in_progress";
   const isCompleted = service.status === "completed";
 
-  const statusLabel = serviceExecutionLabels.status[
-    service.status as keyof typeof serviceExecutionLabels.status
-  ] ?? { vi: service.status, en: service.status };
+  const statusKey = service.status as keyof typeof serviceExecutionLabels.status;
+  const statusLabel: { vi: string; en: string } =
+    statusKey in serviceExecutionLabels.status
+      ? serviceExecutionLabels.status[statusKey]
+      : { vi: service.status, en: service.status };
 
   const typeLabel =
     serviceExecutionLabels.requestType[
@@ -165,14 +211,14 @@ export default function ServiceExecutionDetailPage() {
           </div>
 
           {/* Accepted quote amount */}
-          {service.quotes && service.quotes.length > 0 && (
+          {service.quotes.length > 0 && (
             <div>
               <p className="text-muted-foreground text-sm">
                 {serviceExecutionLabels.info.quoteAmount.vi}
               </p>
               {service.quotes
-                .filter((q: { status: string }) => q.status === "accepted")
-                .map((q: { _id: string; amount: number; currency: string }) => (
+                .filter((q) => q.status === "accepted")
+                .map((q) => (
                   <p key={q._id} className="font-medium">
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",

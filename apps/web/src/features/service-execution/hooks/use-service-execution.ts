@@ -12,6 +12,7 @@
  */
 import { useState } from "react";
 import { api } from "convex/_generated/api";
+import type { Id } from "convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 
 export interface UseServiceExecutionResult {
@@ -67,11 +68,12 @@ export function useServiceExecution(): UseServiceExecutionResult {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await startServiceMutation({
-        id: args.id as Parameters<typeof startServiceMutation>[0]["id"],
+      // WHY: api is AnyApi so mutations return `any`; cast to known return type.
+      const result = (await startServiceMutation({
+        id: args.id as Id<"serviceRequests">,
         notes: args.notes,
-      });
-      return result as string;
+      })) as string;
+      return result;
     } catch (err) {
       const message =
         err instanceof Error
@@ -94,14 +96,15 @@ export function useServiceExecution(): UseServiceExecutionResult {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await updateProgressMutation({
-        id: args.id as Parameters<typeof updateProgressMutation>[0]["id"],
+      // WHY: api is AnyApi so mutations return `any`; cast to known return type.
+      const result = (await updateProgressMutation({
+        id: args.id as Id<"serviceRequests">,
         progressNotes: args.progressNotes,
         percentComplete: args.percentComplete,
         hasUnexpectedIssue: args.hasUnexpectedIssue,
         unexpectedIssueDescVi: args.unexpectedIssueDescVi,
-      });
-      return result as string;
+      })) as string;
+      return result;
     } catch (err) {
       const message =
         err instanceof Error
@@ -118,10 +121,11 @@ export function useServiceExecution(): UseServiceExecutionResult {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await completeServiceMutation({
-        id: args.id as Parameters<typeof completeServiceMutation>[0]["id"],
-      });
-      return result as string;
+      // WHY: api is AnyApi so mutations return `any`; cast to known return type.
+      const result = (await completeServiceMutation({
+        id: args.id as Id<"serviceRequests">,
+      })) as string;
+      return result;
     } catch (err) {
       const message =
         err instanceof Error
@@ -147,8 +151,9 @@ export function useServiceExecution(): UseServiceExecutionResult {
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await submitReportMutation({
-        id: args.id as Parameters<typeof submitReportMutation>[0]["id"],
+      // WHY: api is AnyApi so mutations return `any`; cast to known return type.
+      const result = (await submitReportMutation({
+        id: args.id as Id<"serviceRequests">,
         workDescriptionVi: args.workDescriptionVi,
         workDescriptionEn: args.workDescriptionEn,
         partsReplaced: args.partsReplaced,
@@ -156,8 +161,8 @@ export function useServiceExecution(): UseServiceExecutionResult {
         actualHours: args.actualHours,
         photoUrls: args.photoUrls,
         actualCompletionTime: args.actualCompletionTime,
-      });
-      return result as string;
+      })) as string;
+      return result;
     } catch (err) {
       const message =
         err instanceof Error

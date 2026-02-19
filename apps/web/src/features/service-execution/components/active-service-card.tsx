@@ -85,9 +85,11 @@ export function ActiveServiceCard({
   const isInProgress = service.status === "in_progress";
   const isAccepted = service.status === "accepted";
 
-  const statusLabel = serviceExecutionLabels.status[
-    service.status as keyof typeof serviceExecutionLabels.status
-  ] ?? { vi: service.status, en: service.status };
+  const statusKey = service.status as keyof typeof serviceExecutionLabels.status;
+  const statusLabel: { vi: string; en: string } =
+    statusKey in serviceExecutionLabels.status
+      ? serviceExecutionLabels.status[statusKey]
+      : { vi: service.status, en: service.status };
 
   const statusVariant =
     service.status === "in_progress" || service.status === "accepted"
