@@ -36,3 +36,6 @@ export type { UseServiceRequestDetailResult } from "./hooks/use-service-request-
 
 export { useServiceRequestMutations } from "./hooks/use-service-request-mutations";
 export type { UseServiceRequestMutationsResult } from "./hooks/use-service-request-mutations";
+
+export { useServiceRequestNotifications } from "./hooks/use-service-request-notifications";
+export type { UseServiceRequestNotificationsResult } from "./hooks/use-service-request-notifications";
