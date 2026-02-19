@@ -414,6 +414,33 @@ describe("disputes.addMessage", () => {
       }),
     ).rejects.toThrow();
   });
+
+  it("test_addMessage_creates_audit_log_entry", async () => {
+    // WHY: Vietnamese medical device regulations require a 5-year audit trail for
+    // all changes including dispute messages. addMessage must call createAuditEntry.
+    const t = convexTest(schema, modules);
+    const orgId = await seedOrganization(t);
+    const userId = await seedUser(t);
+    const equipId = await seedEquipment(t, orgId);
+    const srId = await seedServiceRequest(t, orgId, equipId, userId);
+    const disputeId = await seedDispute(t, orgId, srId, userId);
+
+    const asOrg = t.withIdentity({ organizationId: orgId, subject: userId });
+
+    await asOrg.mutation(api.disputes.addMessage, {
+      disputeId: disputeId as any,
+      contentVi: "Tin nhắn kiểm tra audit",
+    });
+
+    const auditLogs = await t.run(async (ctx) =>
+      ctx.db
+        .query("auditLog")
+        .filter((q) => q.eq(q.field("action"), "dispute.messageAdded"))
+        .collect(),
+    );
+    expect(auditLogs.length).toBeGreaterThan(0);
+    expect(auditLogs[0].resourceType).toBe("disputeMessages");
+  });
 });
 
 // ===========================================================================

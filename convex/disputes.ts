@@ -270,6 +270,18 @@ export const addMessage = mutation({
       updatedAt: now,
     });
 
+    // 5. Create audit log entry (Vietnamese medical device 5-year retention requirement).
+    // WHY: addMessage was the only mutation in this file not calling createAuditEntry,
+    // creating a compliance gap. All dispute communications must be auditable.
+    await createAuditEntry(ctx, {
+      organizationId: dispute.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "dispute.messageAdded",
+      resourceType: "disputeMessages",
+      resourceId: messageId,
+      newValues: { disputeId: args.disputeId, contentVi: args.contentVi },
+    });
+
     return messageId;
   },
 });
@@ -541,13 +553,37 @@ export const getById = query({
     id: v.id("disputes"),
   },
   handler: async (ctx, args) => {
-    // Authenticate
-    await localRequireOrgAuth(ctx);
+    // Authenticate with org context (required for ownership check)
+    const auth = await localRequireOrgAuth(ctx);
 
     // Load the dispute
     const dispute = await ctx.db.get(args.id);
     if (!dispute) {
       return null;
+    }
+
+    // Verify access: caller's org must be the hospital that raised the dispute
+    // OR the provider org assigned to the linked service request.
+    // WHY: Without this check any authenticated user can read disputes from any
+    // organization by guessing IDs — a CRITICAL cross-org data leak.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền xem khiếu nại này. (You do not have access to this dispute.)",
+        code: "FORBIDDEN",
+      });
     }
 
     // Join related data in parallel
@@ -599,8 +635,40 @@ export const getMessages = query({
     disputeId: v.id("disputes"),
   },
   handler: async (ctx, args) => {
-    // Authenticate
-    await localRequireAuth(ctx);
+    // Authenticate with org context — required to verify dispute ownership.
+    // WHY: Without an org check, any authenticated user can read messages for
+    // any dispute by guessing a disputeId — a CRITICAL cross-org data leak.
+    const auth = await localRequireOrgAuth(ctx);
+
+    // Load the parent dispute to verify the caller has access to it.
+    const dispute = await ctx.db.get(args.disputeId);
+    if (!dispute) {
+      throw new ConvexError({
+        message: "Khiếu nại không tồn tại. (Dispute not found.)",
+        code: "NOT_FOUND",
+      });
+    }
+
+    // Access check: same as getById — hospital owner OR assigned provider.
+    const orgId = auth.organizationId;
+    const isHospitalOwner = dispute.organizationId === orgId;
+
+    let isProviderAccess = false;
+    if (!isHospitalOwner) {
+      const linkedServiceRequest = await ctx.db.get(dispute.serviceRequestId);
+      if (linkedServiceRequest?.assignedProviderId) {
+        const provider = await ctx.db.get(linkedServiceRequest.assignedProviderId);
+        isProviderAccess = provider?.organizationId === orgId;
+      }
+    }
+
+    if (!isHospitalOwner && !isProviderAccess) {
+      throw new ConvexError({
+        message:
+          "Không có quyền xem tin nhắn này. (You do not have access to these messages.)",
+        code: "FORBIDDEN",
+      });
+    }
 
     // Get messages by dispute index, ordered by createdAt
     const messages = await ctx.db
