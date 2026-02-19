@@ -112,4 +112,11 @@ export const api = {
     ),
     updateProfile: makeFunctionReference<"mutation">("providers:updateProfile"),
   },
+  admin: {
+    auditLog: {
+      list: makeFunctionReference<"query">("admin/auditLog:list"),
+      getById: makeFunctionReference<"query">("admin/auditLog:getById"),
+      exportCSV: makeFunctionReference<"query">("admin/auditLog:exportCSV"),
+    },
+  },
 } as const;
