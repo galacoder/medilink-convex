@@ -166,6 +166,7 @@ export function DisputeTable({
     },
   ];
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: disputes,
     columns,

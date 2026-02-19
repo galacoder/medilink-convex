@@ -29,6 +29,9 @@ export const env = createEnv({
     // Format: https://<deployment>.convex.site
     // Used by convexBetterAuthNextJs for SSR authentication.
     NEXT_PUBLIC_CONVEX_SITE_URL: z.string().url().optional(),
+    // Application version string injected at build time (e.g. "1.2.3" or git SHA).
+    // Optional — falls back to "unknown" when not set (e.g. in local dev).
+    NEXT_PUBLIC_APP_VERSION: z.string().optional(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
@@ -38,6 +41,7 @@ export const env = createEnv({
 
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
     NEXT_PUBLIC_CONVEX_SITE_URL: process.env.NEXT_PUBLIC_CONVEX_SITE_URL,
+    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
   },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",
