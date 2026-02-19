@@ -115,7 +115,8 @@ export default function ServiceExecutionDetailPage() {
   const isInProgress = service.status === "in_progress";
   const isCompleted = service.status === "completed";
 
-  const statusKey = service.status as keyof typeof serviceExecutionLabels.status;
+  const statusKey =
+    service.status as keyof typeof serviceExecutionLabels.status;
   const statusLabel: { vi: string; en: string } =
     statusKey in serviceExecutionLabels.status
       ? serviceExecutionLabels.status[statusKey]
