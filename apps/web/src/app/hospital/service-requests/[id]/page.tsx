@@ -40,6 +40,7 @@ import { useServiceRequestDetail } from "~/features/service-requests/hooks/use-s
 import { useServiceRequestMutations } from "~/features/service-requests/hooks/use-service-request-mutations";
 import { StatusTimeline } from "~/features/service-requests/components/status-timeline";
 import { QuotesList } from "~/features/service-requests/components/quotes-list";
+import { ServiceRatingForm } from "~/features/service-requests/components/service-rating-form";
 import type { ServiceRequestPriority, ServiceRequestStatus } from "~/features/service-requests/types";
 
 const labels = serviceRequestLabels;
@@ -74,7 +75,7 @@ export default function ServiceRequestDetailPage() {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const { detail, isLoading, notFound } = useServiceRequestDetail(id);
-  const { cancelRequest, acceptQuote, rejectQuote } = useServiceRequestMutations();
+  const { cancelRequest, acceptQuote, rejectQuote, rateService } = useServiceRequestMutations();
 
   async function handleCancel() {
     setIsCancelling(true);
@@ -237,6 +238,20 @@ export default function ServiceRequestDetailPage() {
               onReject={rejectQuote}
             />
           </div>
+
+          {/* Rating section — only shown when completed and not yet rated */}
+          {detail.status === "completed" && !detail.rating && (
+            <Card data-testid="rating-section">
+              <CardHeader>
+                <CardTitle className="text-base">{labels.rating.title.vi}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ServiceRatingForm
+                  onSubmit={(data) => rateService(id, data)}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Right column: timeline */}

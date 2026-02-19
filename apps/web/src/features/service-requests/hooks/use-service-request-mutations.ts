@@ -17,11 +17,20 @@ import { api } from "convex/_generated/api";
 
 import type { CreateServiceRequestInput } from "../types";
 
+interface RatingInput {
+  rating: number;
+  serviceQuality?: number;
+  timeliness?: number;
+  professionalism?: number;
+  commentVi?: string;
+}
+
 export interface UseServiceRequestMutationsResult {
   createRequest: (input: CreateServiceRequestInput) => Promise<string>;
   cancelRequest: (id: string) => Promise<void>;
   acceptQuote: (quoteId: string) => Promise<void>;
   rejectQuote: (quoteId: string) => Promise<void>;
+  rateService: (serviceRequestId: string, data: RatingInput) => Promise<void>;
   isCreating: boolean;
   isCancelling: boolean;
   isAccepting: boolean;
@@ -38,6 +47,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   const cancelMutation = useMutation(api.serviceRequests.cancel);
   const acceptMutation = useMutation(api.quotes.accept);
   const rejectMutation = useMutation(api.quotes.reject);
+  const rateMutation = useMutation(api.serviceRatings.create);
 
   async function createRequest(
     input: CreateServiceRequestInput,
@@ -92,11 +102,26 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
     }
   }
 
+  async function rateService(
+    serviceRequestId: string,
+    data: RatingInput,
+  ): Promise<void> {
+    await rateMutation({
+      serviceRequestId: serviceRequestId as Parameters<typeof rateMutation>[0]["serviceRequestId"],
+      rating: data.rating,
+      serviceQuality: data.serviceQuality,
+      timeliness: data.timeliness,
+      professionalism: data.professionalism,
+      commentVi: data.commentVi,
+    });
+  }
+
   return {
     createRequest,
     cancelRequest,
     acceptQuote,
     rejectQuote,
+    rateService,
     isCreating,
     isCancelling,
     isAccepting,
