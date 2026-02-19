@@ -25,7 +25,8 @@
     "./toast": "./src/toast.tsx",
     "./tooltip": "./src/tooltip.tsx",
     "./table": "./src/table.tsx",
-    "./dialog": "./src/dialog.tsx"
+    "./dialog": "./src/dialog.tsx",
+    "./textarea": "./src/textarea.tsx"
   },
   "license": "MIT",
   "scripts": {
