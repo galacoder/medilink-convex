@@ -52,7 +52,8 @@ export function useAdminHospitals(
   });
 
   const typedResult = result as HospitalListResult | undefined;
-  const hospitals: HospitalSummary[] = typedResult?.hospitals ?? EMPTY_HOSPITALS;
+  const hospitals: HospitalSummary[] =
+    typedResult?.hospitals ?? EMPTY_HOSPITALS;
   const total: number = typedResult?.total ?? 0;
   const hasMore: boolean = typedResult?.hasMore ?? false;
 
