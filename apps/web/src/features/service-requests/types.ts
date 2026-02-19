@@ -116,7 +116,8 @@ export interface EquipmentRef {
 /**
  * Full detail shape returned by getById — includes equipment, quotes, rating.
  */
-export interface ServiceRequestDetail extends Omit<ServiceRequest, "equipmentNameVi" | "equipmentNameEn"> {
+export interface ServiceRequestDetail
+  extends Omit<ServiceRequest, "equipmentNameVi" | "equipmentNameEn"> {
   equipment: EquipmentRef | null;
   quotes: Quote[];
   rating: ServiceRating | null;

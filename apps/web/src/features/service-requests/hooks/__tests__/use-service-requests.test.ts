@@ -5,8 +5,9 @@
  * data, isolating the hook's filtering logic and return shape from the
  * actual Convex runtime.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { createMockServiceRequest } from "~/test-utils";
 import { useServiceRequests } from "../use-service-requests";
@@ -17,8 +18,6 @@ vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
 }));
 
-import { useQuery } from "convex/react";
-
 const mockUseQuery = vi.mocked(useQuery);
 
 describe("useServiceRequests", () => {
@@ -27,7 +26,9 @@ describe("useServiceRequests", () => {
       createMockServiceRequest({ _id: "sr_001", status: "pending" }),
       createMockServiceRequest({ _id: "sr_002", status: "quoted" }),
     ];
-    mockUseQuery.mockReturnValue(mockRequests as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      mockRequests as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequests());
 
@@ -39,7 +40,9 @@ describe("useServiceRequests", () => {
     const pendingRequests = [
       createMockServiceRequest({ _id: "sr_001", status: "pending" }),
     ];
-    mockUseQuery.mockReturnValue(pendingRequests as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      pendingRequests as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequests("pending"));
 
@@ -53,7 +56,9 @@ describe("useServiceRequests", () => {
 
   it("test_useServiceRequests_handlesLoadingState", () => {
     // Convex returns undefined while loading
-    mockUseQuery.mockReturnValue(undefined as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      undefined as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequests());
 

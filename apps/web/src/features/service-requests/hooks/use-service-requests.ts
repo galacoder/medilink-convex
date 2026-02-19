@@ -8,8 +8,8 @@
  * useQuery gives real-time reactivity — the UI updates automatically when a
  * provider submits a quote or status changes.
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import type { ServiceRequest, ServiceRequestStatus } from "../types";
 
@@ -31,8 +31,7 @@ export function useServiceRequests(
   status?: ServiceRequestStatus | "all",
 ): UseServiceRequestsResult {
   // Convex query: pass status arg only when filtering a specific status
-  const convexStatus =
-    status && status !== "all" ? status : undefined;
+  const convexStatus = status && status !== "all" ? status : undefined;
 
   const requests = useQuery(api.serviceRequests.listByHospital, {
     ...(convexStatus ? { status: convexStatus } : {}),

@@ -5,8 +5,8 @@
  * and action button visibility. Critical for AC-03 (view quotes) and AC-04
  * (approve/reject quote with confirmation dialog).
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { createMockQuote, renderWithProviders } from "~/test-utils";
 import { QuoteComparisonCard } from "../quote-comparison-card";
@@ -57,7 +57,9 @@ describe("QuoteComparisonCard", () => {
     );
 
     // Accept and reject buttons should be visible for pending quotes
-    expect(screen.getByRole("button", { name: /Chấp nhận/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Chấp nhận/ }),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Từ chối/ })).toBeInTheDocument();
   });
 
@@ -73,8 +75,12 @@ describe("QuoteComparisonCard", () => {
     );
 
     // No action buttons for accepted/rejected/expired quotes
-    expect(screen.queryByRole("button", { name: /Chấp nhận/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Từ chối/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Chấp nhận/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Từ chối/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("test_QuoteComparisonCard_showsConfirmationDialog", () => {

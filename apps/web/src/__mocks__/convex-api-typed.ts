@@ -12,11 +12,15 @@ import { makeFunctionReference } from "convex/server";
 
 export const api = {
   serviceRequests: {
-    listByHospital: makeFunctionReference<"query">("serviceRequests:listByHospital"),
+    listByHospital: makeFunctionReference<"query">(
+      "serviceRequests:listByHospital",
+    ),
     getById: makeFunctionReference<"query">("serviceRequests:getById"),
     create: makeFunctionReference<"mutation">("serviceRequests:create"),
     cancel: makeFunctionReference<"mutation">("serviceRequests:cancel"),
-    updateStatus: makeFunctionReference<"mutation">("serviceRequests:updateStatus"),
+    updateStatus: makeFunctionReference<"mutation">(
+      "serviceRequests:updateStatus",
+    ),
   },
   quotes: {
     accept: makeFunctionReference<"mutation">("quotes:accept"),

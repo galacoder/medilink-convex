@@ -5,8 +5,8 @@
  * priority badges, empty state, and loading skeleton. These are critical
  * for AC-01 (service request list) and AC-10 (responsive layout).
  */
-import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { createMockServiceRequest, renderWithProviders } from "~/test-utils";
 import { ServiceRequestTable } from "../service-request-table";
@@ -30,7 +30,9 @@ describe("ServiceRequestTable", () => {
       }),
     ];
 
-    renderWithProviders(<ServiceRequestTable requests={requests} isLoading={false} />);
+    renderWithProviders(
+      <ServiceRequestTable requests={requests} isLoading={false} />,
+    );
 
     expect(screen.getByText("Máy đo huyết áp")).toBeInTheDocument();
     expect(screen.getByText("Máy siêu âm")).toBeInTheDocument();
@@ -43,7 +45,9 @@ describe("ServiceRequestTable", () => {
       createMockServiceRequest({ _id: "sr_003", status: "completed" }),
     ];
 
-    renderWithProviders(<ServiceRequestTable requests={requests} isLoading={false} />);
+    renderWithProviders(
+      <ServiceRequestTable requests={requests} isLoading={false} />,
+    );
 
     // Status labels in Vietnamese (primary)
     expect(screen.getByText("Đang chờ")).toBeInTheDocument();
@@ -57,19 +61,21 @@ describe("ServiceRequestTable", () => {
       createMockServiceRequest({ _id: "sr_002", priority: "critical" }),
     ];
 
-    renderWithProviders(<ServiceRequestTable requests={requests} isLoading={false} />);
+    renderWithProviders(
+      <ServiceRequestTable requests={requests} isLoading={false} />,
+    );
 
     expect(screen.getByText("Thấp")).toBeInTheDocument();
     expect(screen.getByText("Khẩn cấp")).toBeInTheDocument();
   });
 
   it("test_ServiceRequestTable_showsEmptyState", () => {
-    renderWithProviders(<ServiceRequestTable requests={[]} isLoading={false} />);
+    renderWithProviders(
+      <ServiceRequestTable requests={[]} isLoading={false} />,
+    );
 
     // Should show Vietnamese empty message
-    expect(
-      screen.getByText(/Không có yêu cầu dịch vụ/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Không có yêu cầu dịch vụ/)).toBeInTheDocument();
   });
 
   it("test_ServiceRequestTable_showsLoadingSkeleton", () => {

@@ -5,8 +5,9 @@
  * (undefined = loading, null = not found, object = data) to meaningful
  * boolean flags and typed data for components.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { createMockServiceRequest } from "~/test-utils";
 import { useServiceRequestDetail } from "../use-service-request-detail";
@@ -14,8 +15,6 @@ import { useServiceRequestDetail } from "../use-service-request-detail";
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -33,7 +32,9 @@ describe("useServiceRequestDetail", () => {
       rating: null,
       hospitalOrgName: "Bệnh viện SPMET",
     };
-    mockUseQuery.mockReturnValue(mockDetail as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      mockDetail as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequestDetail("sr_001"));
 
@@ -66,7 +67,9 @@ describe("useServiceRequestDetail", () => {
       rating: null,
       hospitalOrgName: null,
     };
-    mockUseQuery.mockReturnValue(mockDetail as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      mockDetail as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequestDetail("sr_001"));
 
@@ -75,7 +78,9 @@ describe("useServiceRequestDetail", () => {
   });
 
   it("test_useServiceRequestDetail_handlesNotFound", () => {
-    mockUseQuery.mockReturnValue(null as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      null as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequestDetail("nonexistent"));
 
@@ -85,7 +90,9 @@ describe("useServiceRequestDetail", () => {
   });
 
   it("test_useServiceRequestDetail_handlesLoadingState", () => {
-    mockUseQuery.mockReturnValue(undefined as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      undefined as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequestDetail("sr_001"));
 
@@ -94,7 +101,9 @@ describe("useServiceRequestDetail", () => {
   });
 
   it("test_useServiceRequestDetail_skipsWhenNoId", () => {
-    mockUseQuery.mockReturnValue(undefined as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      undefined as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useServiceRequestDetail(null));
 

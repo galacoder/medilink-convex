@@ -7,14 +7,14 @@
  * create consistent test fixtures without boilerplate in each test file.
  */
 import type { RenderOptions } from "@testing-library/react";
-import { render } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { render } from "@testing-library/react";
 
 import type {
   CreateServiceRequestInput,
   Quote,
-  ServiceRequest,
   ServiceRating,
+  ServiceRequest,
 } from "./features/service-requests/types";
 
 // ---------------------------------------------------------------------------

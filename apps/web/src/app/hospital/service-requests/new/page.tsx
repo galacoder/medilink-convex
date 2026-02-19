@@ -10,17 +10,17 @@
  *
  * Route: /hospital/service-requests/new
  */
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useMutation } from "convex/react";
+import { useRouter } from "next/navigation";
 import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import { Button } from "@medilink/ui/button";
 
-import { useActiveOrganization } from "~/auth/client";
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
-import { ServiceRequestForm } from "~/features/service-requests/components/service-request-form";
 import type { CreateServiceRequestInput } from "~/features/service-requests/types";
+import { useActiveOrganization } from "~/auth/client";
+import { ServiceRequestForm } from "~/features/service-requests/components/service-request-form";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
 const labels = serviceRequestLabels;
 
@@ -60,7 +60,9 @@ export default function NewServiceRequestPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-semibold">{labels.pages.create.vi}</h1>
-          <p className="text-muted-foreground text-sm">{labels.pages.create.en}</p>
+          <p className="text-muted-foreground text-sm">
+            {labels.pages.create.en}
+          </p>
         </div>
       </div>
 

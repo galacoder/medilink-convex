@@ -10,8 +10,8 @@
  * Only queries when the user is authenticated (Convex handles auth via
  * the ConvexBetterAuthProvider).
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import type { ServiceRequest } from "../types";
 

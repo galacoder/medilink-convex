@@ -15,11 +15,11 @@ import Link from "next/link";
 
 import { Button } from "@medilink/ui/button";
 
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
-import { StatusFilterTabs } from "~/features/service-requests/components/status-filter-tabs";
-import { ServiceRequestTable } from "~/features/service-requests/components/service-request-table";
-import { useServiceRequests } from "~/features/service-requests/hooks/use-service-requests";
 import type { ServiceRequestStatus } from "~/features/service-requests/types";
+import { ServiceRequestTable } from "~/features/service-requests/components/service-request-table";
+import { StatusFilterTabs } from "~/features/service-requests/components/status-filter-tabs";
+import { useServiceRequests } from "~/features/service-requests/hooks/use-service-requests";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
 const labels = serviceRequestLabels;
 
@@ -35,9 +35,7 @@ export default function ServiceRequestsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">
-            {labels.pages.list.vi}
-          </h1>
+          <h1 className="text-2xl font-semibold">{labels.pages.list.vi}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             {/* Service Requests */}
             {labels.pages.list.en}
@@ -51,10 +49,7 @@ export default function ServiceRequestsPage() {
       </div>
 
       {/* Status filter tabs */}
-      <StatusFilterTabs
-        value={statusFilter}
-        onValueChange={setStatusFilter}
-      />
+      <StatusFilterTabs value={statusFilter} onValueChange={setStatusFilter} />
 
       {/* Service requests table */}
       <ServiceRequestTable requests={requests} isLoading={isLoading} />

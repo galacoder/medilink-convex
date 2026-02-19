@@ -5,9 +5,9 @@
  * step transitions, form data accumulation, and final submission callback.
  * EquipmentSelector is mocked since it depends on Convex queries.
  */
-import { describe, expect, it, vi } from "vitest";
-import userEvent from "@testing-library/user-event";
 import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { ServiceRequestForm } from "../service-request-form";

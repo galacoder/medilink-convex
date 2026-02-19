@@ -5,8 +5,8 @@
  * marks completed steps, and grays out future steps. Critical for AC-05
  * (track status: timeline view showing workflow progression).
  */
-import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { StatusTimeline } from "../status-timeline";

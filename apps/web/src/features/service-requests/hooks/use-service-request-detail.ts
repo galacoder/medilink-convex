@@ -8,8 +8,8 @@
  * and the rating if completed. The real-time subscription ensures the detail
  * page updates when a provider submits a quote or status transitions.
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import type { ServiceRequestDetail } from "../types";
 
