@@ -23,6 +23,13 @@ import {
 
 import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
+/** Minimal equipment shape returned from api.equipment.list pagination */
+interface EquipmentItem {
+  _id: string;
+  nameVi: string;
+  serialNumber?: string | null;
+}
+
 interface EquipmentSelectorProps {
   value: string;
   onSelect: (equipmentId: string, nameVi: string) => void;
@@ -36,7 +43,7 @@ export function EquipmentSelector({ value, onSelect }: EquipmentSelectorProps) {
     paginationOpts: { numItems: 100, cursor: null },
   });
 
-  const equipment = equipmentResult?.page ?? [];
+  const equipment: EquipmentItem[] = (equipmentResult as { page?: EquipmentItem[] } | undefined)?.page ?? [];
 
   function handleValueChange(id: string) {
     const item = equipment.find((e) => e._id === id);

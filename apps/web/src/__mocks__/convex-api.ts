@@ -7,6 +7,7 @@
  *
  * Tests use vi.mock("convex/react") to mock useQuery/useMutation, so
  * the actual function references just need to be distinguishable strings.
+ * The vitest.config.ts alias points here, keeping tests compatible.
  */
 
 export const api = {

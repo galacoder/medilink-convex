@@ -31,7 +31,7 @@ export function useServiceRequestDetail(
   // Skip the query if no ID is provided
   const result = useQuery(
     api.serviceRequests.getById,
-    id ? { id: id as Parameters<typeof api.serviceRequests.getById>[0]["id"] } : "skip",
+    id ? ({ id } as { id: string }) : "skip",
   );
 
   return {

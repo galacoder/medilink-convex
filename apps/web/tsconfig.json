@@ -4,7 +4,8 @@
     "lib": ["ES2022", "dom", "dom.iterable"],
     "jsx": "preserve",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "convex/_generated/api": ["../../convex/_generated/api", "./src/__mocks__/convex-api-typed.ts"]
     },
     "plugins": [{ "name": "next" }]
   },
