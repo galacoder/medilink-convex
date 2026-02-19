@@ -15,6 +15,7 @@ import {
   FileText,
   LayoutDashboard,
   Package,
+  ScanLine,
   Settings,
   Shield,
   Stethoscope,
@@ -46,6 +47,11 @@ export const hospitalNavItems: NavItem[] = [
     href: "/hospital/equipment",
     icon: Stethoscope,
     label: { vi: "Thiết bị y tế", en: "Equipment" },
+  },
+  {
+    href: "/hospital/scan",
+    icon: ScanLine,
+    label: { vi: "Quét mã QR", en: "QR Scan" },
   },
   {
     href: "/hospital/service-requests",
