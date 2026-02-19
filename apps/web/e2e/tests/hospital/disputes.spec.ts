@@ -54,7 +54,7 @@ test.describe("Dispute workflow", () => {
    */
   test.skip(
     "hospital user can add message to existing dispute",
-    async ({ hospitalPage }) => {
+    async () => {
       // TODO: Navigate to dispute detail page
       // TODO: Locate the message input field
       // TODO: Add dispute message text
@@ -74,7 +74,7 @@ test.describe("Dispute workflow", () => {
    */
   test.skip(
     "dispute status updates when marked resolved",
-    async ({ hospitalPage }) => {
+    async () => {
       // TODO: Navigate to open dispute
       // TODO: Locate "mark as resolved" action button
       // TODO: Click resolve button

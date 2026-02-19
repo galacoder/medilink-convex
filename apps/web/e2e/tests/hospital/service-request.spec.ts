@@ -139,7 +139,7 @@ test.describe("Service request detail page", () => {
 
       // Extract request ID from current URL and assert request-info is visible
       const url = hospitalPage.url();
-      const idMatch = url.match(/\/hospital\/service-requests\/([^/]+)$/);
+      const idMatch = /\/hospital\/service-requests\/([^/]+)$/.exec(url);
       if (idMatch?.[1]) {
         const detailPage = new ServiceRequestDetailPage(hospitalPage);
         await expect(detailPage.requestInfo).toBeVisible({ timeout: 10000 });
