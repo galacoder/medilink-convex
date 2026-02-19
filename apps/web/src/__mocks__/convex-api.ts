@@ -27,5 +27,6 @@ export const api = {
   },
   equipment: {
     list: "equipment:list",
+    getById: "equipment:getById",
   },
 } as const;
