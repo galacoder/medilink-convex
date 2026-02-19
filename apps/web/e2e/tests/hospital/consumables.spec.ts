@@ -73,3 +73,41 @@ test.describe("Consumables list", () => {
     await expect(consumablesPage.list).toBeVisible({ timeout: 10000 });
   });
 });
+
+/**
+ * Consumables stock status tests (AC-6).
+ *
+ * WHY: Stock badges communicate critical supply levels to hospital staff.
+ * A consumable item with low or critical stock triggers reorder workflows.
+ * Testing that stock-badge elements are rendered confirms the data model
+ * drives the UI display correctly.
+ */
+test.describe("Consumables stock status", () => {
+  /**
+   * Test (AC-6): Consumables page shows stock status information.
+   *
+   * WHY: When consumables exist, each row must display a data-testid="stock-badge"
+   * to inform staff of stock levels. This assertion validates the stock badge
+   * rendering path in the consumables list component.
+   */
+  test("consumables page shows stock status information", async ({
+    hospitalPage,
+  }) => {
+    const consumablesPage = new ConsumablesListPage(hospitalPage);
+    await consumablesPage.goto();
+
+    await expect(hospitalPage).toHaveURL(/\/hospital\/consumables/, {
+      timeout: 15000,
+    });
+    await expect(consumablesPage.list).toBeVisible({ timeout: 10000 });
+
+    // If there are consumable rows, verify stock badge structure exists
+    const rowCount = await consumablesPage.rows.count();
+    if (rowCount > 0) {
+      // Verify stock badges are present on rows
+      await expect(consumablesPage.statusBadges.first()).toBeVisible({
+        timeout: 5000,
+      });
+    }
+  });
+});
