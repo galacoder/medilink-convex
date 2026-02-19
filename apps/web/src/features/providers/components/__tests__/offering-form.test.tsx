@@ -5,12 +5,12 @@
  * field validation fires, and the form calls onSuccess after a successful
  * mutation.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
+import type { ServiceOffering } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { OfferingForm } from "../offering-form";
-import type { ServiceOffering } from "../../types";
 
 const mockMutateFn = vi.fn().mockResolvedValue("off_new");
 
@@ -34,11 +34,7 @@ const mockOffering: ServiceOffering = {
 describe("OfferingForm", () => {
   it("test_OfferingForm_rendersCreateModeFields", () => {
     renderWithProviders(
-      <OfferingForm
-        mode="create"
-        organizationId="org_001"
-        locale="vi"
-      />,
+      <OfferingForm mode="create" organizationId="org_001" locale="vi" />,
     );
 
     expect(screen.getByLabelText(/Chuyên ngành/)).toBeInTheDocument();
@@ -61,9 +57,7 @@ describe("OfferingForm", () => {
     );
 
     // Description fields should be pre-filled
-    expect(
-      screen.getByDisplayValue("Dịch vụ hiệu chỉnh"),
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Dịch vụ hiệu chỉnh")).toBeInTheDocument();
     expect(screen.getByDisplayValue("Calibration service")).toBeInTheDocument();
     // Price should be pre-filled
     expect(screen.getByDisplayValue("500000")).toBeInTheDocument();

@@ -76,8 +76,14 @@ export const providerLabels = {
       vi: "Thêm chứng nhận để tăng uy tín với bệnh viện",
       en: "Add certifications to build trust with hospitals",
     },
-    nameVi: { vi: "Tên chứng nhận (Tiếng Việt)", en: "Certification Name (Vietnamese)" },
-    nameEn: { vi: "Tên chứng nhận (Tiếng Anh)", en: "Certification Name (English)" },
+    nameVi: {
+      vi: "Tên chứng nhận (Tiếng Việt)",
+      en: "Certification Name (Vietnamese)",
+    },
+    nameEn: {
+      vi: "Tên chứng nhận (Tiếng Anh)",
+      en: "Certification Name (English)",
+    },
     issuingBody: { vi: "Cơ quan cấp", en: "Issuing Body" },
     issuedDate: { vi: "Ngày cấp", en: "Issue Date" },
     expiryDate: { vi: "Ngày hết hạn", en: "Expiry Date" },

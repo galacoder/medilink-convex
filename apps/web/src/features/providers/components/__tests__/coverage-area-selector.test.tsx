@@ -5,9 +5,9 @@
  * onChange callback receives the updated areas array, and the controlled
  * component renders existing values.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { CoverageAreaSelector } from "../coverage-area-selector";
@@ -18,9 +18,7 @@ describe("CoverageAreaSelector", () => {
       <CoverageAreaSelector value={[]} onChange={vi.fn()} locale="vi" />,
     );
 
-    expect(
-      screen.getByText("Chưa có khu vực phủ sóng"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Chưa có khu vực phủ sóng")).toBeInTheDocument();
   });
 
   it("test_CoverageAreaSelector_addsRegion", async () => {
@@ -64,9 +62,7 @@ describe("CoverageAreaSelector", () => {
   });
 
   it("test_CoverageAreaSelector_rendersExistingAreas", () => {
-    const areas = [
-      { region: "TP. Hồ Chí Minh", district: "Quận 1" },
-    ];
+    const areas = [{ region: "TP. Hồ Chí Minh", district: "Quận 1" }];
 
     renderWithProviders(
       <CoverageAreaSelector value={areas} onChange={vi.fn()} locale="vi" />,

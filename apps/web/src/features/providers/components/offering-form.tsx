@@ -8,9 +8,8 @@
  * ensures only valid specialties (matching Convex schema) can be submitted.
  */
 import { useState } from "react";
-
-import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
@@ -24,8 +23,8 @@ import {
 } from "@medilink/ui/select";
 
 import type { ServiceOffering, Specialty } from "../types";
-import { SPECIALTY_OPTIONS } from "../types";
 import { providerLabels } from "../labels";
+import { SPECIALTY_OPTIONS } from "../types";
 
 // Convex codegen does not include providers namespace locally -- cast is safe,
 // all argument shapes are validated by the Convex schema.
@@ -83,9 +82,7 @@ export function OfferingForm({
   locale = "vi",
 }: OfferingFormProps) {
   const [form, setForm] = useState<OfferingFormState>(
-    mode === "edit" && offering
-      ? offeringToFormState(offering)
-      : DEFAULT_FORM,
+    mode === "edit" && offering ? offeringToFormState(offering) : DEFAULT_FORM,
   );
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,7 +150,11 @@ export function OfferingForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" data-testid="offering-form">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+      data-testid="offering-form"
+    >
       {/* Specialty select */}
       <div className="space-y-1.5">
         <Label htmlFor="specialty">
@@ -169,9 +170,7 @@ export function OfferingForm({
           <SelectTrigger id="specialty">
             <SelectValue
               placeholder={
-                locale === "vi"
-                  ? "Chọn chuyên ngành..."
-                  : "Select specialty..."
+                locale === "vi" ? "Chọn chuyên ngành..." : "Select specialty..."
               }
             />
           </SelectTrigger>
@@ -192,7 +191,7 @@ export function OfferingForm({
         </Label>
         <textarea
           id="descriptionVi"
-          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
           value={form.descriptionVi}
           onChange={(e) =>
             setForm((prev) => ({ ...prev, descriptionVi: e.target.value }))
@@ -208,7 +207,7 @@ export function OfferingForm({
         </Label>
         <textarea
           id="descriptionEn"
-          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
           value={form.descriptionEn}
           onChange={(e) =>
             setForm((prev) => ({ ...prev, descriptionEn: e.target.value }))

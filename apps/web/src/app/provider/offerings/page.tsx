@@ -11,11 +11,11 @@
  */
 import { useRouter } from "next/navigation";
 
+import type { ServiceOffering } from "~/features/providers/types";
 import { useActiveOrganization } from "~/auth/client";
 import { OfferingList } from "~/features/providers/components/offering-list";
-import { useProviderOfferings } from "~/features/providers/hooks/use-provider-offerings";
 import { useProviderMutations } from "~/features/providers/hooks/use-provider-mutations";
-import type { ServiceOffering } from "~/features/providers/types";
+import { useProviderOfferings } from "~/features/providers/hooks/use-provider-offerings";
 
 export default function ProviderOfferingsPage() {
   const router = useRouter();

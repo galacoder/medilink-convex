@@ -30,6 +30,16 @@ export const api = {
     list: "equipment:list",
     getById: "equipment:getById",
   },
+  disputes: {
+    listByHospital: "disputes:listByHospital",
+    getById: "disputes:getById",
+    getMessages: "disputes:getMessages",
+    create: "disputes:create",
+    updateStatus: "disputes:updateStatus",
+    addMessage: "disputes:addMessage",
+    escalate: "disputes:escalate",
+    resolve: "disputes:resolve",
+  },
   providers: {
     getProfile: "providers:getProfile",
     listServiceOfferings: "providers:listServiceOfferings",
