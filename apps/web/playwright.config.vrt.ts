@@ -28,8 +28,6 @@ export default defineConfig({
     screenshot: "on",
     // Consistent viewport for reproducible screenshots
     viewport: { width: 1280, height: 720 },
-    // Disable animations for stable screenshots
-    reducedMotion: "reduce",
   },
   snapshotPathTemplate: "{testDir}/__snapshots__/{testFilePath}/{arg}{ext}",
   projects: [
