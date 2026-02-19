@@ -14,20 +14,15 @@
  */
 import { useState } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@medilink/ui/tabs";
 
-import { useProviderQuotes } from "~/features/quotes/hooks/use-provider-quotes";
+import type { QuoteStatus } from "~/features/quotes/types";
 import { QuoteDashboardStats } from "~/features/quotes/components/quote-dashboard-stats";
 import { QuoteStatusBadge } from "~/features/quotes/components/quote-status-badge";
+import { useProviderQuotes } from "~/features/quotes/hooks/use-provider-quotes";
 import { quoteLabels } from "~/features/quotes/labels";
-import type { QuoteStatus } from "~/features/quotes/types";
 
 type StatusFilter = QuoteStatus | "all";
 
@@ -57,15 +52,15 @@ function formatDate(epochMs: number): string {
 
 export default function ProviderQuotesPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const { quotes, isLoading, hasError, stats } = useProviderQuotes(statusFilter);
+  const { quotes, isLoading, hasError, stats } =
+    useProviderQuotes(statusFilter);
 
   return (
     <div className="space-y-6" data-testid="provider-quotes-list">
       {/* Page heading */}
       <div>
         <h1 className="text-2xl font-semibold">
-          {quoteLabels.page.myQuotes.vi}{" "}
-          {/* {quoteLabels.page.myQuotes.en} */}
+          {quoteLabels.page.myQuotes.vi} {/* {quoteLabels.page.myQuotes.en} */}
         </h1>
         <p className="text-muted-foreground mt-1">
           Theo dõi báo giá và tỷ lệ thắng của bạn{" "}
@@ -100,7 +95,7 @@ export default function ProviderQuotesPage() {
                   <p className="text-sm font-medium">
                     Không thể tải danh sách báo giá. Vui lòng thử lại.
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Unable to load quotes. Please try again.
                   </p>
                 </div>

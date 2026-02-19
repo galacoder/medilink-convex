@@ -5,12 +5,12 @@
  * priority, type) are displayed correctly, and that the "Submit Quote"
  * and "Decline" buttons are rendered.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
+import type { IncomingServiceRequest } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { IncomingRequestCard } from "../incoming-request-card";
-import type { IncomingServiceRequest } from "../../types";
 
 // Mock next/navigation to prevent router errors in tests
 vi.mock("next/navigation", () => ({
@@ -78,9 +78,7 @@ describe("IncomingRequestCard", () => {
     });
     renderWithProviders(<IncomingRequestCard request={request} />);
 
-    expect(
-      screen.getByText(/Máy bị hỏng màn hình/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Máy bị hỏng màn hình/)).toBeInTheDocument();
   });
 
   it("shows priority badge for critical requests", () => {

@@ -33,7 +33,9 @@ export const api = {
     reject: makeFunctionReference<"mutation">("quotes:reject"),
     submit: makeFunctionReference<"mutation">("quotes:submit"),
     listByProvider: makeFunctionReference<"query">("quotes:listByProvider"),
-    listByServiceRequest: makeFunctionReference<"query">("quotes:listByServiceRequest"),
+    listByServiceRequest: makeFunctionReference<"query">(
+      "quotes:listByServiceRequest",
+    ),
   },
   serviceRatings: {
     create: makeFunctionReference<"mutation">("serviceRatings:create"),
@@ -51,6 +53,23 @@ export const api = {
     addMessage: makeFunctionReference<"mutation">("disputes:addMessage"),
     escalate: makeFunctionReference<"mutation">("disputes:escalate"),
     resolve: makeFunctionReference<"mutation">("disputes:resolve"),
+  },
+  analytics: {
+    getProviderSummary: makeFunctionReference<"query">(
+      "analytics:getProviderSummary",
+    ),
+    getProviderRevenueByMonth: makeFunctionReference<"query">(
+      "analytics:getProviderRevenueByMonth",
+    ),
+    getProviderRevenueByServiceType: makeFunctionReference<"query">(
+      "analytics:getProviderRevenueByServiceType",
+    ),
+    getProviderRatings: makeFunctionReference<"query">(
+      "analytics:getProviderRatings",
+    ),
+    getProviderHospitalRelationships: makeFunctionReference<"query">(
+      "analytics:getProviderHospitalRelationships",
+    ),
   },
   providers: {
     getProfile: makeFunctionReference<"query">("providers:getProfile"),

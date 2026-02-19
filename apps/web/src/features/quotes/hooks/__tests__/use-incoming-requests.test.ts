@@ -5,19 +5,18 @@
  * data, isolating the hook's filtering logic and return shape from the
  * actual Convex runtime.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
-import { useIncomingRequests } from "../use-incoming-requests";
 import type { IncomingServiceRequest } from "../../types";
+import { useIncomingRequests } from "../use-incoming-requests";
 
 // Mock convex/react so tests don't need a live Convex deployment.
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -110,7 +109,9 @@ describe("useIncomingRequests", () => {
 
   it("test_useIncomingRequests_returnsErrorOnQueryFailure - hasError=true when Convex returns null", () => {
     // Convex returns null when the query handler throws a ConvexError
-    mockUseQuery.mockReturnValue(null as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      null as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useIncomingRequests());
 

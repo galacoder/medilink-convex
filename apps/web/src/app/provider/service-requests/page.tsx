@@ -16,10 +16,10 @@ import { useState } from "react";
 import { Skeleton } from "@medilink/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@medilink/ui/tabs";
 
-import { useIncomingRequests } from "~/features/quotes/hooks/use-incoming-requests";
-import { IncomingRequestCard } from "~/features/quotes/components/incoming-request-card";
-import { quoteLabels } from "~/features/quotes/labels";
 import type { ServiceRequestStatus } from "~/features/quotes/types";
+import { IncomingRequestCard } from "~/features/quotes/components/incoming-request-card";
+import { useIncomingRequests } from "~/features/quotes/hooks/use-incoming-requests";
+import { quoteLabels } from "~/features/quotes/labels";
 
 type StatusFilter = ServiceRequestStatus | "all";
 
@@ -72,7 +72,7 @@ export default function ProviderServiceRequestsPage() {
                   <p className="text-sm font-medium">
                     Không thể tải danh sách yêu cầu. Vui lòng thử lại.
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Unable to load service requests. Please try again.
                   </p>
                 </div>
