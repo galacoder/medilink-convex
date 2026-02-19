@@ -9,19 +9,22 @@ import {
 } from "@medilink/ui/card";
 
 import { useActiveOrganization, useSession } from "~/auth/client";
+import { useProviderOfferings } from "~/features/providers/hooks/use-provider-offerings";
 
 /**
  * Provider portal dashboard — session-aware entry point for medical equipment providers.
  *
  * WHY: Displaying session context (user name, org, role) confirms that the provider
- * auth flow works correctly end-to-end. Uses the same session hooks pattern as
- * the hospital dashboard.
- *
- * Future M3/M4 tasks will replace placeholder cards with real quote and offering content.
+ * auth flow works correctly end-to-end. The offering count card uses real data from
+ * Convex via useProviderOfferings, replacing the previous placeholder "--" value.
  */
 export default function ProviderDashboardPage() {
   const { data: session, isPending: sessionPending } = useSession();
   const { data: activeOrg, isPending: orgPending } = useActiveOrganization();
+
+  const organizationId = activeOrg?.id ?? "";
+  const { offerings, isLoading: offeringsLoading } =
+    useProviderOfferings(organizationId);
 
   const isLoading = sessionPending || orgPending;
 
@@ -79,18 +82,26 @@ export default function ProviderDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Offerings overview placeholder */}
+      {/* Offerings overview */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>
               Sản phẩm đang cung cấp {/* Active Offerings */}
             </CardDescription>
-            <CardTitle className="text-3xl">--</CardTitle>
+            <CardTitle className="text-3xl">
+              {offeringsLoading ? (
+                <span className="text-muted-foreground">--</span>
+              ) : (
+                offerings.length
+              )}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-xs">
-              Dữ liệu sẽ hiển thị sau {/* Data coming soon */}
+              {offeringsLoading
+                ? "Đang tải..." /* Loading... */
+                : "Dịch vụ đang cung cấp" /* Active services */}
             </p>
           </CardContent>
         </Card>
