@@ -4,7 +4,12 @@ import type { FunctionReference } from "convex/server";
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 
-import type { AdminProviderFilters, AdminProviderListItem } from "../types";
+import type {
+  AdminProviderDetail,
+  AdminProviderFilters,
+  AdminProviderListItem,
+  ProviderPerformanceMetrics,
+} from "../types";
 
 // ---------------------------------------------------------------------------
 // Type-safe API references
@@ -36,32 +41,34 @@ const verifyCertificationFn: MutationRef =
  *
  * vi: "Hook danh sách nhà cung cấp (quản trị viên)" / en: "Admin provider list hook"
  */
-export function useAdminProviders(filters?: AdminProviderFilters) {
+export function useAdminProviders(filters?: AdminProviderFilters): {
+  providers: AdminProviderListItem[];
+  isLoading: boolean;
+  totalCount: number;
+} {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const providers = useQuery(listProvidersFn, {
+  const rawProviders = useQuery(listProvidersFn, {
     status: filters?.status,
     verificationStatus: filters?.verificationStatus,
   });
+  const providers = rawProviders as AdminProviderListItem[] | undefined;
 
   // Client-side search filter on top of the Convex status filter
-  const filtered = filters?.search
+  const search = filters?.search;
+  const filtered: AdminProviderListItem[] = search
     ? (providers ?? []).filter(
-        (p: AdminProviderListItem) =>
-          p.nameVi.toLowerCase().includes(filters.search!.toLowerCase()) ||
-          p.nameEn.toLowerCase().includes(filters.search!.toLowerCase()) ||
-          (p.companyName
-            ?.toLowerCase()
-            .includes(filters.search!.toLowerCase()) ??
+        (p) =>
+          p.nameVi.toLowerCase().includes(search.toLowerCase()) ||
+          p.nameEn.toLowerCase().includes(search.toLowerCase()) ||
+          (p.companyName?.toLowerCase().includes(search.toLowerCase()) ??
             false) ||
-          (p.organizationName
-            ?.toLowerCase()
-            .includes(filters.search!.toLowerCase()) ??
+          (p.organizationName?.toLowerCase().includes(search.toLowerCase()) ??
             false),
       )
     : (providers ?? []);
 
   return {
-    providers: filtered as AdminProviderListItem[],
+    providers: filtered,
     isLoading: providers === undefined,
     totalCount: (providers ?? []).length,
   };
@@ -75,12 +82,16 @@ export function useAdminProviders(filters?: AdminProviderFilters) {
  *
  * vi: "Hook chi tiết nhà cung cấp" / en: "Provider detail hook"
  */
-export function useAdminProviderDetail(providerId: string | undefined) {
+export function useAdminProviderDetail(providerId: string | undefined): {
+  provider: AdminProviderDetail | null;
+  isLoading: boolean;
+} {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const detail = useQuery(
+  const rawDetail = useQuery(
     getProviderDetailFn,
     providerId ? { providerId } : "skip",
   );
+  const detail = rawDetail as AdminProviderDetail | undefined;
 
   return {
     provider: detail ?? null,
@@ -97,12 +108,16 @@ export function useAdminProviderDetail(providerId: string | undefined) {
  *
  * vi: "Hook hiệu suất nhà cung cấp" / en: "Provider performance hook"
  */
-export function useProviderPerformance(providerId: string | undefined) {
+export function useProviderPerformance(providerId: string | undefined): {
+  metrics: ProviderPerformanceMetrics | null;
+  isLoading: boolean;
+} {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const metrics = useQuery(
+  const rawMetrics = useQuery(
     getProviderPerformanceFn,
     providerId ? { providerId } : "skip",
   );
+  const metrics = rawMetrics as ProviderPerformanceMetrics | undefined;
 
   return {
     metrics: metrics ?? null,

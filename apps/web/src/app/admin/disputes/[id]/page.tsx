@@ -36,10 +36,7 @@ import {
 } from "@medilink/ui/card";
 import { Separator } from "@medilink/ui/separator";
 
-import type {
-  ArbitrationRulingForm,
-  DisputeArbitrationDetail,
-} from "~/features/admin-disputes";
+import type { ArbitrationRulingForm } from "~/features/admin-disputes";
 import {
   adminDisputeLabels,
   ArbitrationPanel,
@@ -125,9 +122,8 @@ export default function AdminDisputeDetailPage({
     arbitrationHistory,
   } = detail;
 
-  type DisputeStatusKey = keyof typeof adminDisputeLabels.disputeStatuses;
-  const statusLabel =
-    adminDisputeLabels.disputeStatuses[dispute.status]?.vi ?? dispute.status;
+  // WHY: disputeStatuses covers all DisputeStatus values exhaustively — no optional chain needed.
+  const statusLabel = adminDisputeLabels.disputeStatuses[dispute.status].vi;
   const isEscalated = dispute.status === "escalated";
   const isResolved = dispute.status === "resolved";
 
@@ -237,9 +233,10 @@ export default function AdminDisputeDetailPage({
                   </span>
                   <span>
                     {
+                      // WHY: serviceRequestStatuses covers all status values — no optional chain needed.
                       adminDisputeLabels.serviceRequestStatuses[
                         serviceRequest.status
-                      ]?.vi
+                      ].vi
                     }
                   </span>
                 </div>

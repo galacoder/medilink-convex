@@ -37,7 +37,7 @@ export function ProviderTable({ providers, isLoading }: ProviderTableProps) {
   if (isLoading) {
     return (
       <div className="space-y-2">
-        {[...Array(5)].map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="bg-muted h-12 animate-pulse rounded" />
         ))}
       </div>

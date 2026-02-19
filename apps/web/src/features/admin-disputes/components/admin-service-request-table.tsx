@@ -113,8 +113,8 @@ export function AdminServiceRequestTable({
       cell: ({ row }) => {
         const status = row.original.status;
         const label =
-          adminDisputeLabels.serviceRequestStatuses[status]?.vi ?? status;
-        const colorClass = STATUS_COLORS[status] ?? "bg-gray-100 text-gray-800";
+          adminDisputeLabels.serviceRequestStatuses[status].vi;
+        const colorClass = STATUS_COLORS[status];
         return (
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorClass}`}

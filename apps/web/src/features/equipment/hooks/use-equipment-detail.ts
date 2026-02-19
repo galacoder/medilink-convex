@@ -34,7 +34,6 @@ export function useEquipmentDetail(id: Id<"equipment"> | undefined) {
     results: history,
     status: historyStatus,
     loadMore: loadMoreHistoryFn,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   } = usePaginatedQuery(getHistoryFn, id ? { equipmentId: id } : "skip", {
     initialNumItems: 10,
   });

@@ -1,3 +1,4 @@
+import type { Page } from "@playwright/test";
 import { expect, test } from "../../fixtures/hospital";
 import { QRScannerPage } from "../../pages/hospital/qr-scanner.page";
 
@@ -29,7 +30,7 @@ import { QRScannerPage } from "../../pages/hospital/qr-scanner.page";
  * MediaStream, we allow the scanner component to render its container
  * while the actual decode loop is simulated.
  */
-async function mockCameraAPI(page: import("@playwright/test").Page) {
+async function mockCameraAPI(page: Page) {
   await page.addInitScript(() => {
     // Create a minimal MediaStream mock that html5-qrcode accepts
     const mockStream = {

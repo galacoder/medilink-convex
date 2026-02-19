@@ -98,7 +98,7 @@ export function EscalatedDisputeTable({
       header: adminDisputeLabels.columns.type.vi,
       cell: ({ row }) => {
         const type = row.original.type;
-        const colorClass = TYPE_COLORS[type] ?? "bg-gray-100 text-gray-800";
+        const colorClass = TYPE_COLORS[type];
         return (
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colorClass}`}

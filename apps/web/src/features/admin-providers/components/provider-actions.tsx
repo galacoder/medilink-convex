@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import type { Id } from "convex/_generated/dataModel";
 import { Button } from "@medilink/ui/button";
 import {
   Dialog,
@@ -47,6 +48,10 @@ export function ProviderActions({
   const { approveProvider, rejectProvider, suspendProvider } =
     useAdminProviderActions();
 
+  // WHY: provider._id is typed as string in AdminProviderDetail (plain type),
+  // but Convex mutations require the branded Id<"providers"> type.
+  const providerId = provider._id as Id<"providers">;
+
   const handleClose = () => {
     setActiveAction(null);
     setReason("");
@@ -57,7 +62,7 @@ export function ProviderActions({
     setIsSubmitting(true);
     try {
       await approveProvider({
-        providerId: provider._id as any,
+        providerId,
         notes: notes || undefined,
       });
       onActionComplete?.();
@@ -73,7 +78,7 @@ export function ProviderActions({
     if (!reason.trim()) return;
     setIsSubmitting(true);
     try {
-      await rejectProvider({ providerId: provider._id as any, reason });
+      await rejectProvider({ providerId, reason });
       onActionComplete?.();
       handleClose();
     } catch (error) {
@@ -88,7 +93,7 @@ export function ProviderActions({
     setIsSubmitting(true);
     try {
       await suspendProvider({
-        providerId: provider._id as any,
+        providerId,
         reason,
         reactivate: reactivate || undefined,
       });

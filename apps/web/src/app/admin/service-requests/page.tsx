@@ -227,7 +227,7 @@ export default function AdminServiceRequestsPage() {
               Tổng yêu cầu dịch vụ {/* Total service requests */}
             </CardDescription>
             <CardTitle className="text-3xl">
-              {isLoading ? "—" : (allRequests?.length ?? 0)}
+              {isLoading ? "—" : typedRequests.length}
             </CardTitle>
           </CardHeader>
           <CardContent>

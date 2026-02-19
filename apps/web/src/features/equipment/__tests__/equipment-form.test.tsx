@@ -1,3 +1,4 @@
+import type { Equipment } from "../types";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -91,7 +92,6 @@ describe("EquipmentForm", () => {
 
   it("does not show status field in edit mode", () => {
     // Use type assertions at the object level to avoid per-field any casts
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const mockEquipment = {
       _id: "eq1",
       _creationTime: Date.now(),
@@ -104,7 +104,7 @@ describe("EquipmentForm", () => {
       criticality: "B" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    } as import("../types").Equipment;
+    } as Equipment;
     render(
       <EquipmentForm
         mode="edit"
@@ -118,7 +118,6 @@ describe("EquipmentForm", () => {
   });
 
   it("shows 'Lưu' button in edit mode", () => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const mockEquipment = {
       _id: "eq1",
       _creationTime: Date.now(),
@@ -131,7 +130,7 @@ describe("EquipmentForm", () => {
       criticality: "B" as const,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    } as import("../types").Equipment;
+    } as Equipment;
     render(
       <EquipmentForm
         mode="edit"
