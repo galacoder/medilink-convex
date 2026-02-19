@@ -53,7 +53,7 @@ function formatVND(amount: number): string {
 export default function ProviderServiceRequestDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const id = typeof params?.id === "string" ? params.id : null;
+  const id = typeof params.id === "string" ? params.id : null;
 
   const { detail, isLoading, notFound } = useServiceRequestDetail(id);
 
@@ -147,7 +147,7 @@ export default function ProviderServiceRequestDetailPage() {
               <span className="text-muted-foreground">
                 {quoteLabels.info.type.vi}
               </span>
-              <span>{typeLabel?.vi ?? detail.type}</span>
+              <span>{typeLabel.vi}</span>
             </div>
 
             {/* Priority */}
@@ -164,7 +164,7 @@ export default function ProviderServiceRequestDetailPage() {
                       : "secondary"
                 }
               >
-                {priorityLabel?.vi ?? detail.priority}
+                {priorityLabel.vi}
               </Badge>
             </div>
 
@@ -208,7 +208,7 @@ export default function ProviderServiceRequestDetailPage() {
                   Yêu cầu này không còn nhận báo giá (trạng thái:{" "}
                   {quoteLabels.requestStatus[
                     detail.status as keyof typeof quoteLabels.requestStatus
-                  ]?.vi ?? detail.status}
+                  ].vi}
                   )
                 </p>
               </CardContent>

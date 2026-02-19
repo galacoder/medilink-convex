@@ -54,7 +54,7 @@ export function useQuoteMutations(): UseQuoteMutationsResult {
   async function submitQuote(args: SubmitQuoteArgs): Promise<Id<"quotes">> {
     setIsSubmitting(true);
     try {
-      return await submitQuoteMutation(args);
+      return await submitQuoteMutation(args) as Id<"quotes">;
     } finally {
       setIsSubmitting(false);
     }
@@ -65,7 +65,7 @@ export function useQuoteMutations(): UseQuoteMutationsResult {
   ): Promise<{ success: boolean }> {
     setIsDeclining(true);
     try {
-      return await declineRequestMutation(args);
+      return await declineRequestMutation(args) as { success: boolean };
     } finally {
       setIsDeclining(false);
     }

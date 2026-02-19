@@ -107,9 +107,7 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
       const newErrors: FormErrors = {};
       for (const issue of result.error.issues) {
         const field = issue.path[0] as keyof FormErrors;
-        if (field && !newErrors[field]) {
-          newErrors[field] = issue.message;
-        }
+        newErrors[field] ??= issue.message;
       }
       setErrors(newErrors);
       return false;

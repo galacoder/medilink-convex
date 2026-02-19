@@ -23,7 +23,7 @@ import type { ServiceRequestStatus } from "~/features/quotes/types";
 
 type StatusFilter = ServiceRequestStatus | "all";
 
-const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
+const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "Tất cả" },
   { value: "pending", label: quoteLabels.requestStatus.pending.vi },
   { value: "quoted", label: quoteLabels.requestStatus.quoted.vi },

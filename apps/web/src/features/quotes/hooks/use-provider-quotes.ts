@@ -55,7 +55,7 @@ export function useProviderQuotes(
     | ProviderQuote[]
     | null
     | undefined;
-  const statsQuotes = allResult && allResult !== null ? allResult : [];
+  const statsQuotes = allResult ?? [];
 
   const pendingCount = statsQuotes.filter((q) => q.status === "pending").length;
   const acceptedCount = statsQuotes.filter(

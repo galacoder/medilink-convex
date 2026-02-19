@@ -31,7 +31,7 @@ import type { QuoteStatus } from "~/features/quotes/types";
 
 type StatusFilter = QuoteStatus | "all";
 
-const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
+const STATUS_TABS: { value: StatusFilter; label: string }[] = [
   { value: "all", label: "Tất cả" },
   { value: "pending", label: quoteLabels.status.pending.vi },
   { value: "accepted", label: quoteLabels.status.accepted.vi },
