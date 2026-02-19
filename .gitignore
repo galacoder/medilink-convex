@@ -54,8 +54,6 @@ dist/
 # tanstack
 .tanstack
 
-# convex
-convex/_generated/
 
 # claude code task state (local only)
 .claude/tasks/
