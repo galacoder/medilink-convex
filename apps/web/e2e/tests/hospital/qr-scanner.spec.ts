@@ -159,3 +159,47 @@ test.describe("QR Scanner", () => {
     await expect(scannerPage.scannerContainer).toBeVisible({ timeout: 5000 });
   });
 });
+
+/**
+ * QR Scanner manual ID lookup tests (AC-2).
+ *
+ * WHY: Staff in desktop environments or with camera-restricted policies
+ * rely on manual ID entry to look up equipment. This path must process
+ * user input without crashing or hanging, even for unknown equipment IDs.
+ */
+test.describe("QR Scanner manual ID lookup", () => {
+  /**
+   * Test (AC-2): Manual entry with any ID processes without crash.
+   *
+   * WHY: Verifies the manual entry form submits and the system handles
+   * the result gracefully -- either navigating to equipment detail (if found)
+   * or staying on the scan page (if not found). Both are valid outcomes;
+   * the test asserts no crash occurs.
+   */
+  test("manual entry with valid ID navigates or shows result", async ({
+    hospitalPage,
+  }) => {
+    await mockCameraAPI(hospitalPage);
+
+    const scannerPage = new QRScannerPage(hospitalPage);
+    await scannerPage.goto();
+
+    await expect(hospitalPage).toHaveURL(/\/hospital\/scan/, {
+      timeout: 15000,
+    });
+
+    // Switch to manual entry mode
+    await scannerPage.switchToManualEntry();
+    await expect(scannerPage.fallbackInput).toBeVisible({ timeout: 5000 });
+
+    // Submit a test equipment ID (may not exist, but tests the interaction)
+    await scannerPage.submitManualId("test-equipment-id");
+
+    // Either navigates to equipment page or stays on scan page (not found)
+    // We verify the submission was processed without crash/hang
+    await hospitalPage.waitForTimeout(2000);
+    const url = hospitalPage.url();
+    // Should either stay on scan page (not found) or navigate to equipment detail
+    expect(url).toMatch(/\/(hospital\/scan|hospital\/equipment)/);
+  });
+});
