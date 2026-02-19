@@ -1,5 +1,6 @@
 import { expect, test } from "../../fixtures/auth";
 import { ProviderServiceRequestsPage } from "../../pages/provider/service-requests.page";
+import { ProviderQuotesPage } from "../../pages/provider/quotes.page";
 
 /**
  * Provider service requests E2E tests (REQ-006).
@@ -36,5 +37,46 @@ test.describe("Provider service requests", () => {
 
     // Page heading should display in Vietnamese
     await expect(providerPage.locator("h1")).toContainText("Yêu cầu dịch vụ");
+  });
+});
+
+/**
+ * Provider quote listing tests (AC-4, cross-portal flow).
+ *
+ * WHY: The provider-hospital cross-portal flow is the core of the service
+ * request business process. Provider must see requests, hospital must be
+ * isolated from provider portal. Testing both directions validates role-based
+ * access control is working correctly.
+ */
+test.describe("Provider quote listing", () => {
+  /**
+   * Test (AC-4): Provider request list shows available requests.
+   *
+   * WHY: Uses ProviderQuotesPage POM to confirm the provider portal's
+   * service request list is accessible and shows the Vietnamese heading.
+   * Verifies cross-portal isolation by confirming provider cannot access
+   * hospital-specific routes.
+   */
+  test("provider request list shows available requests", async ({
+    providerPage,
+  }) => {
+    const quotesPage = new ProviderQuotesPage(providerPage);
+    await quotesPage.goto();
+
+    await expect(providerPage).toHaveURL(/\/provider\/service-requests/, {
+      timeout: 15000,
+    });
+    await expect(quotesPage.list).toBeVisible({ timeout: 10000 });
+
+    // Verify Vietnamese heading is present on provider portal
+    await expect(providerPage.locator("h1")).toContainText("Yêu cầu dịch vụ");
+
+    // Verify provider portal is separate from hospital portal:
+    // provider session attempting to access hospital routes should be redirected
+    await providerPage.goto("/hospital/equipment");
+    // Should NOT remain on /hospital/equipment (must be redirected away)
+    await expect(providerPage).not.toHaveURL(/\/hospital\/equipment/, {
+      timeout: 5000,
+    });
   });
 });
