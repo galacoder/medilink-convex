@@ -54,6 +54,23 @@ export const api = {
     escalate: makeFunctionReference<"mutation">("disputes:escalate"),
     resolve: makeFunctionReference<"mutation">("disputes:resolve"),
   },
+  analytics: {
+    getProviderSummary: makeFunctionReference<"query">(
+      "analytics:getProviderSummary",
+    ),
+    getProviderRevenueByMonth: makeFunctionReference<"query">(
+      "analytics:getProviderRevenueByMonth",
+    ),
+    getProviderRevenueByServiceType: makeFunctionReference<"query">(
+      "analytics:getProviderRevenueByServiceType",
+    ),
+    getProviderRatings: makeFunctionReference<"query">(
+      "analytics:getProviderRatings",
+    ),
+    getProviderHospitalRelationships: makeFunctionReference<"query">(
+      "analytics:getProviderHospitalRelationships",
+    ),
+  },
   providers: {
     getProfile: makeFunctionReference<"query">("providers:getProfile"),
     listServiceOfferings: makeFunctionReference<"query">(
