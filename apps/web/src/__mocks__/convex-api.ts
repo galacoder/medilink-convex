@@ -30,4 +30,15 @@ export const api = {
     list: "equipment:list",
     getById: "equipment:getById",
   },
+  providers: {
+    getProfile: "providers:getProfile",
+    listServiceOfferings: "providers:listServiceOfferings",
+    getCertifications: "providers:getCertifications",
+    addServiceOffering: "providers:addServiceOffering",
+    updateServiceOffering: "providers:updateServiceOffering",
+    removeServiceOffering: "providers:removeServiceOffering",
+    addCertification: "providers:addCertification",
+    setCoverageArea: "providers:setCoverageArea",
+    updateProfile: "providers:updateProfile",
+  },
 } as const;
