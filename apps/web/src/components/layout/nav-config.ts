@@ -164,6 +164,11 @@ export const adminNavItems: NavItem[] = [
     label: { vi: "Yêu cầu dịch vụ", en: "Service Requests" },
   },
   {
+    href: "/admin/disputes",
+    icon: AlertCircle,
+    label: { vi: "Tranh chấp leo thang", en: "Escalated Disputes" },
+  },
+  {
     href: "/admin/analytics",
     icon: BarChart3,
     label: { vi: "Phân tích", en: "Analytics" },
