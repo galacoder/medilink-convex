@@ -51,7 +51,8 @@ test.describe("Multi-tenancy isolation", () => {
 
       try {
         // Sign up second hospital user with a new organization
-        await secondPage.goto("http://localhost:3000/sign-up");
+        // WHY: Using relative path so playwright baseURL config applies
+        await secondPage.goto("/sign-up");
         await secondPage.fill("#name", secondHospitalUser.name);
         await secondPage.fill("#email", secondHospitalUser.email);
         await secondPage.fill("#password", secondHospitalUser.password);
@@ -70,7 +71,7 @@ test.describe("Multi-tenancy isolation", () => {
         });
 
         // Navigate to equipment list — should show empty list for new org
-        await secondPage.goto("http://localhost:3000/hospital/equipment");
+        await secondPage.goto("/hospital/equipment");
         await expect(secondPage).toHaveURL(/\/hospital\/equipment/, {
           timeout: 15000,
         });
