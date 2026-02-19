@@ -21,8 +21,12 @@ import {
 import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const equipmentApi = api.equipment as any;
+// Pre-cast function references to avoid per-call unsafe-member-access errors
+const createFn: FunctionReference<"mutation"> = equipmentApi.create;
+const updateFn: FunctionReference<"mutation"> = equipmentApi.update;
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 interface EquipmentFormData {
   nameVi: string;
@@ -150,12 +154,8 @@ export function EquipmentForm({
     message: string;
   } | null>(null);
 
-  const createMutation = useMutation(
-    equipmentApi.create as FunctionReference<"mutation">,
-  );
-  const updateMutation = useMutation(
-    equipmentApi.update as FunctionReference<"mutation">,
-  );
+  const createMutation = useMutation(createFn);
+  const updateMutation = useMutation(updateFn);
 
   function handleChange(
     field: keyof EquipmentFormData,
@@ -189,6 +189,7 @@ export function EquipmentForm({
         : undefined;
 
       if (mode === "create") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const newId = await createMutation({
           nameVi: formData.nameVi,
           nameEn: formData.nameEn,
@@ -213,6 +214,7 @@ export function EquipmentForm({
         if (onSuccess && newId) {
           onSuccess(newId as Id<"equipment">);
         }
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (mode === "edit" && equipment) {
         await updateMutation({
           id: equipment._id as Id<"equipment">,
@@ -277,7 +279,7 @@ export function EquipmentForm({
           id="nameVi"
           value={formData.nameVi}
           onChange={(e) => handleChange("nameVi", e.target.value)}
-          placeholder="Tên thiết bị..."
+          placeholder={`${equipmentLabels.placeholders.nameVi.vi} / ${equipmentLabels.placeholders.nameVi.en}`}
           aria-invalid={!!errors.nameVi}
         />
         {errors.nameVi && (
@@ -298,7 +300,7 @@ export function EquipmentForm({
           id="nameEn"
           value={formData.nameEn}
           onChange={(e) => handleChange("nameEn", e.target.value)}
-          placeholder="Equipment name..."
+          placeholder={`${equipmentLabels.placeholders.nameEn.en} / ${equipmentLabels.placeholders.nameEn.vi}`}
           aria-invalid={!!errors.nameEn}
         />
         {errors.nameEn && (
@@ -321,7 +323,7 @@ export function EquipmentForm({
           id="categoryId"
           value={formData.categoryId}
           onChange={(e) => handleChange("categoryId", e.target.value)}
-          placeholder="Category ID..."
+          placeholder={`${equipmentLabels.placeholders.categoryId.vi} / ${equipmentLabels.placeholders.categoryId.en}`}
           aria-invalid={!!errors.categoryId}
         />
         {errors.categoryId && (
@@ -449,7 +451,7 @@ export function EquipmentForm({
           id="location"
           value={formData.location}
           onChange={(e) => handleChange("location", e.target.value)}
-          placeholder="Phòng 101, Tầng 2..."
+          placeholder={`${equipmentLabels.placeholders.location.vi} / ${equipmentLabels.placeholders.location.en}`}
         />
       </div>
 

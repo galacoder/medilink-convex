@@ -1,5 +1,3 @@
-"use client";
-
 import { Badge } from "@medilink/ui/badge";
 import { cn } from "@medilink/ui";
 
@@ -29,6 +27,7 @@ interface StatusBadgeProps {
  * Bilingual support covers both Vietnamese staff and international equipment labels.
  */
 export function StatusBadge({ status, locale = "vi", className }: StatusBadgeProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const label = equipmentLabels.statusValues[status]?.[locale] ?? status;
   return (
     <Badge

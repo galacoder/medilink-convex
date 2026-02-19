@@ -8,6 +8,11 @@ export const equipmentLabels = {
     vi: "Thêm thiết bị đầu tiên để bắt đầu theo dõi",
     en: "Add your first equipment to start tracking",
   },
+  notFound: { vi: "Không tìm thấy thiết bị", en: "Equipment not found" },
+  notFoundDesc: {
+    vi: "Thiết bị này không tồn tại hoặc đã bị xóa.",
+    en: "This equipment does not exist or has been removed.",
+  },
 
   // Fields
   name: { vi: "Tên thiết bị", en: "Equipment Name" },
@@ -95,7 +100,16 @@ export const equipmentLabels = {
 
   // Loading
   loading: { vi: "Đang tải...", en: "Loading..." },
+  loadingOrganization: { vi: "Đang tải thông tin tổ chức...", en: "Loading organization info..." },
   loadMore: { vi: "Tải thêm", en: "Load More" },
+
+  // Placeholders
+  placeholders: {
+    nameVi: { vi: "Tên thiết bị...", en: "Equipment name (Vietnamese)..." },
+    nameEn: { vi: "Tên thiết bị (tiếng Anh)...", en: "Equipment name..." },
+    categoryId: { vi: "ID danh mục...", en: "Category ID..." },
+    location: { vi: "Phòng 101, Tầng 2...", en: "Room 101, Floor 2..." },
+  },
 
   // Status update dialog
   updateStatusTitle: { vi: "Cập nhật trạng thái thiết bị", en: "Update Equipment Status" },

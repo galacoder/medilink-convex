@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { type Id } from "convex/_generated/dataModel";
+import type {Id} from "convex/_generated/dataModel";
 
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
@@ -60,11 +60,13 @@ export default function EquipmentDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <p className="text-muted-foreground text-lg font-medium">
-          Không tìm thấy thiết bị {/* Equipment not found */}
+          {equipmentLabels.notFound.vi}{" "}
+          <span className="text-muted-foreground text-base font-normal">
+            ({equipmentLabels.notFound.en})
+          </span>
         </p>
         <p className="text-muted-foreground mt-1 text-sm">
-          Thiết bị này không tồn tại hoặc đã bị xóa.
-          {/* This equipment does not exist or has been deleted. */}
+          {equipmentLabels.notFoundDesc.vi}
         </p>
         <Button asChild className="mt-4" variant="outline">
           <Link href="/hospital/equipment">

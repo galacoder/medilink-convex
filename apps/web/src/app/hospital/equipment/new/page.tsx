@@ -58,7 +58,7 @@ export default function NewEquipmentPage() {
         />
       ) : (
         <div className="text-muted-foreground rounded-md border border-dashed px-6 py-10 text-center text-sm">
-          Đang tải thông tin tổ chức... {/* Loading organization info... */}
+          {equipmentLabels.loadingOrganization.vi}
         </div>
       )}
     </div>
