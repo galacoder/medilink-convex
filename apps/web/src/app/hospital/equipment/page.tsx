@@ -10,8 +10,12 @@ import Link from "next/link";
 import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
 const equipmentApi = api.equipment as any;
+
+// Pre-cast to avoid per-call unsafe-member-access errors
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const updateStatusFn: FunctionReference<"mutation"> = equipmentApi.updateStatus;
 
 import { Button } from "@medilink/ui/button";
 
@@ -37,16 +41,16 @@ export default function EquipmentListPage() {
   const { equipment, isLoading, canLoadMore, isLoadingMore, loadMore } =
     useEquipment(filters);
 
-  const updateStatusMutation = useMutation(
-    equipmentApi.updateStatus as FunctionReference<"mutation">,
-  );
+  const updateStatusMutation = useMutation(updateStatusFn);
+
+  type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
 
   async function handleBulkUpdateStatus(ids: string[], newStatus: string) {
     await Promise.all(
       ids.map((id) =>
         updateStatusMutation({
           id: id as Id<"equipment">,
-          newStatus: newStatus as Parameters<typeof updateStatusMutation>[0]["newStatus"],
+          newStatus: newStatus as EquipmentStatus,
         }),
       ),
     );
@@ -80,7 +84,7 @@ export default function EquipmentListPage() {
       <div className="md:hidden">
         {isLoading ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            {[...Array(4)].map((_, i) => (
+            {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="bg-muted h-40 animate-pulse rounded-lg" />
             ))}
           </div>
