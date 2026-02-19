@@ -1,4 +1,4 @@
-import { test, expect } from "../../fixtures/auth";
+import { expect, test } from "../../fixtures/auth";
 import { HospitalServiceRequestsPage } from "../../pages/hospital/service-requests.page";
 
 /**

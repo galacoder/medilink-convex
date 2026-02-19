@@ -1,5 +1,5 @@
-import { test as base  } from "@playwright/test";
-import type {Page} from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { test as base } from "@playwright/test";
 
 /**
  * Auth fixtures for MediLink E2E tests.

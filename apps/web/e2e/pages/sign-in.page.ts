@@ -1,4 +1,4 @@
-import type {Page} from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 /**
  * Page Object Model for the sign-in page (/sign-in).

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * Smoke test: verifies the /api/health endpoint returns {status: "ok"}.

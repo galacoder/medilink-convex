@@ -24,7 +24,8 @@ export default function ProviderServiceRequestsPage() {
           Yêu cầu dịch vụ {/* Service Requests */}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Yêu cầu dịch vụ từ các bệnh viện {/* Service requests from hospitals */}
+          Yêu cầu dịch vụ từ các bệnh viện{" "}
+          {/* Service requests from hospitals */}
         </p>
       </div>
 
