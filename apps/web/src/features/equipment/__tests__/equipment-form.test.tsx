@@ -1,8 +1,8 @@
-import type { Equipment } from "../types";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import type { Equipment } from "../types";
 import { EquipmentForm } from "../components/equipment-form";
 
 // Mock the entire convex/react module to avoid server-side deps

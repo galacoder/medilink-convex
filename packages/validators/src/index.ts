@@ -10,3 +10,4 @@ export * from "./qrCodes";
 export * from "./quotes";
 export * from "./serviceExecution";
 export * from "./admin/disputes";
+export * from "./admin";
