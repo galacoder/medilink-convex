@@ -4,7 +4,8 @@
     "lib": ["ES2022", "dom", "dom.iterable"],
     "jsx": "preserve",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "convex/_generated/*": ["../../convex/_generated/*"]
     },
     "plugins": [{ "name": "next" }]
   },
