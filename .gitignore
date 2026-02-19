@@ -55,6 +55,15 @@ dist/
 .tanstack
 
 
+# playwright
+test-results/
+playwright-report/
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/e2e/.auth/
+e2e/.auth/
+blob-report/
+
 # claude code task state (local only)
 .claude/tasks/
 agent-os/

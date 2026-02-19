@@ -34,6 +34,9 @@ import type { EquipmentFilters } from "~/features/equipment/types";
  * and navigate to create new equipment or view details.
  *
  * Responsive: DataTable on tablet/desktop, card grid on mobile (< md).
+ *
+ * data-testid="equipment-list" on the wrapper satisfies E2E test assertions
+ * (M1-8 e2e/tests/hospital/equipment.spec.ts).
  */
 export default function EquipmentListPage() {
   const [filters, setFilters] = useState<EquipmentFilters>({});
@@ -57,7 +60,7 @@ export default function EquipmentListPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="equipment-list">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
