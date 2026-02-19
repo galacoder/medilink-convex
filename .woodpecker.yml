@@ -70,6 +70,8 @@ steps:
     depends_on: [smoke-test]
     environment:
       NEXTAUTH_URL: "http://localhost:3000"
+      # Skip corepack integrity verification (Playwright image has outdated signing keys)
+      COREPACK_INTEGRITY_KEYS: "0"
     commands:
       - corepack enable
       - corepack prepare pnpm@10.19.0 --activate
