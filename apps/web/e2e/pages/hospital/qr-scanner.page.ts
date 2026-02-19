@@ -36,11 +36,15 @@ export class QRScannerPage {
   constructor(page: Page) {
     this.page = page;
     this.scanPage = page.locator('[data-testid="scan-page"]');
-    this.scannerContainer = page.locator('[data-testid="qr-scanner-container"]');
+    this.scannerContainer = page.locator(
+      '[data-testid="qr-scanner-container"]',
+    );
     this.scannerPreview = page.locator('[data-testid="qr-scanner-preview"]');
     this.fallbackInput = page.locator('[data-testid="qr-fallback-input"]');
     this.fallbackSubmit = page.locator('[data-testid="qr-fallback-submit"]');
-    this.toggleManualButton = page.locator('[data-testid="scan-toggle-manual"]');
+    this.toggleManualButton = page.locator(
+      '[data-testid="scan-toggle-manual"]',
+    );
     this.scannerError = page.locator('[data-testid="qr-scanner-error"]');
   }
 

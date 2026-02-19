@@ -118,7 +118,9 @@ test.describe("QR Scanner", () => {
     });
 
     // Toggle to manual entry mode
-    await expect(scannerPage.toggleManualButton).toBeVisible({ timeout: 10000 });
+    await expect(scannerPage.toggleManualButton).toBeVisible({
+      timeout: 10000,
+    });
     await scannerPage.switchToManualEntry();
 
     // Manual entry components should now be visible

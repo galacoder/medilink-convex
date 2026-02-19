@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { Button } from "@medilink/ui/button";
+
 import { Badge } from "@medilink/ui/badge";
+import { Button } from "@medilink/ui/button";
+
 import { QRCodeDisplay } from "~/features/qr-scan";
 
 /**
@@ -68,16 +70,13 @@ export default function HospitalEquipmentDetailPage() {
   const mockCondition = "good";
 
   return (
-    <div
-      className="space-y-6"
-      data-testid="equipment-detail"
-    >
+    <div className="space-y-6" data-testid="equipment-detail">
       {/* Back navigation */}
       <div>
         <Button variant="ghost" size="sm" asChild>
           <Link href="/hospital/equipment" data-testid="equipment-detail-back">
-            {/* vi: "Quay lại danh sách" / en: "Back to list" */}
-            ← Quay lại danh sách {/* ← Back to list */}
+            {/* vi: "Quay lại danh sách" / en: "Back to list" */}← Quay lại danh
+            sách {/* ← Back to list */}
           </Link>
         </Button>
       </div>
@@ -121,7 +120,10 @@ export default function HospitalEquipmentDetailPage() {
                   {/* vi: "Tình trạng" / en: "Condition" */}
                   Tình trạng {/* Condition */}
                 </p>
-                <p className="mt-1 font-medium" data-testid="equipment-condition">
+                <p
+                  className="mt-1 font-medium"
+                  data-testid="equipment-condition"
+                >
                   {CONDITION_LABELS[mockCondition]?.vi ?? mockCondition}
                 </p>
               </div>
@@ -131,7 +133,10 @@ export default function HospitalEquipmentDetailPage() {
                   {/* vi: "Vị trí" / en: "Location" */}
                   Vị trí {/* Location */}
                 </p>
-                <p className="mt-1 font-medium" data-testid="equipment-location">
+                <p
+                  className="mt-1 font-medium"
+                  data-testid="equipment-location"
+                >
                   {/* Placeholder — will be filled from Convex data */}
                   Chưa cập nhật {/* Not yet updated */}
                 </p>
@@ -153,7 +158,7 @@ export default function HospitalEquipmentDetailPage() {
                   ID thiết bị {/* Equipment ID */}
                 </p>
                 <p
-                  className="font-mono mt-1 text-xs"
+                  className="mt-1 font-mono text-xs"
                   data-testid="equipment-id"
                 >
                   {equipmentId}
