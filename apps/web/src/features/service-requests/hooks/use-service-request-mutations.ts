@@ -54,16 +54,15 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   ): Promise<string> {
     setIsCreating(true);
     try {
-      const id = await createMutation({
-        organizationId: input.organizationId as Parameters<typeof createMutation>[0]["organizationId"],
-        equipmentId: input.equipmentId as Parameters<typeof createMutation>[0]["equipmentId"],
+      return (await createMutation({
+        organizationId: input.organizationId,
+        equipmentId: input.equipmentId,
         type: input.type,
         priority: input.priority,
         descriptionVi: input.descriptionVi,
         descriptionEn: input.descriptionEn,
         scheduledAt: input.scheduledAt,
-      });
-      return id as string;
+      })) as string;
     } finally {
       setIsCreating(false);
     }
@@ -72,9 +71,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function cancelRequest(id: string): Promise<void> {
     setIsCancelling(true);
     try {
-      await cancelMutation({
-        id: id as Parameters<typeof cancelMutation>[0]["id"],
-      });
+      await cancelMutation({ id });
     } finally {
       setIsCancelling(false);
     }
@@ -83,9 +80,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function acceptQuote(quoteId: string): Promise<void> {
     setIsAccepting(true);
     try {
-      await acceptMutation({
-        id: quoteId as Parameters<typeof acceptMutation>[0]["id"],
-      });
+      await acceptMutation({ id: quoteId });
     } finally {
       setIsAccepting(false);
     }
@@ -94,9 +89,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function rejectQuote(quoteId: string): Promise<void> {
     setIsRejecting(true);
     try {
-      await rejectMutation({
-        id: quoteId as Parameters<typeof rejectMutation>[0]["id"],
-      });
+      await rejectMutation({ id: quoteId });
     } finally {
       setIsRejecting(false);
     }
@@ -107,7 +100,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
     data: RatingInput,
   ): Promise<void> {
     await rateMutation({
-      serviceRequestId: serviceRequestId as Parameters<typeof rateMutation>[0]["serviceRequestId"],
+      serviceRequestId,
       rating: data.rating,
       serviceQuality: data.serviceQuality,
       timeliness: data.timeliness,

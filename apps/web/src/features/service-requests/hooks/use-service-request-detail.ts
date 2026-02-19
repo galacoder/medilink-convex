@@ -32,10 +32,10 @@ export function useServiceRequestDetail(
   const result = useQuery(
     api.serviceRequests.getById,
     id ? ({ id } as { id: string }) : "skip",
-  );
+  ) as ServiceRequestDetail | null | undefined;
 
   return {
-    detail: result as ServiceRequestDetail | null | undefined,
+    detail: result,
     isLoading: id != null && result === undefined,
     notFound: result === null,
   };

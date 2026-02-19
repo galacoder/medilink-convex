@@ -5,7 +5,6 @@
  * and action button visibility. Critical for AC-03 (view quotes) and AC-04
  * (approve/reject quote with confirmation dialog).
  */
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 

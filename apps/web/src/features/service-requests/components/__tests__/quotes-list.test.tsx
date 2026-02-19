@@ -4,7 +4,6 @@
  * WHY: Verifies that multiple QuoteComparisonCards render correctly,
  * empty state shows bilingual message, and callbacks are passed through.
  */
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 

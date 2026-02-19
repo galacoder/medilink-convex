@@ -4,7 +4,6 @@
  * WHY: Verifies that all status tabs render with bilingual labels and
  * that tab selection calls the onValueChange callback correctly.
  */
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen } from "@testing-library/react";

@@ -36,15 +36,15 @@ export default function NewServiceRequestPage() {
       throw new Error(labels.errors.createFailed.vi);
     }
 
-    const id = await createRequest({
-      organizationId: activeOrg.id as Parameters<typeof createRequest>[0]["organizationId"],
-      equipmentId: formData.equipmentId as Parameters<typeof createRequest>[0]["equipmentId"],
+    const id = (await createRequest({
+      organizationId: activeOrg.id,
+      equipmentId: formData.equipmentId,
       type: formData.type,
       priority: formData.priority,
       descriptionVi: formData.descriptionVi,
       descriptionEn: formData.descriptionEn,
       scheduledAt: formData.scheduledAt,
-    });
+    })) as string;
 
     router.push(`/hospital/service-requests/${id}`);
   }

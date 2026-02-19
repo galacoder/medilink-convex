@@ -5,7 +5,6 @@
  * priority badges, empty state, and loading skeleton. These are critical
  * for AC-01 (service request list) and AC-10 (responsive layout).
  */
-import React from "react";
 import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
 

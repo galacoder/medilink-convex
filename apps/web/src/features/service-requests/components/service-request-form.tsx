@@ -70,7 +70,7 @@ const labels = serviceRequestLabels;
 
 export function ServiceRequestForm({
   onSubmit,
-  organizationId = "",
+  organizationId: _organizationId = "",
 }: ServiceRequestFormProps) {
   const [step, setStep] = useState(1);
   const [formState, setFormState] = useState<FormState>(initialState);

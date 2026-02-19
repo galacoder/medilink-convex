@@ -141,10 +141,10 @@ export interface CreateServiceRequestInput {
 // Constant arrays with bilingual labels (for select/filter rendering)
 // ---------------------------------------------------------------------------
 
-export const SERVICE_REQUEST_STATUSES: ReadonlyArray<{
+export const SERVICE_REQUEST_STATUSES: readonly {
   value: ServiceRequestStatus;
   label: { vi: string; en: string };
-}> = [
+}[] = [
   { value: "pending", label: { vi: "Đang chờ", en: "Pending" } },
   { value: "quoted", label: { vi: "Đã báo giá", en: "Quoted" } },
   { value: "accepted", label: { vi: "Đã chấp nhận", en: "Accepted" } },
@@ -154,20 +154,20 @@ export const SERVICE_REQUEST_STATUSES: ReadonlyArray<{
   { value: "disputed", label: { vi: "Đang tranh chấp", en: "Disputed" } },
 ];
 
-export const SERVICE_REQUEST_PRIORITIES: ReadonlyArray<{
+export const SERVICE_REQUEST_PRIORITIES: readonly {
   value: ServiceRequestPriority;
   label: { vi: string; en: string };
-}> = [
+}[] = [
   { value: "low", label: { vi: "Thấp", en: "Low" } },
   { value: "medium", label: { vi: "Trung bình", en: "Medium" } },
   { value: "high", label: { vi: "Cao", en: "High" } },
   { value: "critical", label: { vi: "Khẩn cấp", en: "Critical" } },
 ];
 
-export const SERVICE_REQUEST_TYPES: ReadonlyArray<{
+export const SERVICE_REQUEST_TYPES: readonly {
   value: ServiceRequestType;
   label: { vi: string; en: string };
-}> = [
+}[] = [
   { value: "repair", label: { vi: "Sửa chữa", en: "Repair" } },
   { value: "maintenance", label: { vi: "Bảo trì", en: "Maintenance" } },
   { value: "calibration", label: { vi: "Hiệu chỉnh", en: "Calibration" } },
@@ -176,10 +176,10 @@ export const SERVICE_REQUEST_TYPES: ReadonlyArray<{
   { value: "other", label: { vi: "Khác", en: "Other" } },
 ];
 
-export const QUOTE_STATUSES: ReadonlyArray<{
+export const QUOTE_STATUSES: readonly {
   value: QuoteStatus;
   label: { vi: string; en: string };
-}> = [
+}[] = [
   { value: "pending", label: { vi: "Đang chờ", en: "Pending" } },
   { value: "accepted", label: { vi: "Đã chấp nhận", en: "Accepted" } },
   { value: "rejected", label: { vi: "Đã từ chối", en: "Rejected" } },

@@ -36,10 +36,10 @@ export function useServiceRequests(
 
   const requests = useQuery(api.serviceRequests.listByHospital, {
     ...(convexStatus ? { status: convexStatus } : {}),
-  });
+  }) as ServiceRequest[] | undefined;
 
   return {
-    requests: (requests ?? []) as ServiceRequest[],
+    requests: requests ?? [],
     isLoading: requests === undefined,
   };
 }

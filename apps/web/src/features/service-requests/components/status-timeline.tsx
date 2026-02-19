@@ -82,7 +82,7 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                     isFuture ? "text-muted-foreground/50" : "text-foreground",
                   ].join(" ")}
                 >
-                  {labels[status]?.label.vi ?? status}
+                  {labels[status].label.vi}
                 </p>
                 <p
                   className={[
@@ -92,7 +92,7 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                       : "text-muted-foreground",
                   ].join(" ")}
                 >
-                  {labels[status]?.description.vi}
+                  {labels[status].description.vi}
                 </p>
               </div>
             </li>
@@ -108,10 +108,10 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
           </div>
           <div>
             <p className="text-sm font-medium text-destructive">
-              {labels[currentStatus]?.label.vi}
+              {labels[currentStatus].label.vi}
             </p>
             <p className="text-muted-foreground mt-0.5 text-xs">
-              {labels[currentStatus]?.description.vi}
+              {labels[currentStatus].description.vi}
             </p>
           </div>
         </div>

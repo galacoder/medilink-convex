@@ -41,9 +41,9 @@ export function EquipmentSelector({ value, onSelect }: EquipmentSelectorProps) {
   // Query all available equipment for this org (no status filter = all statuses)
   const equipmentResult = useQuery(api.equipment.list, {
     paginationOpts: { numItems: 100, cursor: null },
-  });
+  }) as { page?: EquipmentItem[] } | undefined;
 
-  const equipment: EquipmentItem[] = (equipmentResult as { page?: EquipmentItem[] } | undefined)?.page ?? [];
+  const equipment: EquipmentItem[] = equipmentResult?.page ?? [];
 
   function handleValueChange(id: string) {
     const item = equipment.find((e) => e._id === id);

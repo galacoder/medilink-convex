@@ -4,7 +4,6 @@
  * WHY: Verifies star rating interaction, sub-rating fields, and submit callback.
  * Critical for AC-06 (rate completed service: 1-5 stars with optional comment).
  */
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { screen, waitFor } from "@testing-library/react";
@@ -31,7 +30,9 @@ describe("ServiceRatingForm", () => {
 
     // Click 4th star
     const stars = screen.getAllByRole("button", { name: /sao/ });
-    await user.click(stars[3]!); // 4 stars
+    const star4 = stars[3];
+    if (!star4) throw new Error("Expected at least 4 star buttons");
+    await user.click(star4); // 4 stars
 
     // Submit
     await user.click(screen.getByRole("button", { name: /Gửi đánh giá/ }));

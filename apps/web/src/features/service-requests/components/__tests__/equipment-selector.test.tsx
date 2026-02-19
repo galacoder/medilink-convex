@@ -5,7 +5,6 @@
  * Convex query result and calls onSelect when an item is chosen.
  * The Convex useQuery is mocked to provide controlled test data.
  */
-import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 

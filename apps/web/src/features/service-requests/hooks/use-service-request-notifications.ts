@@ -26,9 +26,9 @@ export function useServiceRequestNotifications(): UseServiceRequestNotifications
   // Query all quoted requests (these need hospital action — accept/reject a quote)
   const quotedRequests = useQuery(api.serviceRequests.listByHospital, {
     status: "quoted",
-  });
+  }) as ServiceRequest[] | undefined;
 
-  const quotedCount = (quotedRequests as ServiceRequest[] | undefined)?.length ?? 0;
+  const quotedCount = quotedRequests?.length ?? 0;
 
   return {
     quotedCount,
