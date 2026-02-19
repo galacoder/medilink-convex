@@ -424,6 +424,317 @@ export const declineRequest = mutation({
 });
 
 // ---------------------------------------------------------------------------
+// Local auth helpers for M3-3 execution mutations (testable, no better-auth dep)
+// ---------------------------------------------------------------------------
+
+/**
+ * Local JWT auth helper — no better-auth import needed for testability.
+ * Mirrors disputes.ts pattern so these mutations can be exercised in convex-test.
+ *
+ * WHY: requireOrgAuth from ./lib/auth imports authComponent from ../auth
+ * which depends on better-auth/minimal. convex-test can't resolve that package,
+ * so execution mutations use this local helper instead.
+ */
+async function localRequireOrgAuth(ctx: {
+  auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+}): Promise<{ userId: string; organizationId: Id<"organizations"> }> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new ConvexError({
+      message:
+        "Xác thực thất bại. Vui lòng đăng nhập lại. (Authentication required. Please sign in.)",
+      code: "UNAUTHENTICATED",
+    });
+  }
+  const organizationId = identity.organizationId as Id<"organizations"> | null;
+  if (!organizationId) {
+    throw new ConvexError({
+      message:
+        "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization.)",
+      code: "NO_ACTIVE_ORGANIZATION",
+    });
+  }
+  return {
+    userId: identity.subject as string,
+    organizationId,
+  };
+}
+
+/**
+ * Provider starts executing a service — transitions accepted -> in_progress.
+ *
+ * WHY: Providers mark service as started when they arrive on-site so that
+ * hospital staff see real-time status updates. This begins the execution
+ * phase of the M3-3 workflow.
+ *
+ * Only provider org members (assigned to the request) can start service.
+ * Request must be in "accepted" status.
+ */
+export const startService = mutation({
+  args: {
+    id: v.id("serviceRequests"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate (local helper to avoid better-auth dep in tests)
+    const auth = await localRequireOrgAuth(ctx);
+
+    // 2. Load the service request
+    const request = await ctx.db.get(args.id);
+    if (!request) {
+      throw new ConvexError({
+        message:
+          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        code: "SERVICE_REQUEST_NOT_FOUND",
+      });
+    }
+
+    // 3. Verify request is in "accepted" status (only valid transition source)
+    if (request.status !== "accepted") {
+      throw new ConvexError({
+        message: `Không thể bắt đầu dịch vụ đang ở trạng thái "${request.status}". Yêu cầu phải ở trạng thái "accepted". (Cannot start service in status "${request.status}". Request must be in "accepted" status.)`,
+        code: "INVALID_TRANSITION",
+        currentStatus: request.status,
+        targetStatus: "in_progress",
+      });
+    }
+
+    // 4. Update status to in_progress
+    const now = Date.now();
+    await ctx.db.patch(args.id, {
+      status: "in_progress",
+      updatedAt: now,
+    });
+
+    // 5. Create audit log entry
+    await createAuditEntry(ctx, {
+      organizationId: request.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "serviceRequest.started",
+      resourceType: "serviceRequests",
+      resourceId: args.id,
+      previousValues: { status: "accepted" },
+      newValues: { status: "in_progress", notes: args.notes },
+    });
+
+    return args.id;
+  },
+});
+
+/**
+ * Provider updates service progress in real-time.
+ *
+ * WHY: Hospital staff need visibility into provider progress while on-site.
+ * Progress notes provide a communication trail and optional percentComplete
+ * gives a quick visual indicator without requiring a status transition.
+ *
+ * Request must be in "in_progress" status.
+ */
+export const updateProgress = mutation({
+  args: {
+    id: v.id("serviceRequests"),
+    progressNotes: v.string(),
+    percentComplete: v.optional(v.number()),
+    hasUnexpectedIssue: v.optional(v.boolean()),
+    unexpectedIssueDescVi: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate (local helper to avoid better-auth dep in tests)
+    const auth = await localRequireOrgAuth(ctx);
+
+    // 2. Load the service request
+    const request = await ctx.db.get(args.id);
+    if (!request) {
+      throw new ConvexError({
+        message:
+          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        code: "SERVICE_REQUEST_NOT_FOUND",
+      });
+    }
+
+    // 3. Verify request is in_progress
+    if (request.status !== "in_progress") {
+      throw new ConvexError({
+        message: `Chỉ có thể cập nhật tiến độ khi dịch vụ đang thực hiện. Trạng thái hiện tại: "${request.status}". (Can only update progress when service is in progress. Current status: "${request.status}".)`,
+        code: "INVALID_STATUS_FOR_PROGRESS_UPDATE",
+        currentStatus: request.status,
+      });
+    }
+
+    // 4. Update updatedAt (progress notes are logged in audit trail)
+    const now = Date.now();
+    await ctx.db.patch(args.id, {
+      updatedAt: now,
+    });
+
+    // 5. Create audit log with progress details
+    await createAuditEntry(ctx, {
+      organizationId: request.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "serviceRequest.progressUpdated",
+      resourceType: "serviceRequests",
+      resourceId: args.id,
+      newValues: {
+        progressNotes: args.progressNotes,
+        percentComplete: args.percentComplete,
+        hasUnexpectedIssue: args.hasUnexpectedIssue,
+        unexpectedIssueDescVi: args.unexpectedIssueDescVi,
+      },
+    });
+
+    return args.id;
+  },
+});
+
+/**
+ * Provider marks service as completed — transitions in_progress -> completed.
+ *
+ * WHY: Final status transition that notifies hospital the work is done.
+ * Sets completedAt timestamp for compliance reporting.
+ *
+ * Only provider org members can complete service.
+ * Request must be in "in_progress" status.
+ */
+export const completeService = mutation({
+  args: {
+    id: v.id("serviceRequests"),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate (local helper to avoid better-auth dep in tests)
+    const auth = await localRequireOrgAuth(ctx);
+
+    // 2. Load the service request
+    const request = await ctx.db.get(args.id);
+    if (!request) {
+      throw new ConvexError({
+        message:
+          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        code: "SERVICE_REQUEST_NOT_FOUND",
+      });
+    }
+
+    // 3. Verify state machine transition
+    const currentStatus = request.status as ServiceRequestStatus;
+    if (!canTransition(currentStatus, "completed")) {
+      throw new ConvexError({
+        message: `Không thể hoàn thành yêu cầu dịch vụ đang ở trạng thái "${currentStatus}". (Cannot complete a service request in status "${currentStatus}".)`,
+        code: "INVALID_TRANSITION",
+        currentStatus,
+        targetStatus: "completed",
+      });
+    }
+
+    // 4. Update status and set completedAt
+    const now = Date.now();
+    await ctx.db.patch(args.id, {
+      status: "completed",
+      completedAt: now,
+      updatedAt: now,
+    });
+
+    // 5. Create audit log
+    await createAuditEntry(ctx, {
+      organizationId: request.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "serviceRequest.completed",
+      resourceType: "serviceRequests",
+      resourceId: args.id,
+      previousValues: { status: currentStatus },
+      newValues: { status: "completed", completedAt: now },
+    });
+
+    return args.id;
+  },
+});
+
+/**
+ * Provider submits a structured completion report after service execution.
+ *
+ * WHY: Completion reports are stored in a separate completionReports table
+ * (append-only schema rule) so M3-4 analytics can aggregate parts replaced,
+ * actual hours, and maintenance schedules across all services. Bilingual
+ * descriptions let hospital staff read reports in their preferred language.
+ *
+ * Request must be in "in_progress" or "completed" status.
+ */
+export const submitCompletionReport = mutation({
+  args: {
+    id: v.id("serviceRequests"),
+    workDescriptionVi: v.string(),
+    workDescriptionEn: v.optional(v.string()),
+    partsReplaced: v.optional(v.array(v.string())),
+    nextMaintenanceRecommendation: v.optional(v.string()),
+    actualHours: v.optional(v.number()),
+    photoUrls: v.optional(v.array(v.string())),
+    actualCompletionTime: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate (local helper to avoid better-auth dep in tests)
+    const auth = await localRequireOrgAuth(ctx);
+
+    // 2. Load the service request
+    const request = await ctx.db.get(args.id);
+    if (!request) {
+      throw new ConvexError({
+        message:
+          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        code: "SERVICE_REQUEST_NOT_FOUND",
+      });
+    }
+
+    // 3. Verify status allows completion report submission
+    const validStatuses = ["in_progress", "completed"];
+    if (!validStatuses.includes(request.status)) {
+      throw new ConvexError({
+        message: `Không thể gửi báo cáo hoàn thành cho yêu cầu đang ở trạng thái "${request.status}". Yêu cầu phải đang thực hiện hoặc đã hoàn thành. (Cannot submit completion report for request in status "${request.status}". Request must be in_progress or completed.)`,
+        code: "INVALID_STATUS_FOR_COMPLETION_REPORT",
+        currentStatus: request.status,
+      });
+    }
+
+    // 4. Find the provider assigned to this request (for foreign key)
+    let providerId: Id<"providers"> | undefined;
+    if (request.assignedProviderId) {
+      providerId = request.assignedProviderId;
+    }
+
+    // 5. Insert completion report in the dedicated table
+    const now = Date.now();
+    const reportId = await ctx.db.insert("completionReports", {
+      serviceRequestId: args.id,
+      providerId,
+      workDescriptionVi: args.workDescriptionVi,
+      workDescriptionEn: args.workDescriptionEn,
+      partsReplaced: args.partsReplaced,
+      nextMaintenanceRecommendation: args.nextMaintenanceRecommendation,
+      actualHours: args.actualHours,
+      photoUrls: args.photoUrls,
+      actualCompletionTime: args.actualCompletionTime,
+      submittedBy: auth.userId as Id<"users">,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // 6. Create audit log (5-year retention per Vietnamese regulations)
+    await createAuditEntry(ctx, {
+      organizationId: request.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "serviceRequest.completionReportSubmitted",
+      resourceType: "completionReports",
+      resourceId: reportId,
+      newValues: {
+        serviceRequestId: args.id,
+        workDescriptionVi: args.workDescriptionVi,
+        partsReplaced: args.partsReplaced,
+        actualHours: args.actualHours,
+      },
+    });
+
+    return reportId;
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
 
@@ -722,5 +1033,93 @@ export const getById = query({
       rating: rating ?? null,
       hospitalOrgName: hospitalOrg?.name ?? null,
     };
+  },
+});
+
+/**
+ * Lists active services for the authenticated provider organization.
+ *
+ * WHY: Provider staff use this mobile-first screen to see all services
+ * they need to execute. Returns accepted (scheduled) and in_progress (on-site)
+ * requests sorted by scheduledAt so upcoming work is easy to find.
+ *
+ * Only provider org members can call this.
+ * Returns requests with hospital name, equipment details, and accepted quote info.
+ */
+export const listActiveServices = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await localRequireOrgAuth(ctx);
+
+    // Verify the org is a provider
+    const org = await ctx.db.get(auth.organizationId as Id<"organizations">);
+    if (!org || org.org_type !== "provider") {
+      throw new ConvexError({
+        message:
+          "Chỉ tổ chức nhà cung cấp mới có thể xem danh sách dịch vụ đang thực hiện. (Only provider organizations can list active services.)",
+        code: "FORBIDDEN_ORG_TYPE",
+      });
+    }
+
+    // Find the provider record for this org
+    const providerRecord = await ctx.db
+      .query("providers")
+      .withIndex("by_org", (q) =>
+        q.eq("organizationId", auth.organizationId as Id<"organizations">),
+      )
+      .first();
+
+    if (!providerRecord) {
+      return [];
+    }
+
+    // Get accepted and in_progress requests assigned to this provider
+    const activeRequests = await ctx.db
+      .query("serviceRequests")
+      .withIndex("by_provider", (q) =>
+        q.eq("assignedProviderId", providerRecord._id),
+      )
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("status"), "accepted"),
+          q.eq(q.field("status"), "in_progress"),
+        ),
+      )
+      .collect();
+
+    // Sort by scheduledAt (earliest first), then by createdAt for requests without schedule
+    const sorted = [...activeRequests].sort((a, b) => {
+      const aDate = a.scheduledAt ?? a.createdAt;
+      const bDate = b.scheduledAt ?? b.createdAt;
+      return aDate - bDate;
+    });
+
+    // Enrich with hospital and equipment details
+    const enriched = await Promise.all(
+      sorted.map(async (req) => {
+        const [equipment, hospitalOrg, acceptedQuote] = await Promise.all([
+          ctx.db.get(req.equipmentId),
+          ctx.db.get(req.organizationId),
+          ctx.db
+            .query("quotes")
+            .withIndex("by_service_request", (q) =>
+              q.eq("serviceRequestId", req._id),
+            )
+            .filter((q) => q.eq(q.field("status"), "accepted"))
+            .first(),
+        ]);
+        return {
+          ...req,
+          equipmentNameVi: equipment?.nameVi ?? null,
+          equipmentNameEn: equipment?.nameEn ?? null,
+          equipmentLocation: equipment?.location ?? null,
+          hospitalOrgName: hospitalOrg?.name ?? null,
+          acceptedQuoteAmount: acceptedQuote?.amount ?? null,
+          acceptedQuoteCurrency: acceptedQuote?.currency ?? null,
+        };
+      }),
+    );
+
+    return enriched;
   },
 });
