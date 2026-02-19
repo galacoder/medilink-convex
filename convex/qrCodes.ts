@@ -53,7 +53,7 @@ export const getByCode = query({
     code: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    const { organizationId } = await requireAuth(ctx);
 
     const qrCode = await ctx.db
       .query("qrCodes")
@@ -61,7 +61,7 @@ export const getByCode = query({
       .filter((q) => q.eq(q.field("isActive"), true))
       .first();
 
-    if (!qrCode) {
+    if (!qrCode || qrCode.organizationId !== organizationId) {
       return null;
     }
 
@@ -153,8 +153,11 @@ export const generateQRCode = mutation({
       );
     }
 
-    // Generate a unique code string: orgId-equipmentId-timestamp
-    const code = `${organizationId}-${args.equipmentId}-${Date.now()}`;
+    // Generate a unique code string as a URL for reliable parsing.
+    // Format: https://medilink.app/equipment/{equipmentId}?org={orgId}&t={timestamp}
+    // WHY: URL format is unambiguous — equipmentId is a distinct path segment,
+    // so parsing never relies on delimiter assumptions about Convex ID characters.
+    const code = `https://medilink.app/equipment/${args.equipmentId}?org=${organizationId}&t=${Date.now()}`;
     const now = Date.now();
 
     const qrCodeId = await ctx.db.insert("qrCodes", {
@@ -193,13 +196,13 @@ export const recordScan = mutation({
     metadata: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    const { subject } = await requireAuth(ctx);
+    const { subject, organizationId } = await requireAuth(ctx);
 
-    // Verify the QR code exists
+    // Verify the QR code exists and belongs to this organization
     const qrCode = await ctx.db.get(args.qrCodeId);
-    if (!qrCode) {
+    if (!qrCode || qrCode.organizationId !== organizationId) {
       throw new ConvexError(
-        "Mã QR không tồn tại (QR code not found)",
+        "Mã QR không hợp lệ / Invalid QR code",
       );
     }
 
@@ -293,8 +296,8 @@ export const batchGenerateQRCodes = mutation({
         continue;
       }
 
-      // Generate unique code and insert
-      const code = `${organizationId}-${equipment._id}-${now}-${generated}`;
+      // Generate unique code as URL (same format as generateQRCode)
+      const code = `https://medilink.app/equipment/${equipment._id}?org=${organizationId}&t=${now + generated}`;
       await ctx.db.insert("qrCodes", {
         equipmentId: equipment._id,
         organizationId,

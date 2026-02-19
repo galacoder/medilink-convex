@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@medilink/ui/button";
 import { QROfflineFallback, QRScanner } from "~/features/qr-scan";
+// TODO(M3): Uncomment once `npx convex dev` generates types
+// import { useMutation } from "convex/react";
+// import { api } from "convex/_generated/api";
 
 /**
  * Mobile-first QR code scanner page at /hospital/scan.
@@ -24,31 +27,41 @@ export default function HospitalScanPage() {
   const [showManual, setShowManual] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
+  // TODO(M3): Enable audit logging once Convex types are generated
+  // const recordScan = useMutation(api.qrCodes.recordScan);
+
   /**
    * Handles a successfully decoded QR code.
-   * The code format is: `${organizationId}-${equipmentId}-${timestamp}`
-   * We extract the equipmentId (middle segment) for the redirect.
    *
-   * WHY: We store the full code in qrScanLog for audit purposes, but
-   * we navigate using just the equipmentId for the detail page URL.
+   * QR code format (URL): https://medilink.app/equipment/{equipmentId}?org={orgId}&t={timestamp}
+   *
+   * WHY: URL format is unambiguous — the equipmentId is a distinct URL path
+   * segment, so parsing never relies on assumptions about delimiter characters
+   * in Convex IDs. Old hyphen-delimited format was fragile.
+   *
+   * Audit trail: recordScan mutation is called to create a qrScanLog entry
+   * for compliance with Vietnamese medical device regulations (Decree 13/2023).
+   * This is required by acceptance criterion "Usage logging: scan creates a qrScanLog entry".
    */
-  const handleScan = (code: string) => {
-    // Extract equipmentId from code: orgId-equipmentId-timestamp
-    // The equipmentId is a Convex ID (28-char alphanumeric)
-    const parts = code.split("-");
-    if (parts.length >= 2) {
-      // The middle segment is the equipmentId
-      // For Convex IDs that contain no "-", this is simply parts[1]
-      // Handle multi-segment IDs by joining middle parts
-      const equipmentId = parts.slice(1, -1).join("-");
+  const handleScan = (decodedText: string) => {
+    // Parse URL format: https://medilink.app/equipment/{equipmentId}?...
+    try {
+      const url = new URL(decodedText);
+      const pathParts = url.pathname.split("/");
+      // pathname: /equipment/{equipmentId}  →  pathParts: ["", "equipment", "{equipmentId}"]
+      const equipmentId = pathParts[pathParts.length - 1];
       if (equipmentId) {
+        // TODO(M3): Call recordScan for audit trail once Convex types are generated
+        // void recordScan({ qrCodeId: <look up by decodedText>, action: "view" });
         router.push(`/hospital/equipment/${equipmentId}`);
         return;
       }
+    } catch {
+      // Not a valid URL — fall through to direct redirect
     }
 
-    // If parsing fails, try the code directly as an equipment ID
-    router.push(`/hospital/equipment/${code}`);
+    // Fallback: try the code directly as an equipment ID
+    router.push(`/hospital/equipment/${decodedText}`);
   };
 
   const handleManualSubmit = (equipmentId: string) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Html5Qrcode } from "html5-qrcode";
 
 /**
  * Custom hook for managing the html5-qrcode scanner lifecycle.
@@ -30,10 +31,11 @@ export function useQRScanner(elementId: string): UseQRScannerReturn {
     lastResult: null,
   });
 
-  // Store scanner instance in a ref to avoid re-renders
-  // Type is any because html5-qrcode does not export its class types well
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const scannerRef = useRef<any>(null);
+  // Store scanner instance in a ref to avoid re-renders.
+  // WHY: Using the imported Html5Qrcode type (type-only import) gives proper
+  // typing for .stop(), .clear(), .start() calls without triggering
+  // @typescript-eslint/no-unsafe-call or no-unsafe-member-access errors.
+  const scannerRef = useRef<Html5Qrcode | null>(null);
 
   const stopScan = useCallback(async () => {
     if (scannerRef.current) {
