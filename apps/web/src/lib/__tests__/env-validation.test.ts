@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-properties */
 /**
  * Tests for production environment validation utility.
  *
@@ -5,6 +6,12 @@
  * or confusing errors at runtime. The validation script should catch
  * missing required vars at startup (before serving traffic), fail fast
  * with clear error messages, and list all missing vars in one shot.
+ *
+ * WHY eslint-disable no-restricted-properties: This test file must directly
+ * manipulate process.env to simulate missing/present env vars. Using
+ * `import { env } from '~/env'` would not allow simulating missing vars
+ * because ~/env throws when required vars are absent — exactly the
+ * scenario these tests verify.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

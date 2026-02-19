@@ -14,27 +14,27 @@ vi.mock("~/env", () => ({
     NODE_ENV: "test",
     NEXT_PUBLIC_CONVEX_URL: "https://test.convex.cloud",
     NEXT_PUBLIC_CONVEX_SITE_URL: undefined,
+    NEXT_PUBLIC_APP_VERSION: "1.0.0",
   },
 }));
 
 describe("GET /api/health", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Stub required env vars so health check reports 'ok'
-    vi.stubEnv("NEXT_PUBLIC_APP_VERSION", "1.0.0");
-    vi.stubEnv("NEXT_PUBLIC_CONVEX_URL", "https://test.convex.cloud");
+    // Stub AUTH_SECRET via process.env since it is a server-side var
+    // not included in the ~/env client schema.
     vi.stubEnv("AUTH_SECRET", "test-secret-value");
   });
 
   it("returns 200 with status ok", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     expect(response.status).toBe(200);
   });
 
   it("returns JSON with required fields", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     const body = (await response.json()) as Record<string, unknown>;
 
     expect(body).toHaveProperty("status");
@@ -45,7 +45,7 @@ describe("GET /api/health", () => {
 
   it("returns status ok when all services healthy", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     const body = (await response.json()) as Record<string, unknown>;
 
     expect(body.status).toBe("ok");
@@ -53,7 +53,7 @@ describe("GET /api/health", () => {
 
   it("returns a valid ISO 8601 timestamp", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     const body = (await response.json()) as Record<string, unknown>;
 
     // Verify timestamp is a valid ISO 8601 date string
@@ -63,7 +63,7 @@ describe("GET /api/health", () => {
 
   it("returns services object with convex field", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     const body = (await response.json()) as {
       services: Record<string, unknown>;
     };
@@ -73,7 +73,7 @@ describe("GET /api/health", () => {
 
   it("returns version from environment", async () => {
     const { GET } = await import("../route");
-    const response = await GET();
+    const response = GET();
     const body = (await response.json()) as Record<string, unknown>;
 
     // Version should be a string (from env or 'unknown')

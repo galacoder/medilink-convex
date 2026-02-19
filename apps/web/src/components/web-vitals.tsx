@@ -19,6 +19,8 @@
  */
 import { useReportWebVitals } from "next/web-vitals";
 
+import { env } from "~/env";
+
 type MetricName = "TTFB" | "FCP" | "LCP" | "FID" | "CLS" | "INP";
 
 interface WebVitalMetric {
@@ -45,7 +47,7 @@ const ALERT_THRESHOLDS: Partial<Record<MetricName, number>> = {
 
 function reportVital(metric: WebVitalMetric) {
   // In development — log to console for debugging performance issues
-  if (process.env.NODE_ENV === "development") {
+  if (env.NODE_ENV === "development") {
     const isAboveThreshold =
       ALERT_THRESHOLDS[metric.name] !== undefined &&
       metric.value > (ALERT_THRESHOLDS[metric.name] ?? Infinity);
@@ -75,16 +77,21 @@ function reportVital(metric: WebVitalMetric) {
   // importing @sentry/nextjs directly. This avoids a hard dependency on
   // the Sentry package — it only runs when Sentry is actually loaded.
   // Teams can enable Sentry monitoring without changing this file.
+  //
+  // WHY inline eslint-disable for no-restricted-properties: NEXT_PUBLIC_SENTRY_DSN
+  // is an optional monitoring variable not included in the validated env schema.
+  // It is only used here as a boolean presence check, not as a typed value.
   if (
     typeof window !== "undefined" &&
+    // eslint-disable-next-line no-restricted-properties
     process.env.NEXT_PUBLIC_SENTRY_DSN &&
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    typeof (window as any).__SENTRY__ !== "undefined"
+    typeof (window as Window & { __SENTRY__?: unknown }).__SENTRY__ !==
+      "undefined"
   ) {
     try {
       // Access Sentry via the global object to avoid a hard compile-time dependency.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sentry = (window as any).__SENTRY__ as {
+      const sentry = (window as Window & { __SENTRY__?: unknown })
+        .__SENTRY__ as {
         hub?: { captureEvent?: (event: Record<string, unknown>) => void };
       };
       sentry.hub?.captureEvent?.({
@@ -105,8 +112,10 @@ function reportVital(metric: WebVitalMetric) {
     }
   }
 
-  // Send to custom analytics endpoint via beacon (non-blocking)
-  if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+  // Send to custom analytics endpoint via beacon (non-blocking).
+  // WHY: navigator.sendBeacon is always available when navigator is defined
+  // (supported in all modern browsers). The typeof guard handles SSR environments.
+  if (typeof navigator !== "undefined") {
     navigator.sendBeacon("/api/analytics/vitals", body);
   }
 }

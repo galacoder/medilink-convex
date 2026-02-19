@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-properties */
 /**
  * Production environment variable validation utility.
  *
@@ -6,6 +7,12 @@
  * silently with cryptic errors. This utility validates all required vars at
  * startup so failures are immediate, explicit, and list all missing vars
  * in a single check (fail-fast pattern).
+ *
+ * WHY eslint-disable no-restricted-properties: This module is deliberately
+ * designed to read raw process.env values BEFORE the T3 env validation runs.
+ * It is the startup validator that verifies env vars are present — using
+ * `import { env } from '~/env'` would defeat its purpose because ~/env throws
+ * when vars are missing (the very condition this module is meant to detect).
  *
  * Usage in scripts/validate-env.ts:
  *   const result = validateProductionEnv();
@@ -16,7 +23,7 @@
  * Required environment variables for production deployment.
  * Each entry has the variable name and a human-readable description.
  */
-const REQUIRED_PRODUCTION_VARS: Array<{ name: string; description: string }> = [
+const REQUIRED_PRODUCTION_VARS: { name: string; description: string }[] = [
   {
     name: "NEXT_PUBLIC_CONVEX_URL",
     description:

@@ -127,7 +127,6 @@ export class ClassErrorBoundary extends React.Component<
   constructor(props: ClassErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
-    this.resetError = this.resetError.bind(this);
   }
 
   static getDerivedStateFromError(error: Error): ClassErrorBoundaryState {
@@ -141,9 +140,11 @@ export class ClassErrorBoundary extends React.Component<
     console.error("[MediLink] Unhandled render error:", error, errorInfo);
   }
 
-  resetError() {
+  // Arrow function class property ensures `this` is always bound correctly
+  // when resetError is passed as a prop (avoids @typescript-eslint/unbound-method).
+  resetError = () => {
     this.setState({ hasError: false, error: null });
-  }
+  };
 
   render() {
     if (this.state.hasError && this.state.error) {

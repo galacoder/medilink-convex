@@ -10,6 +10,8 @@
  */
 import { NextResponse } from "next/server";
 
+import { env } from "~/env";
+
 export const runtime = "nodejs";
 // Disable caching — health checks must always reflect current state
 export const dynamic = "force-dynamic";
@@ -39,7 +41,7 @@ interface HealthResponse {
  * This is the most critical dependency — without it the app cannot function.
  */
 function checkConvexConnectivity(): ServiceStatus {
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+  const convexUrl = env.NEXT_PUBLIC_CONVEX_URL;
   if (!convexUrl) {
     return {
       status: "unavailable",
@@ -54,6 +56,11 @@ function checkConvexConnectivity(): ServiceStatus {
  * Verifies AUTH_SECRET is present which is required for session handling.
  */
 function checkAuthService(): ServiceStatus {
+  // AUTH_SECRET is a server-side env var validated via authEnv() in packages/auth/env.ts.
+  // We use process.env directly here because AUTH_SECRET is not exposed through the
+  // client-side env schema — accessing it via authEnv() would require the full auth
+  // package import which is unnecessary for a lightweight health check.
+  // eslint-disable-next-line no-restricted-properties
   const authSecret = process.env.AUTH_SECRET;
   if (!authSecret) {
     return {
@@ -64,7 +71,7 @@ function checkAuthService(): ServiceStatus {
   return { status: "ok" };
 }
 
-export async function GET() {
+export function GET() {
   const convex = checkConvexConnectivity();
   const auth = checkAuthService();
 
@@ -83,7 +90,7 @@ export async function GET() {
   const body: HealthResponse = {
     status: overallStatus,
     timestamp: new Date().toISOString(),
-    version: process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown",
+    version: env.NEXT_PUBLIC_APP_VERSION ?? "unknown",
     services: {
       convex,
       auth,
