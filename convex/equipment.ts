@@ -1,9 +1,10 @@
-import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { ConvexError, v } from "convex/values";
 
-import { mutation, query } from "./_generated/server";
+import type { EquipmentStatus } from "./lib/statusMachine";
 import { type Id } from "./_generated/dataModel";
-import { assertTransition, type EquipmentStatus } from "./lib/statusMachine";
+import { mutation, query } from "./_generated/server";
+import { assertTransition } from "./lib/statusMachine";
 
 // ---------------------------------------------------------------------------
 // Helper: extract authenticated organizationId from JWT identity
@@ -23,9 +24,7 @@ async function requireAuth(ctx: {
 }): Promise<{ subject: string; organizationId: Id<"organizations"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
-    throw new ConvexError(
-      "Không có quyền truy cập (Not authenticated)",
-    );
+    throw new ConvexError("Không có quyền truy cập (Not authenticated)");
   }
   const organizationId = identity.organizationId as Id<"organizations"> | null;
   if (!organizationId) {
@@ -72,9 +71,7 @@ export const list = query({
       results = await ctx.db
         .query("equipment")
         .withIndex("by_org_and_status", (q) =>
-          q
-            .eq("organizationId", organizationId)
-            .eq("status", args.status!),
+          q.eq("organizationId", organizationId).eq("status", args.status!),
         )
         .paginate(args.paginationOpts);
     } else {
@@ -184,9 +181,7 @@ export const getHistory = query({
 
     return await ctx.db
       .query("equipmentHistory")
-      .withIndex("by_equipment", (q) =>
-        q.eq("equipmentId", args.equipmentId),
-      )
+      .withIndex("by_equipment", (q) => q.eq("equipmentId", args.equipmentId))
       .order("desc")
       .paginate(args.paginationOpts);
   },
@@ -227,9 +222,7 @@ export const getMaintenanceSchedule = query({
 
     const records = await ctx.db
       .query("maintenanceRecords")
-      .withIndex("by_equipment", (q) =>
-        q.eq("equipmentId", args.equipmentId),
-      )
+      .withIndex("by_equipment", (q) => q.eq("equipmentId", args.equipmentId))
       .collect();
 
     return records

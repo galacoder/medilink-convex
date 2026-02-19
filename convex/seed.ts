@@ -15,47 +15,46 @@
  */
 
 import { v } from "convex/values";
-import { internalMutation, action } from "./_generated/server";
+
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-
+import { action, internalMutation } from "./_generated/server";
+import {
+  ALL_SEED_CONSUMABLES,
+  ALL_SEED_EQUIPMENT,
+  CATEGORY_DIAGNOSTIC,
+  CATEGORY_MEDICAL_IT,
+  CATEGORY_PATIENT_MONITORING,
+  CATEGORY_SURGICAL,
+} from "./seedData/equipment";
+import { SPMET_HOSPITAL, TECHMED_PROVIDER } from "./seedData/organizations";
+import {
+  ALL_SEED_CERTIFICATIONS,
+  ALL_SEED_COVERAGE_AREAS,
+  ALL_SEED_OFFERINGS,
+  ALL_SEED_QUOTES,
+  ALL_SEED_SERVICE_REQUESTS,
+  TECHMED_PROFILE,
+} from "./seedData/serviceRequests";
 // Seed data constants
 import {
-  PLATFORM_ADMIN,
   HOSPITAL_OWNER,
   HOSPITAL_STAFF_1,
   HOSPITAL_STAFF_2,
+  PLATFORM_ADMIN,
   PROVIDER_OWNER,
   PROVIDER_TECHNICIAN,
 } from "./seedData/users";
-import { SPMET_HOSPITAL, TECHMED_PROVIDER } from "./seedData/organizations";
-import {
-  CATEGORY_DIAGNOSTIC,
-  CATEGORY_PATIENT_MONITORING,
-  CATEGORY_SURGICAL,
-  CATEGORY_MEDICAL_IT,
-  ALL_SEED_EQUIPMENT,
-  ALL_SEED_CONSUMABLES,
-} from "./seedData/equipment";
-import {
-  TECHMED_PROFILE,
-  ALL_SEED_OFFERINGS,
-  ALL_SEED_CERTIFICATIONS,
-  ALL_SEED_COVERAGE_AREAS,
-  ALL_SEED_SERVICE_REQUESTS,
-  ALL_SEED_QUOTES,
-} from "./seedData/serviceRequests";
-
 // Idempotency helpers
 import {
-  findOrgBySlug,
-  findUserByEmail,
-  findEquipmentBySerial,
-  findQrByCode,
-  findMembership,
   findCategoryByName,
-  findProviderByOrg,
   findConsumableByName,
+  findEquipmentBySerial,
+  findMembership,
+  findOrgBySlug,
+  findProviderByOrg,
+  findQrByCode,
+  findUserByEmail,
 } from "./seedHelpers";
 
 // ---------------------------------------------------------------------------
@@ -120,7 +119,9 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created platform admin: ${PLATFORM_ADMIN.email}`);
     } else {
-      console.log(`Skipping platform admin: already exists (${PLATFORM_ADMIN.email})`);
+      console.log(
+        `Skipping platform admin: already exists (${PLATFORM_ADMIN.email})`,
+      );
     }
 
     // --- Hospital org ---
@@ -135,7 +136,9 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created hospital org: ${SPMET_HOSPITAL.slug}`);
     } else {
-      console.log(`Skipping hospital org: already exists (${SPMET_HOSPITAL.slug})`);
+      console.log(
+        `Skipping hospital org: already exists (${SPMET_HOSPITAL.slug})`,
+      );
     }
 
     // --- Provider org ---
@@ -150,7 +153,9 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created provider org: ${TECHMED_PROVIDER.slug}`);
     } else {
-      console.log(`Skipping provider org: already exists (${TECHMED_PROVIDER.slug})`);
+      console.log(
+        `Skipping provider org: already exists (${TECHMED_PROVIDER.slug})`,
+      );
     }
 
     // --- Hospital owner ---
@@ -164,10 +169,16 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created hospital owner: ${HOSPITAL_OWNER.email}`);
     } else {
-      console.log(`Skipping hospital owner: already exists (${HOSPITAL_OWNER.email})`);
+      console.log(
+        `Skipping hospital owner: already exists (${HOSPITAL_OWNER.email})`,
+      );
     }
     // Hospital owner membership
-    const hospitalOwnerMembership = await findMembership(ctx, hospitalOrgId, hospitalOwnerUserId);
+    const hospitalOwnerMembership = await findMembership(
+      ctx,
+      hospitalOrgId,
+      hospitalOwnerUserId,
+    );
     if (hospitalOwnerMembership === null) {
       await ctx.db.insert("organizationMemberships", {
         orgId: hospitalOrgId,
@@ -182,7 +193,10 @@ export const seedBaseEntities = internalMutation({
     }
 
     // --- Hospital staff 1 ---
-    let hospitalStaff1UserId = await findUserByEmail(ctx, HOSPITAL_STAFF_1.email);
+    let hospitalStaff1UserId = await findUserByEmail(
+      ctx,
+      HOSPITAL_STAFF_1.email,
+    );
     if (hospitalStaff1UserId === null) {
       hospitalStaff1UserId = await ctx.db.insert("users", {
         name: HOSPITAL_STAFF_1.name,
@@ -192,9 +206,15 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created hospital staff 1: ${HOSPITAL_STAFF_1.email}`);
     } else {
-      console.log(`Skipping hospital staff 1: already exists (${HOSPITAL_STAFF_1.email})`);
+      console.log(
+        `Skipping hospital staff 1: already exists (${HOSPITAL_STAFF_1.email})`,
+      );
     }
-    const staff1Membership = await findMembership(ctx, hospitalOrgId, hospitalStaff1UserId);
+    const staff1Membership = await findMembership(
+      ctx,
+      hospitalOrgId,
+      hospitalStaff1UserId,
+    );
     if (staff1Membership === null) {
       await ctx.db.insert("organizationMemberships", {
         orgId: hospitalOrgId,
@@ -203,13 +223,18 @@ export const seedBaseEntities = internalMutation({
         createdAt: now,
         updatedAt: now,
       });
-      console.log(`Created hospital staff 1 membership: ${HOSPITAL_STAFF_1.email}`);
+      console.log(
+        `Created hospital staff 1 membership: ${HOSPITAL_STAFF_1.email}`,
+      );
     } else {
       console.log(`Skipping hospital staff 1 membership: already exists`);
     }
 
     // --- Hospital staff 2 ---
-    let hospitalStaff2UserId = await findUserByEmail(ctx, HOSPITAL_STAFF_2.email);
+    let hospitalStaff2UserId = await findUserByEmail(
+      ctx,
+      HOSPITAL_STAFF_2.email,
+    );
     if (hospitalStaff2UserId === null) {
       hospitalStaff2UserId = await ctx.db.insert("users", {
         name: HOSPITAL_STAFF_2.name,
@@ -219,9 +244,15 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created hospital staff 2: ${HOSPITAL_STAFF_2.email}`);
     } else {
-      console.log(`Skipping hospital staff 2: already exists (${HOSPITAL_STAFF_2.email})`);
+      console.log(
+        `Skipping hospital staff 2: already exists (${HOSPITAL_STAFF_2.email})`,
+      );
     }
-    const staff2Membership = await findMembership(ctx, hospitalOrgId, hospitalStaff2UserId);
+    const staff2Membership = await findMembership(
+      ctx,
+      hospitalOrgId,
+      hospitalStaff2UserId,
+    );
     if (staff2Membership === null) {
       await ctx.db.insert("organizationMemberships", {
         orgId: hospitalOrgId,
@@ -230,7 +261,9 @@ export const seedBaseEntities = internalMutation({
         createdAt: now,
         updatedAt: now,
       });
-      console.log(`Created hospital staff 2 membership: ${HOSPITAL_STAFF_2.email}`);
+      console.log(
+        `Created hospital staff 2 membership: ${HOSPITAL_STAFF_2.email}`,
+      );
     } else {
       console.log(`Skipping hospital staff 2 membership: already exists`);
     }
@@ -246,9 +279,15 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created provider owner: ${PROVIDER_OWNER.email}`);
     } else {
-      console.log(`Skipping provider owner: already exists (${PROVIDER_OWNER.email})`);
+      console.log(
+        `Skipping provider owner: already exists (${PROVIDER_OWNER.email})`,
+      );
     }
-    const providerOwnerMembership = await findMembership(ctx, providerOrgId, providerOwnerUserId);
+    const providerOwnerMembership = await findMembership(
+      ctx,
+      providerOrgId,
+      providerOwnerUserId,
+    );
     if (providerOwnerMembership === null) {
       await ctx.db.insert("organizationMemberships", {
         orgId: providerOrgId,
@@ -263,7 +302,10 @@ export const seedBaseEntities = internalMutation({
     }
 
     // --- Provider technician ---
-    let providerTechUserId = await findUserByEmail(ctx, PROVIDER_TECHNICIAN.email);
+    let providerTechUserId = await findUserByEmail(
+      ctx,
+      PROVIDER_TECHNICIAN.email,
+    );
     if (providerTechUserId === null) {
       providerTechUserId = await ctx.db.insert("users", {
         name: PROVIDER_TECHNICIAN.name,
@@ -273,9 +315,15 @@ export const seedBaseEntities = internalMutation({
       });
       console.log(`Created provider technician: ${PROVIDER_TECHNICIAN.email}`);
     } else {
-      console.log(`Skipping provider technician: already exists (${PROVIDER_TECHNICIAN.email})`);
+      console.log(
+        `Skipping provider technician: already exists (${PROVIDER_TECHNICIAN.email})`,
+      );
     }
-    const providerTechMembership = await findMembership(ctx, providerOrgId, providerTechUserId);
+    const providerTechMembership = await findMembership(
+      ctx,
+      providerOrgId,
+      providerTechUserId,
+    );
     if (providerTechMembership === null) {
       await ctx.db.insert("organizationMemberships", {
         orgId: providerOrgId,
@@ -284,7 +332,9 @@ export const seedBaseEntities = internalMutation({
         createdAt: now,
         updatedAt: now,
       });
-      console.log(`Created provider technician membership: ${PROVIDER_TECHNICIAN.email}`);
+      console.log(
+        `Created provider technician membership: ${PROVIDER_TECHNICIAN.email}`,
+      );
     } else {
       console.log(`Skipping provider technician membership: already exists`);
     }
@@ -364,7 +414,8 @@ export const seedEquipmentData = internalMutation({
     }
 
     const categoryIdDiagnostic = categoryIdMap.get("diagnostic")!;
-    const categoryIdPatientMonitoring = categoryIdMap.get("patient_monitoring")!;
+    const categoryIdPatientMonitoring =
+      categoryIdMap.get("patient_monitoring")!;
     const categoryIdSurgical = categoryIdMap.get("surgical")!;
     const categoryIdMedicalIt = categoryIdMap.get("medical_it")!;
 
@@ -376,7 +427,11 @@ export const seedEquipmentData = internalMutation({
       // Resolve category
       const catId = categoryIdMap.get(equip.categoryKey)!;
 
-      let equipId = await findEquipmentBySerial(ctx, hospitalOrgId, equip.serialNumber);
+      let equipId = await findEquipmentBySerial(
+        ctx,
+        hospitalOrgId,
+        equip.serialNumber,
+      );
       if (equipId === null) {
         equipId = await ctx.db.insert("equipment", {
           nameVi: equip.nameVi,
@@ -399,7 +454,9 @@ export const seedEquipmentData = internalMutation({
         });
         console.log(`Created equipment: ${equip.nameEn} (${equip.status})`);
       } else {
-        console.log(`Skipping equipment: already exists (${equip.serialNumber})`);
+        console.log(
+          `Skipping equipment: already exists (${equip.serialNumber})`,
+        );
       }
 
       equipmentIds.push(equipId);
@@ -435,7 +492,9 @@ export const seedEquipmentData = internalMutation({
       // Check if this equipment already has a maintenance record to maintain idempotency
       const existingMaintenance = await ctx.db
         .query("maintenanceRecords")
-        .withIndex("by_equipment", (q) => q.eq("equipmentId", maintenanceEquipmentId!))
+        .withIndex("by_equipment", (q) =>
+          q.eq("equipmentId", maintenanceEquipmentId!),
+        )
         .filter((q) => q.eq(q.field("status"), "overdue"))
         .first();
 
@@ -487,7 +546,10 @@ export const seedProviderData = internalMutation({
   returns: v.object({
     providerId: v.id("providers"),
   }),
-  handler: async (ctx, { providerOrgId, providerOwnerUserId }): Promise<ProviderDataIds> => {
+  handler: async (
+    ctx,
+    { providerOrgId, providerOwnerUserId },
+  ): Promise<ProviderDataIds> => {
     const now = Date.now();
 
     // --- Provider profile ---
@@ -514,7 +576,9 @@ export const seedProviderData = internalMutation({
       });
       console.log(`Created provider profile: ${TECHMED_PROFILE.nameEn}`);
     } else {
-      console.log(`Skipping provider profile: already exists (${TECHMED_PROFILE.nameEn})`);
+      console.log(
+        `Skipping provider profile: already exists (${TECHMED_PROFILE.nameEn})`,
+      );
     }
 
     // --- Service offerings ---
@@ -539,7 +603,9 @@ export const seedProviderData = internalMutation({
         });
         console.log(`Created service offering: ${offering.specialty}`);
       } else {
-        console.log(`Skipping service offering: already exists (${offering.specialty})`);
+        console.log(
+          `Skipping service offering: already exists (${offering.specialty})`,
+        );
       }
     }
 
@@ -563,7 +629,8 @@ export const seedProviderData = internalMutation({
           createdAt: now,
           updatedAt: now,
         });
-        const expiredLabel = cert.expiresAt && cert.expiresAt < now ? " (EXPIRED)" : " (valid)";
+        const expiredLabel =
+          cert.expiresAt && cert.expiresAt < now ? " (EXPIRED)" : " (valid)";
         console.log(`Created certification: ${cert.nameEn}${expiredLabel}`);
       } else {
         console.log(`Skipping certification: already exists (${cert.nameEn})`);
@@ -609,12 +676,19 @@ export const seedConsumablesData = internalMutation({
   returns: v.object({
     consumableIds: v.array(v.id("consumables")),
   }),
-  handler: async (ctx, { hospitalOrgId }): Promise<{ consumableIds: Id<"consumables">[] }> => {
+  handler: async (
+    ctx,
+    { hospitalOrgId },
+  ): Promise<{ consumableIds: Id<"consumables">[] }> => {
     const now = Date.now();
     const consumableIds: Id<"consumables">[] = [];
 
     for (const consumable of ALL_SEED_CONSUMABLES) {
-      let consumableId = await findConsumableByName(ctx, hospitalOrgId, consumable.nameEn);
+      let consumableId = await findConsumableByName(
+        ctx,
+        hospitalOrgId,
+        consumable.nameEn,
+      );
       if (consumableId === null) {
         consumableId = await ctx.db.insert("consumables", {
           organizationId: hospitalOrgId,
@@ -636,7 +710,9 @@ export const seedConsumablesData = internalMutation({
         });
         console.log(`Created consumable: ${consumable.nameEn}`);
       } else {
-        console.log(`Skipping consumable: already exists (${consumable.nameEn})`);
+        console.log(
+          `Skipping consumable: already exists (${consumable.nameEn})`,
+        );
       }
       consumableIds.push(consumableId);
     }
@@ -708,7 +784,8 @@ export const seedServiceRequestData = internalMutation({
 
     // Insert service requests
     for (const request of ALL_SEED_SERVICE_REQUESTS) {
-      const equipmentId = equipmentIds[equipmentKeyToIndex[request.equipmentKey]];
+      const equipmentId =
+        equipmentIds[equipmentKeyToIndex[request.equipmentKey]];
       const requestedBy = userKeyMap[request.requestedByKey];
 
       // Idempotency: check by equipment + org + status combination
@@ -744,20 +821,26 @@ export const seedServiceRequestData = internalMutation({
         );
         requestIds.push(requestId);
       } else {
-        console.log(`Skipping service request: already exists (${request.status}/${request.type})`);
+        console.log(
+          `Skipping service request: already exists (${request.status}/${request.type})`,
+        );
         requestIds.push(existing._id);
       }
     }
 
     // --- Disputed service request: create dispute record ---
     // WHY: The disputed request needs a corresponding dispute entry in the disputes table
-    const disputedRequest = ALL_SEED_SERVICE_REQUESTS.find((r) => r.status === "disputed");
+    const disputedRequest = ALL_SEED_SERVICE_REQUESTS.find(
+      (r) => r.status === "disputed",
+    );
     if (disputedRequest !== null && disputedRequest !== undefined) {
       const disputedEquipmentId =
         equipmentIds[equipmentKeyToIndex[disputedRequest.equipmentKey]];
       const disputedRequestRecord = await ctx.db
         .query("serviceRequests")
-        .withIndex("by_equipment", (q) => q.eq("equipmentId", disputedEquipmentId))
+        .withIndex("by_equipment", (q) =>
+          q.eq("equipmentId", disputedEquipmentId),
+        )
         .filter((q) =>
           q.and(
             q.eq(q.field("organizationId"), hospitalOrgId),
@@ -807,12 +890,15 @@ export const seedServiceRequestData = internalMutation({
     };
 
     for (const quote of ALL_SEED_QUOTES) {
-      const serviceRequestId = requestIds[requestKeyToIndex[quote.serviceRequestKey]];
+      const serviceRequestId =
+        requestIds[requestKeyToIndex[quote.serviceRequestKey]];
 
       // Idempotency: check by service request + provider + status
       const existing = await ctx.db
         .query("quotes")
-        .withIndex("by_service_request", (q) => q.eq("serviceRequestId", serviceRequestId))
+        .withIndex("by_service_request", (q) =>
+          q.eq("serviceRequestId", serviceRequestId),
+        )
         .filter((q) =>
           q.and(
             q.eq(q.field("providerId"), providerId),
@@ -833,10 +919,14 @@ export const seedServiceRequestData = internalMutation({
           createdAt: now - 14 * 24 * 60 * 60 * 1000,
           updatedAt: now,
         });
-        console.log(`Created quote: ${quote.status} for ${quote.serviceRequestKey}`);
+        console.log(
+          `Created quote: ${quote.status} for ${quote.serviceRequestKey}`,
+        );
         quoteIds.push(quoteId);
       } else {
-        console.log(`Skipping quote: already exists (${quote.status}/${quote.serviceRequestKey})`);
+        console.log(
+          `Skipping quote: already exists (${quote.status}/${quote.serviceRequestKey})`,
+        );
         quoteIds.push(existing._id);
       }
     }
@@ -859,17 +949,27 @@ export default action({
     console.log("=".repeat(60));
 
     // Step 1: Base entities (users, orgs, memberships)
-    console.log("\n[1/5] Seeding base entities (users, organizations, memberships)...");
-    const baseIds = (await ctx.runMutation(internal.seed.seedBaseEntities, {})) as BaseEntityIds;
+    console.log(
+      "\n[1/5] Seeding base entities (users, organizations, memberships)...",
+    );
+    const baseIds = (await ctx.runMutation(
+      internal.seed.seedBaseEntities,
+      {},
+    )) as BaseEntityIds;
     console.log(`  ✓ Users: 6 | Orgs: 2 | Memberships: 5`);
 
     // Step 2: Equipment data (categories, equipment, QR codes)
-    console.log("\n[2/5] Seeding equipment data (categories, equipment, QR codes)...");
-    const equipmentData = (await ctx.runMutation(internal.seed.seedEquipmentData, {
-      hospitalOrgId: baseIds.hospitalOrgId,
-      adminUserId: baseIds.adminUserId,
-      hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
-    })) as EquipmentDataIds;
+    console.log(
+      "\n[2/5] Seeding equipment data (categories, equipment, QR codes)...",
+    );
+    const equipmentData = (await ctx.runMutation(
+      internal.seed.seedEquipmentData,
+      {
+        hospitalOrgId: baseIds.hospitalOrgId,
+        adminUserId: baseIds.adminUserId,
+        hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+      },
+    )) as EquipmentDataIds;
     console.log(
       `  ✓ Categories: 4 | Equipment: ${equipmentData.equipmentIds.length} | QR codes: ${equipmentData.equipmentIds.length}`,
     );
@@ -878,11 +978,16 @@ export default action({
     console.log(
       "\n[3/5] Seeding provider data (profile, offerings, certifications, coverage areas)...",
     );
-    const providerData = (await ctx.runMutation(internal.seed.seedProviderData, {
-      providerOrgId: baseIds.providerOrgId,
-      providerOwnerUserId: baseIds.providerOwnerUserId,
-    })) as ProviderDataIds;
-    console.log(`  ✓ Provider: 1 | Offerings: 3 | Certifications: 2 | Coverage areas: 2`);
+    const providerData = (await ctx.runMutation(
+      internal.seed.seedProviderData,
+      {
+        providerOrgId: baseIds.providerOrgId,
+        providerOwnerUserId: baseIds.providerOwnerUserId,
+      },
+    )) as ProviderDataIds;
+    console.log(
+      `  ✓ Provider: 1 | Offerings: 3 | Certifications: 2 | Coverage areas: 2`,
+    );
 
     // Step 4: Consumables
     console.log("\n[4/5] Seeding consumables...");
@@ -893,14 +998,17 @@ export default action({
 
     // Step 5: Service requests and quotes
     console.log("\n[5/5] Seeding service requests and quotes...");
-    const serviceData = (await ctx.runMutation(internal.seed.seedServiceRequestData, {
-      hospitalOrgId: baseIds.hospitalOrgId,
-      hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
-      hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
-      hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
-      providerId: providerData.providerId,
-      equipmentIds: equipmentData.equipmentIds,
-    })) as { requestIds: Id<"serviceRequests">[]; quoteIds: Id<"quotes">[] };
+    const serviceData = (await ctx.runMutation(
+      internal.seed.seedServiceRequestData,
+      {
+        hospitalOrgId: baseIds.hospitalOrgId,
+        hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+        hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+        hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
+        providerId: providerData.providerId,
+        equipmentIds: equipmentData.equipmentIds,
+      },
+    )) as { requestIds: Id<"serviceRequests">[]; quoteIds: Id<"quotes">[] };
     console.log(
       `  ✓ Service requests: ${serviceData.requestIds.length} | Quotes: ${serviceData.quoteIds.length}`,
     );
@@ -913,9 +1021,13 @@ export default action({
     console.log("\nSeed Summary:");
     console.log("  Organizations : 2 (SPMET Hospital + TechMed Provider)");
     console.log("  Users         : 6 (1 admin + 3 hospital + 2 provider)");
-    console.log("  Memberships   : 5 (1 owner + 2 member + 1 owner + 1 member)");
+    console.log(
+      "  Memberships   : 5 (1 owner + 2 member + 1 owner + 1 member)",
+    );
     console.log("  Categories    : 4 equipment categories");
-    console.log("  Equipment     : 12 items (6 available, 2 in_use, 2 maintenance, 1 damaged, 1 retired)");
+    console.log(
+      "  Equipment     : 12 items (6 available, 2 in_use, 2 maintenance, 1 damaged, 1 retired)",
+    );
     console.log("  QR Codes      : 12 (1 per equipment)");
     console.log("  Maintenance   : 1 overdue record (X-Ray machine)");
     console.log("  Provider      : 1 profile (TechMed, verified)");
@@ -923,7 +1035,9 @@ export default action({
     console.log("  Certifications: 2 (1 valid ISO 13485 + 1 expired)");
     console.log("  Coverage areas: 2 (HCMC + Binh Duong)");
     console.log("  Consumables   : 3 (gloves, ECG electrodes, disinfectant)");
-    console.log("  Service reqs  : 6 (pending/quoted/accepted/in_progress/completed/disputed)");
+    console.log(
+      "  Service reqs  : 6 (pending/quoted/accepted/in_progress/completed/disputed)",
+    );
     console.log("  Quotes        : 4 (pending/accepted/rejected/expired)");
     console.log("  Dispute       : 1 (quality dispute on disputed request)");
     console.log("\nRun again safely — seed is idempotent.");

@@ -1,14 +1,21 @@
 "use client";
 
-import { useState } from "react";
-
-import { useMutation } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { PlusIcon } from "lucide-react";
-import Link from "next/link";
-
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useState } from "react";
+import Link from "next/link";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
+import { PlusIcon } from "lucide-react";
+
+import { Button } from "@medilink/ui/button";
+
+import type { EquipmentFilters } from "~/features/equipment/types";
+import { EquipmentCard } from "~/features/equipment/components/equipment-card";
+import { EquipmentFiltersBar } from "~/features/equipment/components/equipment-filters";
+import { EquipmentTable } from "~/features/equipment/components/equipment-table";
+import { useEquipment } from "~/features/equipment/hooks/use-equipment";
+import { equipmentLabels } from "~/features/equipment/labels";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
 const equipmentApi = api.equipment as any;
@@ -16,15 +23,6 @@ const equipmentApi = api.equipment as any;
 // Pre-cast to avoid per-call unsafe-member-access errors
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 const updateStatusFn: FunctionReference<"mutation"> = equipmentApi.updateStatus;
-
-import { Button } from "@medilink/ui/button";
-
-import { EquipmentCard } from "~/features/equipment/components/equipment-card";
-import { EquipmentFiltersBar } from "~/features/equipment/components/equipment-filters";
-import { EquipmentTable } from "~/features/equipment/components/equipment-table";
-import { useEquipment } from "~/features/equipment/hooks/use-equipment";
-import { equipmentLabels } from "~/features/equipment/labels";
-import type { EquipmentFilters } from "~/features/equipment/types";
 
 /**
  * Hospital equipment list page.
@@ -46,7 +44,12 @@ export default function EquipmentListPage() {
 
   const updateStatusMutation = useMutation(updateStatusFn);
 
-  type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
+  type EquipmentStatus =
+    | "available"
+    | "in_use"
+    | "maintenance"
+    | "damaged"
+    | "retired";
 
   async function handleBulkUpdateStatus(ids: string[], newStatus: string) {
     await Promise.all(
@@ -74,7 +77,9 @@ export default function EquipmentListPage() {
         <Button asChild>
           <Link href="/hospital/equipment/new">
             <PlusIcon className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">{equipmentLabels.addEquipment.vi}</span>
+            <span className="hidden sm:inline">
+              {equipmentLabels.addEquipment.vi}
+            </span>
             <span className="sm:hidden">+</span>
           </Link>
         </Button>

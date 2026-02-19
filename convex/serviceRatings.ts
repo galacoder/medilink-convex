@@ -11,10 +11,11 @@
  */
 
 import { ConvexError, v } from "convex/values";
-import { mutation } from "./_generated/server";
+
 import type { Id } from "./_generated/dataModel";
-import { requireOrgAuth } from "./lib/auth";
+import { mutation } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
+import { requireOrgAuth } from "./lib/auth";
 
 // ---------------------------------------------------------------------------
 // Mutations
@@ -61,7 +62,10 @@ export const create = mutation({
       timeliness: args.timeliness,
       professionalism: args.professionalism,
     })) {
-      if (value !== undefined && (value < 1 || value > 5 || !Number.isInteger(value))) {
+      if (
+        value !== undefined &&
+        (value < 1 || value > 5 || !Number.isInteger(value))
+      ) {
         throw new ConvexError({
           message: `Điểm "${key}" phải là số nguyên từ 1 đến 5. (Sub-rating "${key}" must be an integer between 1 and 5.)`,
           code: "INVALID_RATING_VALUE",
@@ -75,8 +79,7 @@ export const create = mutation({
     const serviceRequest = await ctx.db.get(args.serviceRequestId);
     if (!serviceRequest) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -151,7 +154,8 @@ export const create = mutation({
       const oldAvg = provider.averageRating ?? 0;
       const newCount = oldCount + 1;
       // Compute new average, rounded to 2 decimal places
-      const newAvg = Math.round(((oldAvg * oldCount + args.rating) / newCount) * 100) / 100;
+      const newAvg =
+        Math.round(((oldAvg * oldCount + args.rating) / newCount) * 100) / 100;
       const completedServices = (provider.completedServices ?? 0) + 1;
 
       await ctx.db.patch(serviceRequest.assignedProviderId, {

@@ -1,9 +1,8 @@
 "use client";
 
+import type { Id } from "convex/_generated/dataModel";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-
-import type { Id } from "convex/_generated/dataModel";
 
 import { Skeleton } from "@medilink/ui/skeleton";
 
@@ -39,7 +38,7 @@ export default function EquipmentEditPage() {
 
   if (!equipment) {
     return (
-      <div className="text-muted-foreground text-center py-16">
+      <div className="text-muted-foreground py-16 text-center">
         Không tìm thấy thiết bị {/* Equipment not found */}
       </div>
     );
@@ -71,9 +70,7 @@ export default function EquipmentEditPage() {
         <h1 className="text-2xl font-semibold">
           {equipmentLabels.editEquipment.vi}
         </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {equipment.nameVi}
-        </p>
+        <p className="text-muted-foreground mt-1 text-sm">{equipment.nameVi}</p>
       </div>
 
       {/* Edit form */}

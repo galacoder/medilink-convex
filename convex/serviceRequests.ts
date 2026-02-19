@@ -11,14 +11,13 @@
  */
 
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+
 import type { Id } from "./_generated/dataModel";
-import { requireAuth, requireOrgAuth } from "./lib/auth";
-import {
-  canTransition,
-  type ServiceRequestStatus,
-} from "./lib/workflowStateMachine";
+import type { ServiceRequestStatus } from "./lib/workflowStateMachine";
+import { mutation, query } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
+import { requireAuth, requireOrgAuth } from "./lib/auth";
+import { canTransition } from "./lib/workflowStateMachine";
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -29,14 +28,24 @@ import { createAuditEntry } from "./lib/auditLog";
  * Throws a bilingual ConvexError if it does not.
  */
 async function assertHospitalOrg(
-  ctx: { db: { get: (id: Id<"organizations">) => Promise<{ org_type: string } | null> } },
+  ctx: {
+    db: {
+      get: (id: Id<"organizations">) => Promise<{ org_type: string } | null>;
+    };
+  },
   organizationId: Id<"organizations">,
-): Promise<{ org_type: "hospital" | "provider"; _id: Id<"organizations">; name: string; slug: string; createdAt: number; updatedAt: number }> {
+): Promise<{
+  org_type: "hospital" | "provider";
+  _id: Id<"organizations">;
+  name: string;
+  slug: string;
+  createdAt: number;
+  updatedAt: number;
+}> {
   const org = await ctx.db.get(organizationId);
   if (!org) {
     throw new ConvexError({
-      message:
-        "Không tìm thấy tổ chức. (Organization not found.)",
+      message: "Không tìm thấy tổ chức. (Organization not found.)",
       code: "ORG_NOT_FOUND",
     });
   }
@@ -47,14 +56,27 @@ async function assertHospitalOrg(
       code: "FORBIDDEN_ORG_TYPE",
     });
   }
-  return org as { org_type: "hospital" | "provider"; _id: Id<"organizations">; name: string; slug: string; createdAt: number; updatedAt: number };
+  return org as {
+    org_type: "hospital" | "provider";
+    _id: Id<"organizations">;
+    name: string;
+    slug: string;
+    createdAt: number;
+    updatedAt: number;
+  };
 }
 
 /**
  * Verifies that the given organizationId corresponds to a provider org.
  */
 async function assertProviderOrg(
-  ctx: { db: { get: (id: Id<"organizations">) => Promise<{ org_type: string; _id: Id<"organizations"> } | null> } },
+  ctx: {
+    db: {
+      get: (
+        id: Id<"organizations">,
+      ) => Promise<{ org_type: string; _id: Id<"organizations"> } | null>;
+    };
+  },
   organizationId: Id<"organizations">,
 ): Promise<void> {
   const org = await ctx.db.get(organizationId);
@@ -122,8 +144,7 @@ export const create = mutation({
     const equipment = await ctx.db.get(args.equipmentId);
     if (!equipment) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy thiết bị. (Equipment not found.)",
+        message: "Không tìm thấy thiết bị. (Equipment not found.)",
         code: "EQUIPMENT_NOT_FOUND",
       });
     }
@@ -188,8 +209,7 @@ export const cancel = mutation({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -264,8 +284,7 @@ export const updateStatus = mutation({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -466,7 +485,10 @@ export const listByProvider = query({
     const openStatuses: ServiceRequestStatus[] = ["pending", "quoted"];
     const openRequests: typeof assignedRequests = [];
 
-    if (!args.status || openStatuses.includes(args.status as ServiceRequestStatus)) {
+    if (
+      !args.status ||
+      openStatuses.includes(args.status as ServiceRequestStatus)
+    ) {
       // Get all coverage areas for this provider
       const coverageAreas = await ctx.db
         .query("coverageAreas")
@@ -546,8 +568,7 @@ export const getById = query({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -569,7 +590,10 @@ export const getById = query({
         }
         // Also allow access if the request is open (pending/quoted) — providers
         // should be able to see open requests to decide whether to quote
-        if (!isProviderAccess && ["pending", "quoted"].includes(request.status)) {
+        if (
+          !isProviderAccess &&
+          ["pending", "quoted"].includes(request.status)
+        ) {
           isProviderAccess = true;
         }
       }
@@ -588,11 +612,15 @@ export const getById = query({
       ctx.db.get(request.equipmentId),
       ctx.db
         .query("quotes")
-        .withIndex("by_service_request", (q) => q.eq("serviceRequestId", args.id))
+        .withIndex("by_service_request", (q) =>
+          q.eq("serviceRequestId", args.id),
+        )
         .collect(),
       ctx.db
         .query("serviceRatings")
-        .withIndex("by_service_request", (q) => q.eq("serviceRequestId", args.id))
+        .withIndex("by_service_request", (q) =>
+          q.eq("serviceRequestId", args.id),
+        )
         .first(),
       ctx.db.get(request.organizationId),
     ]);

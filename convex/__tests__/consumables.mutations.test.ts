@@ -4,9 +4,10 @@
  *
  * vi: "Kiểm tra tích hợp các đột biến vật tư tiêu hao" / en: "Consumables mutation integration tests"
  */
-import { ConvexError } from "convex/values";
 import { convexTest } from "convex-test";
+import { ConvexError } from "convex/values";
 import { describe, expect, it } from "vitest";
+
 import { api } from "../_generated/api";
 import schema from "../schema";
 
@@ -129,7 +130,9 @@ describe("consumables.create", () => {
     });
     const after = Date.now();
 
-    const consumable = await t.run(async (ctx) => ctx.db.get(consumableId as any));
+    const consumable = await t.run(async (ctx) =>
+      ctx.db.get(consumableId as any),
+    );
 
     expect(consumable).not.toBeNull();
     expect(consumable!.nameVi).toBe("Băng gạc y tế");
@@ -154,7 +157,9 @@ describe("consumables.create", () => {
       reorderPoint: 30,
     });
 
-    const consumable = await t.run(async (ctx) => ctx.db.get(consumableId as any));
+    const consumable = await t.run(async (ctx) =>
+      ctx.db.get(consumableId as any),
+    );
     expect(consumable!.organizationId).toBe(orgId);
   });
 
@@ -249,7 +254,10 @@ describe("consumables.recordUsage", () => {
     const userId = await seedUser(t);
     const consumableId = await seedConsumable(t, orgId, { currentStock: 100 });
 
-    const asOrg = t.withIdentity({ organizationId: orgId, email: "staff@spmet.edu.vn" });
+    const asOrg = t.withIdentity({
+      organizationId: orgId,
+      email: "staff@spmet.edu.vn",
+    });
     await asOrg.mutation(api.consumables.recordUsage, {
       consumableId: consumableId as any,
       quantity: 10,
@@ -264,8 +272,10 @@ describe("consumables.recordUsage", () => {
     const logs = await t.run(async (ctx) =>
       ctx.db
         .query("consumableUsageLog")
-        .withIndex("by_consumable", (q) => q.eq("consumableId", consumableId as any))
-        .collect()
+        .withIndex("by_consumable", (q) =>
+          q.eq("consumableId", consumableId as any),
+        )
+        .collect(),
     );
     expect(logs).toHaveLength(1);
     expect(logs[0].transactionType).toBe("USAGE");
@@ -313,8 +323,10 @@ describe("consumables.receiveStock", () => {
     const logs = await t.run(async (ctx) =>
       ctx.db
         .query("consumableUsageLog")
-        .withIndex("by_consumable", (q) => q.eq("consumableId", consumableId as any))
-        .collect()
+        .withIndex("by_consumable", (q) =>
+          q.eq("consumableId", consumableId as any),
+        )
+        .collect(),
     );
     expect(logs).toHaveLength(1);
     expect(logs[0].transactionType).toBe("RECEIVE");
@@ -342,7 +354,9 @@ describe("consumables.adjustStock", () => {
       notes: "Found extra stock",
     });
 
-    const afterPositive = await t.run(async (ctx) => ctx.db.get(consumableId as any));
+    const afterPositive = await t.run(async (ctx) =>
+      ctx.db.get(consumableId as any),
+    );
     expect(afterPositive!.currentStock).toBe(60);
 
     // Negative adjustment
@@ -353,17 +367,23 @@ describe("consumables.adjustStock", () => {
       notes: "Waste disposal",
     });
 
-    const afterNegative = await t.run(async (ctx) => ctx.db.get(consumableId as any));
+    const afterNegative = await t.run(async (ctx) =>
+      ctx.db.get(consumableId as any),
+    );
     expect(afterNegative!.currentStock).toBe(55);
 
     const logs = await t.run(async (ctx) =>
       ctx.db
         .query("consumableUsageLog")
-        .withIndex("by_consumable", (q) => q.eq("consumableId", consumableId as any))
-        .collect()
+        .withIndex("by_consumable", (q) =>
+          q.eq("consumableId", consumableId as any),
+        )
+        .collect(),
     );
     expect(logs).toHaveLength(2);
-    expect(logs.every((l: any) => l.transactionType === "ADJUSTMENT")).toBe(true);
+    expect(logs.every((l: any) => l.transactionType === "ADJUSTMENT")).toBe(
+      true,
+    );
   });
 });
 
@@ -378,12 +398,15 @@ describe("consumables.createReorderRequest", () => {
     const consumableId = await seedConsumable(t, orgId);
 
     const asOrg = t.withIdentity({ organizationId: orgId });
-    const requestId = await asOrg.mutation(api.consumables.createReorderRequest, {
-      consumableId: consumableId as any,
-      quantity: 50,
-      requestedBy: userId as any,
-      notes: "Running low",
-    });
+    const requestId = await asOrg.mutation(
+      api.consumables.createReorderRequest,
+      {
+        consumableId: consumableId as any,
+        quantity: 50,
+        requestedBy: userId as any,
+        notes: "Running low",
+      },
+    );
 
     const request = await t.run(async (ctx) => ctx.db.get(requestId as any));
     expect(request).not.toBeNull();
@@ -455,15 +478,19 @@ describe("consumables.updateReorderStatus", () => {
     });
 
     // Stock should be increased by the order quantity
-    const consumable = await t.run(async (ctx) => ctx.db.get(consumableId as any));
+    const consumable = await t.run(async (ctx) =>
+      ctx.db.get(consumableId as any),
+    );
     expect(consumable!.currentStock).toBe(60); // 10 + 50
 
     // Usage log entry should be created
     const logs = await t.run(async (ctx) =>
       ctx.db
         .query("consumableUsageLog")
-        .withIndex("by_consumable", (q) => q.eq("consumableId", consumableId as any))
-        .collect()
+        .withIndex("by_consumable", (q) =>
+          q.eq("consumableId", consumableId as any),
+        )
+        .collect(),
     );
     expect(logs).toHaveLength(1);
     expect(logs[0].transactionType).toBe("RECEIVE");

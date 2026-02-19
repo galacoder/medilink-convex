@@ -5,11 +5,7 @@ import { MoreHorizontalIcon } from "lucide-react";
 
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader } from "@medilink/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@medilink/ui/dropdown-menu";
 
-import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
+import { equipmentLabels } from "../labels";
 import { StatusBadge } from "./status-badge";
 
 interface EquipmentCardProps {
@@ -104,7 +100,8 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
             className={`border text-xs ${getCriticalityColor(equipment.criticality)}`}
           >
             {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-            {equipmentLabels.criticalityValues[equipment.criticality]?.vi ?? equipment.criticality}
+            {equipmentLabels.criticalityValues[equipment.criticality]?.vi ??
+              equipment.criticality}
           </Badge>
         </div>
 
@@ -113,7 +110,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
           {equipment.location && (
             <div className="text-muted-foreground flex items-center gap-1">
               <span>{equipmentLabels.location.vi}:</span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {equipment.location}
               </span>
             </div>
@@ -121,7 +118,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
           {equipment.serialNumber && (
             <div className="text-muted-foreground flex items-center gap-1">
               <span>{equipmentLabels.serialNumber.vi}:</span>
-              <span className="font-medium text-foreground font-mono">
+              <span className="text-foreground font-mono font-medium">
                 {equipment.serialNumber}
               </span>
             </div>
@@ -129,7 +126,7 @@ export function EquipmentCard({ equipment }: EquipmentCardProps) {
           {equipment.model && (
             <div className="text-muted-foreground flex items-center gap-1">
               <span>{equipmentLabels.model.vi}:</span>
-              <span className="font-medium text-foreground">
+              <span className="text-foreground font-medium">
                 {equipment.model}
               </span>
             </div>

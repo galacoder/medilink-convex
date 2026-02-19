@@ -108,54 +108,54 @@ Consumers are the primary end-users of each platform: students (ProX), hospital 
 
 #### ProX Consumer (Student)
 
-| Step | Action | Route | Convex Tables Accessed |
-|------|--------|-------|----------------------|
-| 1 | View dashboard with enrolled courses | `(member)/dashboard` | `enrollments`, `courses`, `progress` |
-| 2 | Browse course catalog | `(member)/courses` | `courses` (filtered by organizationId) |
-| 3 | View course details | `(member)/courses/[slug]` | `courses`, `lessons` |
-| 4 | Enroll in course | `(member)/courses/[slug]` (action) | `enrollments.create` |
-| 5 | Access lesson content | `(member)/courses/[slug]/lessons/[id]` | `lessons`, `progress` |
-| 6 | Track progress | `(member)/courses/[slug]` | `progress.update` |
-| 7 | Post in community | `(member)/community` | `posts.create`, `spaces` |
-| 8 | Comment on posts | `(member)/community/[postId]` | `comments.create` |
-| 9 | View achievements | `(member)/profile` | `userAchievements`, `achievements` |
-| 10 | Check leaderboard | `(member)/leaderboard` | `leaderboardEntries` |
-| 11 | Join groups | `(member)/groups/[id]` | `groupMembers.create` |
-| 12 | Receive notifications | Header bell icon | `notifications` (real-time) |
+| Step | Action                               | Route                                  | Convex Tables Accessed                 |
+| ---- | ------------------------------------ | -------------------------------------- | -------------------------------------- |
+| 1    | View dashboard with enrolled courses | `(member)/dashboard`                   | `enrollments`, `courses`, `progress`   |
+| 2    | Browse course catalog                | `(member)/courses`                     | `courses` (filtered by organizationId) |
+| 3    | View course details                  | `(member)/courses/[slug]`              | `courses`, `lessons`                   |
+| 4    | Enroll in course                     | `(member)/courses/[slug]` (action)     | `enrollments.create`                   |
+| 5    | Access lesson content                | `(member)/courses/[slug]/lessons/[id]` | `lessons`, `progress`                  |
+| 6    | Track progress                       | `(member)/courses/[slug]`              | `progress.update`                      |
+| 7    | Post in community                    | `(member)/community`                   | `posts.create`, `spaces`               |
+| 8    | Comment on posts                     | `(member)/community/[postId]`          | `comments.create`                      |
+| 9    | View achievements                    | `(member)/profile`                     | `userAchievements`, `achievements`     |
+| 10   | Check leaderboard                    | `(member)/leaderboard`                 | `leaderboardEntries`                   |
+| 11   | Join groups                          | `(member)/groups/[id]`                 | `groupMembers.create`                  |
+| 12   | Receive notifications                | Header bell icon                       | `notifications` (real-time)            |
 
 #### MediLink Consumer (Hospital Staff)
 
-| Step | Action | Route | Convex Tables Accessed |
-|------|--------|-------|----------------------|
-| 1 | View dashboard with equipment status | `(member)/dashboard` | `equipment` (by organizationId) |
-| 2 | Browse equipment inventory | `(member)/equipment` | `equipment`, `equipmentCategory` |
-| 3 | View equipment details + history | `(member)/equipment/[id]` | `equipment`, `equipmentHistory`, `maintenanceRecord` |
-| 4 | Scan QR code on equipment | `(member)/equipment` (camera) | `qrCode` -> navigate to equipment detail |
-| 5 | Submit service request | `(member)/service-requests/new` | `serviceRequest.create` |
-| 6 | Track service request status | `(member)/service-requests/[id]` | `serviceRequest`, `serviceQuote`, `serviceRequestHistory` |
-| 7 | Compare provider quotes | `(member)/service-requests/[id]` | `serviceQuote` (multiple per request) |
-| 8 | Rate completed service | `(member)/service-requests/[id]` | `serviceRating.create` |
-| 9 | View consumable supply levels | `(member)/consumables` | `consumable` (by equipmentId) |
-| 10 | Submit support ticket | `(member)/support/new` | `supportTicket.create` |
-| 11 | Create dispute | `(member)/service-requests/[id]` | `dispute.create` |
-| 12 | Chat with AI copilot | Floating chat button | `aiConversation` |
-| 13 | Receive notifications | Header bell icon | `notification` (real-time) |
+| Step | Action                               | Route                            | Convex Tables Accessed                                    |
+| ---- | ------------------------------------ | -------------------------------- | --------------------------------------------------------- |
+| 1    | View dashboard with equipment status | `(member)/dashboard`             | `equipment` (by organizationId)                           |
+| 2    | Browse equipment inventory           | `(member)/equipment`             | `equipment`, `equipmentCategory`                          |
+| 3    | View equipment details + history     | `(member)/equipment/[id]`        | `equipment`, `equipmentHistory`, `maintenanceRecord`      |
+| 4    | Scan QR code on equipment            | `(member)/equipment` (camera)    | `qrCode` -> navigate to equipment detail                  |
+| 5    | Submit service request               | `(member)/service-requests/new`  | `serviceRequest.create`                                   |
+| 6    | Track service request status         | `(member)/service-requests/[id]` | `serviceRequest`, `serviceQuote`, `serviceRequestHistory` |
+| 7    | Compare provider quotes              | `(member)/service-requests/[id]` | `serviceQuote` (multiple per request)                     |
+| 8    | Rate completed service               | `(member)/service-requests/[id]` | `serviceRating.create`                                    |
+| 9    | View consumable supply levels        | `(member)/consumables`           | `consumable` (by equipmentId)                             |
+| 10   | Submit support ticket                | `(member)/support/new`           | `supportTicket.create`                                    |
+| 11   | Create dispute                       | `(member)/service-requests/[id]` | `dispute.create`                                          |
+| 12   | Chat with AI copilot                 | Floating chat button             | `aiConversation`                                          |
+| 13   | Receive notifications                | Header bell icon                 | `notification` (real-time)                                |
 
 #### PalX Consumer (Personal User)
 
-| Step | Action | Route | Convex Tables Accessed |
-|------|--------|-------|----------------------|
-| 1 | View dashboard | `(member)/dashboard` | `conversations`, `usageTracking` |
-| 2 | Start conversation with AI | `(member)/chat` | `conversations.create` |
-| 3 | Send message | `(member)/chat/[id]` | `messages.create` |
-| 4 | Browse knowledge base | `(member)/knowledge` | `knowledgeBase` (by category) |
-| 5 | Bookmark knowledge | `(member)/knowledge/[id]` | `userKnowledge.create` |
-| 6 | View YAML flows | `(member)/flows` | `yamlFlows`, `flowTriggers` |
-| 7 | Manage connections | `(member)/connections` | `appConnections`, `oauthCredentials` |
-| 8 | Track spending | `(member)/spending` | `spending` |
-| 9 | Manage habits | `(member)/habits` | `habits` |
-| 10 | View usage | `(member)/settings/billing` | `usageTracking` |
-| 11 | Check notifications | Header bell icon | `notifications` (real-time) |
+| Step | Action                     | Route                       | Convex Tables Accessed               |
+| ---- | -------------------------- | --------------------------- | ------------------------------------ |
+| 1    | View dashboard             | `(member)/dashboard`        | `conversations`, `usageTracking`     |
+| 2    | Start conversation with AI | `(member)/chat`             | `conversations.create`               |
+| 3    | Send message               | `(member)/chat/[id]`        | `messages.create`                    |
+| 4    | Browse knowledge base      | `(member)/knowledge`        | `knowledgeBase` (by category)        |
+| 5    | Bookmark knowledge         | `(member)/knowledge/[id]`   | `userKnowledge.create`               |
+| 6    | View YAML flows            | `(member)/flows`            | `yamlFlows`, `flowTriggers`          |
+| 7    | Manage connections         | `(member)/connections`      | `appConnections`, `oauthCredentials` |
+| 8    | Track spending             | `(member)/spending`         | `spending`                           |
+| 9    | Manage habits              | `(member)/habits`           | `habits`                             |
+| 10   | View usage                 | `(member)/settings/billing` | `usageTracking`                      |
+| 11   | Check notifications        | Header bell icon            | `notifications` (real-time)          |
 
 ### 1.3 Account Management Flow
 
@@ -254,33 +254,33 @@ Producers are users who create and manage content or services: instructors (ProX
 
 ### 2.2 Content Management Flow (ProX Instructor)
 
-| Step | Action | Route | Convex Operations |
-|------|--------|-------|------------------|
-| 1 | View my courses | `(admin)/courses/manage` | `courses.listByInstructor(organizationId, instructorId)` |
-| 2 | View enrollment analytics | `(admin)/courses/manage/[id]/analytics` | `analyticsEvent.query`, `enrollments.countByCourse` |
-| 3 | Edit published course | `(admin)/courses/manage/[id]/edit` | `courses.update` (preserves existing enrollments) |
-| 4 | Manage lesson ordering | `(admin)/courses/manage/[id]/lessons` | `lessons.reorder` (batch update order field) |
-| 5 | View student progress | `(admin)/courses/manage/[id]/students` | `enrollments.listByCourse`, `progress.listByCourse` |
-| 6 | Archive course | `(admin)/courses/manage/[id]` | `courses.update({ isPublished: false })` |
+| Step | Action                    | Route                                   | Convex Operations                                        |
+| ---- | ------------------------- | --------------------------------------- | -------------------------------------------------------- |
+| 1    | View my courses           | `(admin)/courses/manage`                | `courses.listByInstructor(organizationId, instructorId)` |
+| 2    | View enrollment analytics | `(admin)/courses/manage/[id]/analytics` | `analyticsEvent.query`, `enrollments.countByCourse`      |
+| 3    | Edit published course     | `(admin)/courses/manage/[id]/edit`      | `courses.update` (preserves existing enrollments)        |
+| 4    | Manage lesson ordering    | `(admin)/courses/manage/[id]/lessons`   | `lessons.reorder` (batch update order field)             |
+| 5    | View student progress     | `(admin)/courses/manage/[id]/students`  | `enrollments.listByCourse`, `progress.listByCourse`      |
+| 6    | Archive course            | `(admin)/courses/manage/[id]`           | `courses.update({ isPublished: false })`                 |
 
 ### 2.3 Equipment Administration Flow (MediLink Admin)
 
-| Step | Action | Route | Convex Operations |
-|------|--------|-------|------------------|
-| 1 | View equipment dashboard | `(admin)/dashboard` | `equipment.listByOrganization`, status aggregation |
-| 2 | Add new equipment | `(admin)/equipment/new` | `equipment.create({ organizationId, ... })` |
-| 3 | Edit equipment details | `(admin)/equipment/[id]/edit` | `equipment.update` |
-| 4 | Manage categories | `(admin)/equipment/categories` | `equipmentCategory.create/update/delete` |
-| 5 | Schedule maintenance | `(admin)/equipment/[id]/maintenance` | `maintenanceRecord.create({ equipmentId, scheduledDate })` |
-| 6 | Report equipment failure | `(admin)/equipment/[id]/failure` | `failureReport.create({ equipmentId, severity })` |
-| 7 | Generate QR codes | `(admin)/equipment/[id]` | `qrCode.create({ equipmentId, code })` |
-| 8 | Manage service requests | `(admin)/service-requests` | `serviceRequest.listByOrganization`, status filters |
-| 9 | Assign providers | `(admin)/service-requests/[id]` | `serviceRequest.assignProvider(providerId)` |
-| 10 | Approve/reject quotes | `(admin)/service-requests/[id]/quotes` | `serviceQuote.approve/reject` |
-| 11 | Manage providers | `(admin)/providers` | `provider.create/update/updateStatus` |
-| 12 | View audit trail | `(admin)/audit-log` | `auditLog.list({ organizationId, filters })` |
-| 13 | Build automation recipes | `(admin)/automation/new` | `automationRecipe.create({ trigger, conditions, actions })` |
-| 14 | View analytics | `(admin)/analytics` | Equipment counts, service request volume, provider ratings |
+| Step | Action                   | Route                                  | Convex Operations                                           |
+| ---- | ------------------------ | -------------------------------------- | ----------------------------------------------------------- |
+| 1    | View equipment dashboard | `(admin)/dashboard`                    | `equipment.listByOrganization`, status aggregation          |
+| 2    | Add new equipment        | `(admin)/equipment/new`                | `equipment.create({ organizationId, ... })`                 |
+| 3    | Edit equipment details   | `(admin)/equipment/[id]/edit`          | `equipment.update`                                          |
+| 4    | Manage categories        | `(admin)/equipment/categories`         | `equipmentCategory.create/update/delete`                    |
+| 5    | Schedule maintenance     | `(admin)/equipment/[id]/maintenance`   | `maintenanceRecord.create({ equipmentId, scheduledDate })`  |
+| 6    | Report equipment failure | `(admin)/equipment/[id]/failure`       | `failureReport.create({ equipmentId, severity })`           |
+| 7    | Generate QR codes        | `(admin)/equipment/[id]`               | `qrCode.create({ equipmentId, code })`                      |
+| 8    | Manage service requests  | `(admin)/service-requests`             | `serviceRequest.listByOrganization`, status filters         |
+| 9    | Assign providers         | `(admin)/service-requests/[id]`        | `serviceRequest.assignProvider(providerId)`                 |
+| 10   | Approve/reject quotes    | `(admin)/service-requests/[id]/quotes` | `serviceQuote.approve/reject`                               |
+| 11   | Manage providers         | `(admin)/providers`                    | `provider.create/update/updateStatus`                       |
+| 12   | View audit trail         | `(admin)/audit-log`                    | `auditLog.list({ organizationId, filters })`                |
+| 13   | Build automation recipes | `(admin)/automation/new`               | `automationRecipe.create({ trigger, conditions, actions })` |
+| 14   | View analytics           | `(admin)/analytics`                    | Equipment counts, service request volume, provider ratings  |
 
 ### 2.4 Service Request Lifecycle (MediLink)
 
@@ -304,6 +304,7 @@ Producers are users who create and manage content or services: instructors (ProX
 ```
 
 Tables involved per state transition:
+
 - `serviceRequest` (status field updated)
 - `serviceRequestHistory` (audit entry created per transition)
 - `serviceQuote` (created when provider quotes)
@@ -417,16 +418,16 @@ Platform Admin Dashboard: (super)/
 
 ### 3.3 Admin Role Comparison by Project
 
-| Capability | ProX Admin | MediLink Admin | PalX Admin |
-|-----------|-----------|---------------|-----------|
-| Member management | Invite students, instructors | Invite hospital staff | Invite team members |
-| Content management | Manage all courses | Manage equipment, providers | Manage knowledge base |
-| Analytics | Enrollment, revenue, engagement | Equipment, service requests, providers | Usage, conversations |
-| Billing | Membership tiers | Org plan management | User tier management |
-| Automation | Course event triggers | Equipment/service event triggers | N/A |
-| Audit log | Minimal (future) | Comprehensive (M2-6) | Minimal (future) |
-| Route group | `(admin)/` | `(admin)/` | `(admin)/` |
-| Minimum role | owner, admin, instructor | owner, admin | owner, admin |
+| Capability         | ProX Admin                      | MediLink Admin                         | PalX Admin            |
+| ------------------ | ------------------------------- | -------------------------------------- | --------------------- |
+| Member management  | Invite students, instructors    | Invite hospital staff                  | Invite team members   |
+| Content management | Manage all courses              | Manage equipment, providers            | Manage knowledge base |
+| Analytics          | Enrollment, revenue, engagement | Equipment, service requests, providers | Usage, conversations  |
+| Billing            | Membership tiers                | Org plan management                    | User tier management  |
+| Automation         | Course event triggers           | Equipment/service event triggers       | N/A                   |
+| Audit log          | Minimal (future)                | Comprehensive (M2-6)                   | Minimal (future)      |
+| Route group        | `(admin)/`                      | `(admin)/`                             | `(admin)/`            |
+| Minimum role       | owner, admin, instructor        | owner, admin                           | owner, admin          |
 
 ---
 
@@ -459,11 +460,10 @@ export default defineSchema({
     name: v.string(),
     image: v.optional(v.string()),
     bio: v.optional(v.string()),
-    organizationId: v.optional(v.id("organizations")),  // Active org
-    platformRole: v.optional(v.union(
-      v.literal("platform_admin"),
-      v.literal("platform_support")
-    )),
+    organizationId: v.optional(v.id("organizations")), // Active org
+    platformRole: v.optional(
+      v.union(v.literal("platform_admin"), v.literal("platform_support")),
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -498,8 +498,7 @@ export default defineSchema({
     value: v.string(),
     expiresAt: v.number(),
     createdAt: v.number(),
-  })
-    .index("by_identifier", ["identifier"]),
+  }).index("by_identifier", ["identifier"]),
 
   // ============================================================
   // MULTI-TENANCY TABLES
@@ -510,22 +509,24 @@ export default defineSchema({
     name: v.string(),
     slug: v.string(),
     ownerId: v.id("user"),
-    plan: v.union(
-      v.literal("free"),
-      v.literal("pro"),
-      v.literal("enterprise")
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
+    settings: v.optional(
+      v.object({
+        branding: v.optional(
+          v.object({
+            logoUrl: v.optional(v.string()),
+            primaryColor: v.optional(v.string()),
+          }),
+        ),
+        features: v.optional(
+          v.object({
+            communityEnabled: v.optional(v.boolean()),
+            gamificationEnabled: v.optional(v.boolean()),
+            salesFunnelEnabled: v.optional(v.boolean()),
+          }),
+        ),
+      }),
     ),
-    settings: v.optional(v.object({
-      branding: v.optional(v.object({
-        logoUrl: v.optional(v.string()),
-        primaryColor: v.optional(v.string()),
-      })),
-      features: v.optional(v.object({
-        communityEnabled: v.optional(v.boolean()),
-        gamificationEnabled: v.optional(v.boolean()),
-        salesFunnelEnabled: v.optional(v.boolean()),
-      })),
-    })),
     createdAt: v.number(),
   })
     .index("by_slug", ["slug"])
@@ -539,7 +540,7 @@ export default defineSchema({
       v.literal("admin"),
       v.literal("instructor"),
       v.literal("member"),
-      v.literal("guest")
+      v.literal("guest"),
     ),
     invitedBy: v.optional(v.id("user")),
     joinedAt: v.number(),
@@ -565,10 +566,10 @@ export default defineSchema({
       v.literal("free"),
       v.literal("starter"),
       v.literal("pro"),
-      v.literal("vip")
+      v.literal("vip"),
     ),
     isPublished: v.boolean(),
-    estimatedDuration: v.optional(v.number()),  // minutes
+    estimatedDuration: v.optional(v.number()), // minutes
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -581,15 +582,13 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     courseId: v.id("courses"),
     title: v.string(),
-    content: v.string(),               // Rich text / markdown
-    mediaUrl: v.optional(v.string()),   // Video/image URL
-    mediaType: v.optional(v.union(
-      v.literal("video"),
-      v.literal("image"),
-      v.literal("document")
-    )),
+    content: v.string(), // Rich text / markdown
+    mediaUrl: v.optional(v.string()), // Video/image URL
+    mediaType: v.optional(
+      v.union(v.literal("video"), v.literal("image"), v.literal("document")),
+    ),
     order: v.number(),
-    estimatedDuration: v.optional(v.number()),  // minutes
+    estimatedDuration: v.optional(v.number()), // minutes
     createdAt: v.number(),
   })
     .index("by_organization", ["organizationId"])
@@ -610,7 +609,7 @@ export default defineSchema({
     status: v.union(
       v.literal("active"),
       v.literal("completed"),
-      v.literal("dropped")
+      v.literal("dropped"),
     ),
   })
     .index("by_organization", ["organizationId"])
@@ -624,7 +623,7 @@ export default defineSchema({
     courseId: v.id("courses"),
     lessonId: v.id("lessons"),
     completedAt: v.optional(v.number()),
-    progressPercent: v.number(),        // 0-100
+    progressPercent: v.number(), // 0-100
     lastAccessedAt: v.number(),
   })
     .index("by_organization", ["organizationId"])
@@ -638,18 +637,18 @@ export default defineSchema({
 
   membershipTiers: defineTable({
     organizationId: v.id("organizations"),
-    name: v.string(),                    // FREE, STARTER, PRO, VIP
+    name: v.string(), // FREE, STARTER, PRO, VIP
     slug: v.string(),
-    price: v.number(),                   // cents (0 for free)
+    price: v.number(), // cents (0 for free)
     interval: v.union(
       v.literal("monthly"),
       v.literal("yearly"),
-      v.literal("lifetime")
+      v.literal("lifetime"),
     ),
-    features: v.array(v.string()),       // Feature descriptions
-    maxCourses: v.optional(v.number()),   // null = unlimited
+    features: v.array(v.string()), // Feature descriptions
+    maxCourses: v.optional(v.number()), // null = unlimited
     isActive: v.boolean(),
-    order: v.number(),                    // Display order
+    order: v.number(), // Display order
     createdAt: v.number(),
   })
     .index("by_organization", ["organizationId"])
@@ -664,7 +663,7 @@ export default defineSchema({
       v.literal("active"),
       v.literal("canceled"),
       v.literal("past_due"),
-      v.literal("trialing")
+      v.literal("trialing"),
     ),
     currentPeriodStart: v.number(),
     currentPeriodEnd: v.number(),
@@ -687,7 +686,7 @@ export default defineSchema({
     type: v.union(
       v.literal("general"),
       v.literal("course"),
-      v.literal("study_group")
+      v.literal("study_group"),
     ),
     isPublic: v.boolean(),
     createdBy: v.id("user"),
@@ -716,7 +715,7 @@ export default defineSchema({
   comments: defineTable({
     organizationId: v.id("organizations"),
     postId: v.id("posts"),
-    parentId: v.optional(v.id("comments")),  // Nested replies
+    parentId: v.optional(v.id("comments")), // Nested replies
     authorId: v.id("user"),
     content: v.string(),
     createdAt: v.number(),
@@ -733,7 +732,7 @@ export default defineSchema({
       v.literal("like"),
       v.literal("love"),
       v.literal("fire"),
-      v.literal("clap")
+      v.literal("clap"),
     ),
     createdAt: v.number(),
   })
@@ -750,13 +749,12 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     name: v.string(),
     description: v.string(),
-    spaceId: v.optional(v.id("spaces")),  // Link to community space
+    spaceId: v.optional(v.id("spaces")), // Link to community space
     createdBy: v.id("user"),
     isPublic: v.boolean(),
     maxMembers: v.optional(v.number()),
     createdAt: v.number(),
-  })
-    .index("by_organization", ["organizationId"]),
+  }).index("by_organization", ["organizationId"]),
 
   groupMembers: defineTable({
     organizationId: v.id("organizations"),
@@ -775,7 +773,7 @@ export default defineSchema({
   // ============================================================
 
   achievements: defineTable({
-    organizationId: v.optional(v.id("organizations")),  // null = global
+    organizationId: v.optional(v.id("organizations")), // null = global
     name: v.string(),
     description: v.string(),
     icon: v.string(),
@@ -783,9 +781,9 @@ export default defineSchema({
       v.literal("course_completion"),
       v.literal("community_participation"),
       v.literal("streak"),
-      v.literal("milestone")
+      v.literal("milestone"),
     ),
-    threshold: v.number(),              // e.g., complete 5 courses
+    threshold: v.number(), // e.g., complete 5 courses
     points: v.number(),
     isActive: v.boolean(),
     createdAt: v.number(),
@@ -798,7 +796,7 @@ export default defineSchema({
     userId: v.id("user"),
     achievementId: v.id("achievements"),
     earnedAt: v.number(),
-    progress: v.number(),               // 0-100 for in-progress
+    progress: v.number(), // 0-100 for in-progress
   })
     .index("by_organization", ["organizationId"])
     .index("by_user", ["organizationId", "userId"])
@@ -807,12 +805,12 @@ export default defineSchema({
   leaderboardEntries: defineTable({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
-    spaceId: v.optional(v.id("spaces")),  // null = org-wide leaderboard
+    spaceId: v.optional(v.id("spaces")), // null = org-wide leaderboard
     points: v.number(),
     period: v.union(
       v.literal("weekly"),
       v.literal("monthly"),
-      v.literal("alltime")
+      v.literal("alltime"),
     ),
     periodStart: v.number(),
     updatedAt: v.number(),
@@ -827,7 +825,7 @@ export default defineSchema({
   // ============================================================
 
   linchpinLinks: defineTable({
-    organizationId: v.optional(v.id("organizations")),  // null = user-owned
+    organizationId: v.optional(v.id("organizations")), // null = user-owned
     userId: v.id("user"),
     title: v.string(),
     url: v.string(),
@@ -852,11 +850,11 @@ export default defineSchema({
       v.literal("community_mention"),
       v.literal("achievement_earned"),
       v.literal("enrollment_confirmed"),
-      v.literal("system_announcement")
+      v.literal("system_announcement"),
     ),
     title: v.string(),
     message: v.string(),
-    entityType: v.optional(v.string()),   // "course", "post", etc.
+    entityType: v.optional(v.string()), // "course", "post", etc.
     entityId: v.optional(v.string()),
     isRead: v.boolean(),
     createdAt: v.number(),
@@ -873,7 +871,7 @@ export default defineSchema({
   analyticsEvents: defineTable({
     organizationId: v.id("organizations"),
     userId: v.optional(v.id("user")),
-    eventType: v.string(),               // "page_view", "enrollment", "lesson_complete"
+    eventType: v.string(), // "page_view", "enrollment", "lesson_complete"
     entityType: v.optional(v.string()),
     entityId: v.optional(v.string()),
     metadata: v.optional(v.any()),
@@ -896,24 +894,23 @@ export default defineSchema({
       v.literal("offer"),
       v.literal("checkout"),
       v.literal("upsell"),
-      v.literal("thank_you")
+      v.literal("thank_you"),
     ),
     order: v.number(),
-    config: v.optional(v.any()),         // Stage-specific configuration
+    config: v.optional(v.any()), // Stage-specific configuration
     isActive: v.boolean(),
     createdAt: v.number(),
-  })
-    .index("by_organization", ["organizationId"]),
+  }).index("by_organization", ["organizationId"]),
 
   salesFunnelConversions: defineTable({
     organizationId: v.id("organizations"),
     stageId: v.id("salesFunnelStages"),
     userId: v.optional(v.id("user")),
-    visitorId: v.optional(v.string()),   // Anonymous tracking
+    visitorId: v.optional(v.string()), // Anonymous tracking
     action: v.union(
       v.literal("view"),
       v.literal("click"),
-      v.literal("convert")
+      v.literal("convert"),
     ),
     createdAt: v.number(),
   })
@@ -933,18 +930,20 @@ export default defineSchema({
       v.literal("course_completion"),
       v.literal("membership_change"),
       v.literal("community_post"),
-      v.literal("scheduled")
+      v.literal("scheduled"),
     ),
-    conditions: v.optional(v.any()),     // Condition tree
-    actions: v.array(v.object({
-      type: v.union(
-        v.literal("send_notification"),
-        v.literal("send_email"),
-        v.literal("update_field"),
-        v.literal("add_to_group")
-      ),
-      config: v.any(),
-    })),
+    conditions: v.optional(v.any()), // Condition tree
+    actions: v.array(
+      v.object({
+        type: v.union(
+          v.literal("send_notification"),
+          v.literal("send_email"),
+          v.literal("update_field"),
+          v.literal("add_to_group"),
+        ),
+        config: v.any(),
+      }),
+    ),
     isActive: v.boolean(),
     createdAt: v.number(),
   })
@@ -958,7 +957,7 @@ export default defineSchema({
     status: v.union(
       v.literal("running"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
     result: v.optional(v.any()),
     error: v.optional(v.string()),
@@ -981,7 +980,7 @@ export default defineSchema({
       v.literal("article"),
       v.literal("video"),
       v.literal("document"),
-      v.literal("resource")
+      v.literal("resource"),
     ),
     authorId: v.id("user"),
     isPublished: v.boolean(),
@@ -1023,10 +1022,9 @@ export default defineSchema({
     name: v.string(),
     image: v.optional(v.string()),
     organizationId: v.optional(v.id("organizations")),
-    platformRole: v.optional(v.union(
-      v.literal("platform_admin"),
-      v.literal("platform_support")
-    )),
+    platformRole: v.optional(
+      v.union(v.literal("platform_admin"), v.literal("platform_support")),
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -1061,8 +1059,7 @@ export default defineSchema({
     value: v.string(),
     expiresAt: v.number(),
     createdAt: v.number(),
-  })
-    .index("by_identifier", ["identifier"]),
+  }).index("by_identifier", ["identifier"]),
 
   // ============================================================
   // MULTI-TENANCY TABLES (Hospitals as organizations)
@@ -1070,14 +1067,10 @@ export default defineSchema({
   // ============================================================
 
   organizations: defineTable({
-    name: v.string(),                    // Hospital name
+    name: v.string(), // Hospital name
     slug: v.string(),
     ownerId: v.id("user"),
-    plan: v.union(
-      v.literal("free"),
-      v.literal("pro"),
-      v.literal("enterprise")
-    ),
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
     address: v.optional(v.string()),
     phone: v.optional(v.string()),
     createdAt: v.number(),
@@ -1089,11 +1082,11 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
     role: v.union(
-      v.literal("owner"),       // Clinic owner
-      v.literal("admin"),       // Clinic admin
-      v.literal("instructor"),  // Doctor/Provider
-      v.literal("member"),      // Hospital staff
-      v.literal("guest")        // Family member / visitor
+      v.literal("owner"), // Clinic owner
+      v.literal("admin"), // Clinic admin
+      v.literal("instructor"), // Doctor/Provider
+      v.literal("member"), // Hospital staff
+      v.literal("guest"), // Family member / visitor
     ),
     invitedBy: v.optional(v.id("user")),
     joinedAt: v.number(),
@@ -1117,13 +1110,13 @@ export default defineSchema({
       v.literal("operational"),
       v.literal("maintenance"),
       v.literal("out_of_service"),
-      v.literal("decommissioned")
+      v.literal("decommissioned"),
     ),
     location: v.optional(v.string()),
     department: v.optional(v.string()),
     purchaseDate: v.optional(v.number()),
     warrantyExpiry: v.optional(v.number()),
-    specifications: v.optional(v.any()),   // Equipment-specific metadata
+    specifications: v.optional(v.any()), // Equipment-specific metadata
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -1145,7 +1138,7 @@ export default defineSchema({
   equipmentHistory: defineTable({
     organizationId: v.id("organizations"),
     equipmentId: v.id("equipment"),
-    action: v.string(),                  // "status_change", "maintenance", "transfer"
+    action: v.string(), // "status_change", "maintenance", "transfer"
     previousStatus: v.optional(v.string()),
     newStatus: v.optional(v.string()),
     performedBy: v.id("user"),
@@ -1162,18 +1155,18 @@ export default defineSchema({
       v.literal("preventive"),
       v.literal("corrective"),
       v.literal("calibration"),
-      v.literal("inspection")
+      v.literal("inspection"),
     ),
     scheduledDate: v.number(),
     completedDate: v.optional(v.number()),
     performedBy: v.optional(v.id("user")),
     notes: v.optional(v.string()),
-    cost: v.optional(v.number()),        // cents
+    cost: v.optional(v.number()), // cents
     status: v.union(
       v.literal("scheduled"),
       v.literal("in_progress"),
       v.literal("completed"),
-      v.literal("overdue")
+      v.literal("overdue"),
     ),
     createdAt: v.number(),
   })
@@ -1190,7 +1183,7 @@ export default defineSchema({
       v.literal("low"),
       v.literal("medium"),
       v.literal("high"),
-      v.literal("critical")
+      v.literal("critical"),
     ),
     description: v.string(),
     resolution: v.optional(v.string()),
@@ -1217,7 +1210,7 @@ export default defineSchema({
       v.literal("low"),
       v.literal("medium"),
       v.literal("high"),
-      v.literal("urgent")
+      v.literal("urgent"),
     ),
     status: v.union(
       v.literal("pending"),
@@ -1225,7 +1218,7 @@ export default defineSchema({
       v.literal("approved"),
       v.literal("in_progress"),
       v.literal("completed"),
-      v.literal("cancelled")
+      v.literal("cancelled"),
     ),
     assignedProviderId: v.optional(v.id("providers")),
     approvedQuoteId: v.optional(v.id("serviceQuotes")),
@@ -1243,14 +1236,14 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     serviceRequestId: v.id("serviceRequests"),
     providerId: v.id("providers"),
-    amount: v.number(),                  // cents
-    currency: v.string(),               // "USD", "VND"
+    amount: v.number(), // cents
+    currency: v.string(), // "USD", "VND"
     estimatedDays: v.number(),
     description: v.string(),
     status: v.union(
       v.literal("pending"),
       v.literal("approved"),
-      v.literal("rejected")
+      v.literal("rejected"),
     ),
     createdAt: v.number(),
   })
@@ -1262,7 +1255,7 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     serviceRequestId: v.id("serviceRequests"),
     userId: v.id("user"),
-    rating: v.number(),                  // 1-5
+    rating: v.number(), // 1-5
     comment: v.optional(v.string()),
     createdAt: v.number(),
   })
@@ -1296,7 +1289,7 @@ export default defineSchema({
     status: v.union(
       v.literal("active"),
       v.literal("inactive"),
-      v.literal("suspended")
+      v.literal("suspended"),
     ),
     averageRating: v.optional(v.number()),
     totalJobs: v.number(),
@@ -1314,7 +1307,7 @@ export default defineSchema({
   qrCodes: defineTable({
     organizationId: v.id("organizations"),
     equipmentId: v.id("equipment"),
-    code: v.string(),                    // Unique QR code value
+    code: v.string(), // Unique QR code value
     generatedAt: v.number(),
   })
     .index("by_organization", ["organizationId"])
@@ -1331,7 +1324,7 @@ export default defineSchema({
     equipmentId: v.optional(v.id("equipment")),
     name: v.string(),
     quantity: v.number(),
-    unit: v.string(),                    // "pcs", "ml", "kg"
+    unit: v.string(), // "pcs", "ml", "kg"
     reorderLevel: v.number(),
     supplier: v.optional(v.string()),
     lastRestockedAt: v.optional(v.number()),
@@ -1355,7 +1348,7 @@ export default defineSchema({
       v.literal("open"),
       v.literal("under_review"),
       v.literal("resolved"),
-      v.literal("rejected")
+      v.literal("rejected"),
     ),
     resolution: v.optional(v.string()),
     resolvedBy: v.optional(v.id("user")),
@@ -1380,13 +1373,9 @@ export default defineSchema({
       v.literal("open"),
       v.literal("in_progress"),
       v.literal("resolved"),
-      v.literal("closed")
+      v.literal("closed"),
     ),
-    priority: v.union(
-      v.literal("low"),
-      v.literal("medium"),
-      v.literal("high")
-    ),
+    priority: v.union(v.literal("low"), v.literal("medium"), v.literal("high")),
     assignedTo: v.optional(v.id("user")),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -1403,10 +1392,10 @@ export default defineSchema({
   auditLog: defineTable({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
-    action: v.string(),                  // "create", "update", "delete"
-    entityType: v.string(),             // "equipment", "serviceRequest", etc.
+    action: v.string(), // "create", "update", "delete"
+    entityType: v.string(), // "equipment", "serviceRequest", etc.
     entityId: v.string(),
-    metadata: v.optional(v.any()),       // Before/after state
+    metadata: v.optional(v.any()), // Before/after state
     createdAt: v.number(),
   })
     .index("by_organization", ["organizationId"])
@@ -1428,7 +1417,7 @@ export default defineSchema({
       v.literal("maintenance_due"),
       v.literal("low_stock"),
       v.literal("dispute_update"),
-      v.literal("system_announcement")
+      v.literal("system_announcement"),
     ),
     title: v.string(),
     message: v.string(),
@@ -1443,14 +1432,12 @@ export default defineSchema({
 
   notificationTemplates: defineTable({
     organizationId: v.id("organizations"),
-    type: v.string(),                    // Matches notification type
+    type: v.string(), // Matches notification type
     subject: v.string(),
-    bodyTemplate: v.string(),            // Template with {{variables}}
-    channels: v.array(v.union(
-      v.literal("in_app"),
-      v.literal("email"),
-      v.literal("push")
-    )),
+    bodyTemplate: v.string(), // Template with {{variables}}
+    channels: v.array(
+      v.union(v.literal("in_app"), v.literal("email"), v.literal("push")),
+    ),
     isActive: v.boolean(),
     createdAt: v.number(),
   })
@@ -1471,22 +1458,26 @@ export default defineSchema({
       v.literal("service_request_created"),
       v.literal("maintenance_due"),
       v.literal("low_stock"),
-      v.literal("scheduled")
+      v.literal("scheduled"),
     ),
-    conditions: v.optional(v.object({
-      field: v.optional(v.string()),
-      operator: v.optional(v.string()),
-      value: v.optional(v.any()),
-    })),
-    actions: v.array(v.object({
-      type: v.union(
-        v.literal("send_notification"),
-        v.literal("update_status"),
-        v.literal("create_audit_log"),
-        v.literal("send_email")
-      ),
-      config: v.any(),
-    })),
+    conditions: v.optional(
+      v.object({
+        field: v.optional(v.string()),
+        operator: v.optional(v.string()),
+        value: v.optional(v.any()),
+      }),
+    ),
+    actions: v.array(
+      v.object({
+        type: v.union(
+          v.literal("send_notification"),
+          v.literal("update_status"),
+          v.literal("create_audit_log"),
+          v.literal("send_email"),
+        ),
+        config: v.any(),
+      }),
+    ),
     isActive: v.boolean(),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -1498,11 +1489,11 @@ export default defineSchema({
   automationExecutions: defineTable({
     organizationId: v.id("organizations"),
     recipeId: v.id("automationRecipes"),
-    triggeredBy: v.optional(v.string()),  // Entity that triggered
+    triggeredBy: v.optional(v.string()), // Entity that triggered
     status: v.union(
       v.literal("running"),
       v.literal("completed"),
-      v.literal("failed")
+      v.literal("failed"),
     ),
     result: v.optional(v.any()),
     error: v.optional(v.string()),
@@ -1521,11 +1512,13 @@ export default defineSchema({
   aiConversations: defineTable({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
-    messages: v.array(v.object({
-      role: v.union(v.literal("user"), v.literal("assistant")),
-      content: v.string(),
-      timestamp: v.number(),
-    })),
+    messages: v.array(
+      v.object({
+        role: v.union(v.literal("user"), v.literal("assistant")),
+        content: v.string(),
+        timestamp: v.number(),
+      }),
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -1559,13 +1552,13 @@ export default defineSchema({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
     serviceRequestId: v.optional(v.id("serviceRequests")),
-    amount: v.number(),                  // cents
+    amount: v.number(), // cents
     currency: v.string(),
     status: v.union(
       v.literal("pending"),
       v.literal("completed"),
       v.literal("failed"),
-      v.literal("refunded")
+      v.literal("refunded"),
     ),
     stripePaymentId: v.optional(v.string()),
     createdAt: v.number(),
@@ -1604,12 +1597,13 @@ export default defineSchema({
     name: v.string(),
     image: v.optional(v.string()),
     bio: v.optional(v.string()),
-    tier: v.union(                       // Retained for billing compatibility
+    tier: v.union(
+      // Retained for billing compatibility
       v.literal("free"),
       v.literal("paid"),
-      v.literal("admin")
+      v.literal("admin"),
     ),
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-02)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-02)
     stripeCustomerId: v.optional(v.string()),
     subscriptionStatus: v.optional(v.string()),
     subscriptionPlan: v.optional(v.string()),
@@ -1621,7 +1615,7 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_email", ["email"])
-    .index("by_organization", ["organizationId"])          // NEW (P6-02)
+    .index("by_organization", ["organizationId"]) // NEW (P6-02)
     .index("by_stripe_customer", ["stripeCustomerId"]),
 
   session: defineTable({
@@ -1659,8 +1653,7 @@ export default defineSchema({
     expiresAt: v.number(),
     createdAt: v.number(),
     updatedAt: v.number(),
-  })
-    .index("by_identifier", ["identifier"]),
+  }).index("by_identifier", ["identifier"]),
 
   // ============================================================
   // MULTI-TENANCY TABLES (NEW -- P6-01)
@@ -1669,11 +1662,7 @@ export default defineSchema({
   organizations: defineTable({
     name: v.string(),
     slug: v.string(),
-    plan: v.union(
-      v.literal("free"),
-      v.literal("pro"),
-      v.literal("enterprise")
-    ),
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
     ownerId: v.id("user"),
     createdAt: v.number(),
   })
@@ -1683,11 +1672,7 @@ export default defineSchema({
   organizationMemberships: defineTable({
     organizationId: v.id("organizations"),
     userId: v.id("user"),
-    role: v.union(
-      v.literal("owner"),
-      v.literal("admin"),
-      v.literal("member")
-    ),
+    role: v.union(v.literal("owner"), v.literal("admin"), v.literal("member")),
     invitedAt: v.number(),
     joinedAt: v.optional(v.number()),
   })
@@ -1701,24 +1686,21 @@ export default defineSchema({
   // ============================================================
 
   knowledgeBase: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (null = public)
+    organizationId: v.optional(v.id("organizations")), // NEW (null = public)
     frameworkId: v.string(),
-    category: v.union(
-      v.literal("warriorx"),
-      v.literal("busos")
-    ),
+    category: v.union(v.literal("warriorx"), v.literal("busos")),
     subcategory: v.string(),
     title: v.string(),
     content: v.string(),
     keyTakeaways: v.optional(v.array(v.string())),
     tags: v.optional(v.array(v.string())),
-    embedding: v.optional(v.array(v.float64())),           // RAG vector
+    embedding: v.optional(v.array(v.float64())), // RAG vector
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_category", ["category"])
     .index("by_framework_id", ["frameworkId"])
-    .index("by_organization", ["organizationId"])          // NEW (P6-03)
+    .index("by_organization", ["organizationId"]) // NEW (P6-03)
     .index("by_tags", ["tags"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
@@ -1743,19 +1725,16 @@ export default defineSchema({
   // ============================================================
 
   yamlFlows: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (null = public)
+    organizationId: v.optional(v.id("organizations")), // NEW (null = public)
     flowId: v.string(),
     name: v.string(),
-    category: v.union(
-      v.literal("warriorx"),
-      v.literal("busos")
-    ),
+    category: v.union(v.literal("warriorx"), v.literal("busos")),
     description: v.string(),
     yamlContent: v.string(),
     status: v.union(
       v.literal("draft"),
       v.literal("active"),
-      v.literal("archived")
+      v.literal("archived"),
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -1763,14 +1742,14 @@ export default defineSchema({
     .index("by_flow_id", ["flowId"])
     .index("by_status", ["status"])
     .index("by_category", ["category"])
-    .index("by_organization", ["organizationId"]),          // NEW (P6-03)
+    .index("by_organization", ["organizationId"]), // NEW (P6-03)
 
   flowTriggers: defineTable({
     flowId: v.id("yamlFlows"),
     triggerType: v.union(
       v.literal("schedule"),
       v.literal("event"),
-      v.literal("manual")
+      v.literal("manual"),
     ),
     config: v.any(),
     isActive: v.boolean(),
@@ -1785,7 +1764,7 @@ export default defineSchema({
   // ============================================================
 
   routerAnalytics: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-04)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-04)
     userId: v.id("user"),
     route: v.string(),
     category: v.optional(v.string()),
@@ -1794,20 +1773,17 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   contentCurations: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-04)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-04)
     contentType: v.union(
       v.literal("article"),
       v.literal("video"),
       v.literal("podcast"),
-      v.literal("book")
+      v.literal("book"),
     ),
-    category: v.union(
-      v.literal("warriorx"),
-      v.literal("busos")
-    ),
+    category: v.union(v.literal("warriorx"), v.literal("busos")),
     title: v.string(),
     url: v.optional(v.string()),
     summary: v.optional(v.string()),
@@ -1817,7 +1793,7 @@ export default defineSchema({
   })
     .index("by_category", ["category"])
     .index("by_curator", ["curatedBy"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   // ============================================================
   // NOTIFICATIONS (Notifications plugin -> packages/notifications/)
@@ -1825,13 +1801,13 @@ export default defineSchema({
   // ============================================================
 
   notifications: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-04)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-04)
     userId: v.id("user"),
     type: v.union(
       v.literal("system"),
       v.literal("achievement"),
       v.literal("reminder"),
-      v.literal("social")
+      v.literal("social"),
     ),
     title: v.string(),
     message: v.string(),
@@ -1841,7 +1817,7 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_unread", ["userId", "isRead"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   // ============================================================
   // USAGE TRACKING (Billing plugin -> packages/billing/)
@@ -1849,16 +1825,16 @@ export default defineSchema({
   // ============================================================
 
   usageTracking: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
     feature: v.string(),
     tokensUsed: v.number(),
-    date: v.string(),                    // "YYYY-MM-DD"
+    date: v.string(), // "YYYY-MM-DD"
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
     .index("by_date", ["userId", "date"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   // ============================================================
   // CHAT (Conversation plugin -> packages/conversation/)
@@ -1866,32 +1842,29 @@ export default defineSchema({
   // ============================================================
 
   conversations: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
     title: v.string(),
-    category: v.optional(v.union(
-      v.literal("warriorx"),
-      v.literal("busos"),
-      v.literal("general")
-    )),
+    category: v.optional(
+      v.union(v.literal("warriorx"), v.literal("busos"), v.literal("general")),
+    ),
     isArchived: v.boolean(),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   messages: defineTable({
     conversationId: v.id("conversations"),
     role: v.union(v.literal("user"), v.literal("assistant")),
     content: v.string(),
-    metadata: v.optional(v.any()),       // Tool calls, citations
+    metadata: v.optional(v.any()), // Tool calls, citations
     createdAt: v.number(),
-  })
-    .index("by_conversation", ["conversationId"]),
+  }).index("by_conversation", ["conversationId"]),
 
   chatbotState: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
     currentFlowId: v.optional(v.string()),
     flowStep: v.optional(v.number()),
@@ -1899,7 +1872,7 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   // ============================================================
   // CONNECTIONS (Connections plugin -> packages/connections/)
@@ -1907,13 +1880,13 @@ export default defineSchema({
   // ============================================================
 
   appConnections: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
-    provider: v.string(),                // "google", "apple", "prox"
+    provider: v.string(), // "google", "apple", "prox"
     status: v.union(
       v.literal("connected"),
       v.literal("disconnected"),
-      v.literal("error")
+      v.literal("error"),
     ),
     lastSyncAt: v.optional(v.number()),
     createdAt: v.number(),
@@ -1921,7 +1894,7 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_provider", ["userId", "provider"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   oauthCredentials: defineTable({
     userId: v.id("user"),
@@ -1943,28 +1916,28 @@ export default defineSchema({
   // ============================================================
 
   spending: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
     category: v.string(),
     amount: v.number(),
     currency: v.string(),
-    date: v.string(),                    // "YYYY-MM-DD"
+    date: v.string(), // "YYYY-MM-DD"
     description: v.optional(v.string()),
-    source: v.optional(v.string()),      // "manual", "google_sheets", etc.
+    source: v.optional(v.string()), // "manual", "google_sheets", etc.
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
     .index("by_date", ["userId", "date"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   habits: defineTable({
-    organizationId: v.optional(v.id("organizations")),     // NEW (P6-05)
+    organizationId: v.optional(v.id("organizations")), // NEW (P6-05)
     userId: v.id("user"),
     name: v.string(),
     frequency: v.union(
       v.literal("daily"),
       v.literal("weekly"),
-      v.literal("monthly")
+      v.literal("monthly"),
     ),
     targetCount: v.number(),
     currentStreak: v.number(),
@@ -1974,7 +1947,7 @@ export default defineSchema({
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_organization", ["organizationId"]),          // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 });
 ```
 
@@ -2051,7 +2024,7 @@ import { betterAuth } from "better-auth";
 import { organization } from "better-auth/plugins";
 
 export const auth = betterAuth({
-  database: convexAdapter,   // Convex adapter (PalX pattern)
+  database: convexAdapter, // Convex adapter (PalX pattern)
   plugins: [
     organization({
       roles: {
@@ -2080,9 +2053,7 @@ export const auth = betterAuth({
           ],
         },
         guest: {
-          permissions: [
-            "read:content",
-          ],
+          permissions: ["read:content"],
         },
       },
     }),
@@ -2125,31 +2096,32 @@ guest             -- Limited access, invited by a member. View-only for specific
 
 ### Permission Matrix
 
-| Permission | owner | admin | instructor | member | guest |
-|-----------|-------|-------|------------|--------|-------|
-| View content | Y | Y | Y | Y | Y |
-| Create content | Y | Y | Y | - | - |
-| Edit own content | Y | Y | Y | - | - |
-| Edit any content | Y | Y | - | - | - |
-| Delete content | Y | Y | - | - | - |
-| Manage members | Y | Y | - | - | - |
-| Change member roles | Y | Y | - | - | - |
-| Manage settings | Y | Y | - | - | - |
-| View analytics | Y | Y | Y | - | - |
-| Manage billing | Y | - | - | - | - |
-| Delete organization | Y | - | - | - | - |
-| Manage automation | Y | Y | - | - | - |
-| View audit log | Y | Y | - | - | - |
-| Post in community | Y | Y | Y | Y | - |
-| Manage own profile | Y | Y | Y | Y | Y |
+| Permission          | owner | admin | instructor | member | guest |
+| ------------------- | ----- | ----- | ---------- | ------ | ----- |
+| View content        | Y     | Y     | Y          | Y      | Y     |
+| Create content      | Y     | Y     | Y          | -      | -     |
+| Edit own content    | Y     | Y     | Y          | -      | -     |
+| Edit any content    | Y     | Y     | -          | -      | -     |
+| Delete content      | Y     | Y     | -          | -      | -     |
+| Manage members      | Y     | Y     | -          | -      | -     |
+| Change member roles | Y     | Y     | -          | -      | -     |
+| Manage settings     | Y     | Y     | -          | -      | -     |
+| View analytics      | Y     | Y     | Y          | -      | -     |
+| Manage billing      | Y     | -     | -          | -      | -     |
+| Delete organization | Y     | -     | -          | -      | -     |
+| Manage automation   | Y     | Y     | -          | -      | -     |
+| View audit log      | Y     | Y     | -          | -      | -     |
+| Post in community   | Y     | Y     | Y          | Y      | -     |
+| Manage own profile  | Y     | Y     | Y          | Y      | Y     |
 
 ### RBAC Implementation Pattern (Convex)
 
 ```typescript
 // convex/lib/rbac.ts
 
-import { QueryCtx, MutationCtx } from "./_generated/server";
 import { ConvexError } from "convex/values";
+
+import { MutationCtx, QueryCtx } from "./_generated/server";
 
 type Role = "owner" | "admin" | "instructor" | "member" | "guest";
 
@@ -2183,14 +2155,14 @@ export async function requireAuth(ctx: QueryCtx | MutationCtx) {
 export async function requireOrgRole(
   ctx: QueryCtx | MutationCtx,
   organizationId: Id<"organizations">,
-  minimumRole: Role
+  minimumRole: Role,
 ) {
   const user = await requireAuth(ctx);
 
   const membership = await ctx.db
     .query("organizationMembers")
     .withIndex("by_org_user", (q) =>
-      q.eq("organizationId", organizationId).eq("userId", user._id)
+      q.eq("organizationId", organizationId).eq("userId", user._id),
     )
     .first();
 
@@ -2234,7 +2206,7 @@ export const createCourse = mutation({
     const { user } = await requireOrgRole(
       ctx,
       args.organizationId,
-      "instructor"
+      "instructor",
     );
 
     return await ctx.db.insert("courses", {
@@ -2254,13 +2226,13 @@ export const createCourse = mutation({
 
 ### Route Group Access Control
 
-| Route Group | Required Auth | Middleware Check |
-|-------------|--------------|-----------------|
-| `(auth)/` | None | Public routes |
-| `(marketing)/` | None | Public routes |
-| `(member)/` | Session cookie | `requireAuth()` |
-| `(admin)/` | Session + org role | `requireOrgRole(orgId, "instructor")` |
-| `(super)/` | Session + platformRole + IP + MFA | `requirePlatformAdmin()` + IP allowlist |
+| Route Group    | Required Auth                     | Middleware Check                        |
+| -------------- | --------------------------------- | --------------------------------------- |
+| `(auth)/`      | None                              | Public routes                           |
+| `(marketing)/` | None                              | Public routes                           |
+| `(member)/`    | Session cookie                    | `requireAuth()`                         |
+| `(admin)/`     | Session + org role                | `requireOrgRole(orgId, "instructor")`   |
+| `(super)/`     | Session + platformRole + IP + MFA | `requirePlatformAdmin()` + IP allowlist |
 
 ---
 
@@ -2282,7 +2254,7 @@ export const listCourses = query({
     return await ctx.db
       .query("courses")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId)
+        q.eq("organizationId", args.organizationId),
       )
       .filter((q) => q.eq(q.field("isPublished"), true))
       .collect();
@@ -2317,9 +2289,9 @@ export const listKnowledge = query({
           q.eq(q.field("category"), args.category),
           q.or(
             q.eq(q.field("organizationId"), user.organizationId),
-            q.eq(q.field("organizationId"), undefined)  // Public content
-          )
-        )
+            q.eq(q.field("organizationId"), undefined), // Public content
+          ),
+        ),
       )
       .collect();
   },
@@ -2328,11 +2300,11 @@ export const listKnowledge = query({
 
 ### Multi-Tenancy Compliance Status
 
-| Project | Status | Coverage | Migration Required |
-|---------|--------|---------|-------------------|
-| **ProX** | COMPLIANT (by design) | 100% planned | None (pre-implementation) |
-| **MediLink** | COMPLIANT (by design) | 100% planned | None (pre-implementation, Postgres to Convex covers it) |
-| **PalX** | NON-COMPLIANT | 0% (0/17 tables) | Yes: P6-01 through P6-10, 6-8 hours |
+| Project      | Status                | Coverage         | Migration Required                                      |
+| ------------ | --------------------- | ---------------- | ------------------------------------------------------- |
+| **ProX**     | COMPLIANT (by design) | 100% planned     | None (pre-implementation)                               |
+| **MediLink** | COMPLIANT (by design) | 100% planned     | None (pre-implementation, Postgres to Convex covers it) |
+| **PalX**     | NON-COMPLIANT         | 0% (0/17 tables) | Yes: P6-01 through P6-10, 6-8 hours                     |
 
 ### PalX Migration Checklist
 
@@ -2372,28 +2344,29 @@ Application Error Boundary (root layout)
 
 ### API Error Patterns
 
-| HTTP Code | Convex Equivalent | Cause | User-Facing Message |
-|-----------|-------------------|-------|-------------------|
-| 400 | ConvexError("Invalid input") | Validation failed | "Please check your input and try again" |
-| 401 | ConvexError("Not authenticated") | No session | Redirect to sign-in |
-| 403 | ConvexError("Insufficient permissions") | Wrong role | "You don't have permission to do this" |
-| 404 | ConvexError("Not found") | Entity missing | "This item was not found" |
-| 429 | ConvexError("Rate limited") | Too many requests | "Please slow down and try again" |
-| 500 | Unhandled error | Server error | "Something went wrong. We've been notified." |
+| HTTP Code | Convex Equivalent                       | Cause             | User-Facing Message                          |
+| --------- | --------------------------------------- | ----------------- | -------------------------------------------- |
+| 400       | ConvexError("Invalid input")            | Validation failed | "Please check your input and try again"      |
+| 401       | ConvexError("Not authenticated")        | No session        | Redirect to sign-in                          |
+| 403       | ConvexError("Insufficient permissions") | Wrong role        | "You don't have permission to do this"       |
+| 404       | ConvexError("Not found")                | Entity missing    | "This item was not found"                    |
+| 429       | ConvexError("Rate limited")             | Too many requests | "Please slow down and try again"             |
+| 500       | Unhandled error                         | Server error      | "Something went wrong. We've been notified." |
 
 ### User Notification System
 
-| Channel | Implementation | Projects |
-|---------|---------------|----------|
-| **Toast notifications** | shadcn/ui Sonner (success, error, info, warning) | All |
-| **In-app notification center** | Convex real-time subscription on `notifications` table | ProX, MediLink |
-| **Email notifications** | React Email templates via Convex actions | MediLink (M3-3) |
-| **Push notifications** | Expo push (PalX mobile) | PalX |
-| **Bell icon badge** | Real-time unread count via Convex subscription | ProX, MediLink |
+| Channel                        | Implementation                                         | Projects        |
+| ------------------------------ | ------------------------------------------------------ | --------------- |
+| **Toast notifications**        | shadcn/ui Sonner (success, error, info, warning)       | All             |
+| **In-app notification center** | Convex real-time subscription on `notifications` table | ProX, MediLink  |
+| **Email notifications**        | React Email templates via Convex actions               | MediLink (M3-3) |
+| **Push notifications**         | Expo push (PalX mobile)                                | PalX            |
+| **Bell icon badge**            | Real-time unread count via Convex subscription         | ProX, MediLink  |
 
 ### Notification Types by Project
 
 **ProX:**
+
 - `course_update` -- New lesson, course published
 - `community_mention` -- Mentioned in post/comment
 - `achievement_earned` -- Badge unlocked
@@ -2401,6 +2374,7 @@ Application Error Boundary (root layout)
 - `system_announcement` -- Platform-wide announcements
 
 **MediLink:**
+
 - `equipment_status` -- Status change (operational, maintenance, out of service)
 - `service_request_update` -- Status transition (pending, quoted, approved, etc.)
 - `maintenance_due` -- Upcoming scheduled maintenance
@@ -2408,6 +2382,7 @@ Application Error Boundary (root layout)
 - `dispute_update` -- Dispute status change
 
 **PalX:**
+
 - `system` -- System updates, maintenance windows
 - `achievement` -- WarriorX/BusOS milestone completed
 - `reminder` -- Scheduled flow triggers
@@ -2437,16 +2412,17 @@ Application Error Boundary (root layout)
 
 ### Test Coverage Targets
 
-| Category | ProX | MediLink | PalX |
-|----------|------|----------|------|
-| Unit tests (Convex functions) | 100+ | 80+ | 50+ |
-| Integration tests (multi-tenancy, RBAC) | 30+ | 40+ | 20+ |
-| E2E tests (Playwright) | 30-40 | 20-30 | 10-15 |
-| VRT screenshots | 50-80 | 30-50 | 10-20 |
+| Category                                | ProX  | MediLink | PalX  |
+| --------------------------------------- | ----- | -------- | ----- |
+| Unit tests (Convex functions)           | 100+  | 80+      | 50+   |
+| Integration tests (multi-tenancy, RBAC) | 30+   | 40+      | 20+   |
+| E2E tests (Playwright)                  | 30-40 | 20-30    | 10-15 |
+| VRT screenshots                         | 50-80 | 30-50    | 10-20 |
 
 ### Critical Test Scenarios
 
 **Multi-Tenancy Data Isolation (all projects):**
+
 ```typescript
 test("user in Org A cannot see Org B courses", async () => {
   // Create two organizations
@@ -2461,24 +2437,26 @@ test("user in Org A cannot see Org B courses", async () => {
 
   // Org A should NOT see Org B's course
   expect(courses).not.toContainEqual(
-    expect.objectContaining({ _id: course._id })
+    expect.objectContaining({ _id: course._id }),
   );
 });
 ```
 
 **RBAC Permission Check:**
+
 ```typescript
 test("member cannot create course", async () => {
   const org = await createOrg("Test Org");
   const member = await createUser("member@test.com", org, "member");
 
-  await expect(
-    createCourse(org, "New Course", { as: member })
-  ).rejects.toThrow("Requires instructor role or higher");
+  await expect(createCourse(org, "New Course", { as: member })).rejects.toThrow(
+    "Requires instructor role or higher",
+  );
 });
 ```
 
 **Authentication Flow (E2E):**
+
 ```typescript
 test("sign up -> verify email -> access dashboard", async ({ page }) => {
   await page.goto("/sign-up");
@@ -2506,34 +2484,34 @@ test("sign up -> verify email -> access dashboard", async ({ page }) => {
 
 ### Common Tables (Identical Schema Across All 3 Projects)
 
-| Table | Fields | Purpose |
-|-------|--------|---------|
-| `user` | email, name, image, organizationId, platformRole | User identity |
-| `session` | userId, token, expiresAt | Session management |
-| `account` | userId, providerId, accountId | OAuth accounts |
-| `verification` | identifier, value, expiresAt | Email verification tokens |
-| `organizations` | name, slug, ownerId, plan | Multi-tenancy entity |
-| `organizationMembers` | organizationId, userId, role | Role assignment |
+| Table                 | Fields                                           | Purpose                   |
+| --------------------- | ------------------------------------------------ | ------------------------- |
+| `user`                | email, name, image, organizationId, platformRole | User identity             |
+| `session`             | userId, token, expiresAt                         | Session management        |
+| `account`             | userId, providerId, accountId                    | OAuth accounts            |
+| `verification`        | identifier, value, expiresAt                     | Email verification tokens |
+| `organizations`       | name, slug, ownerId, plan                        | Multi-tenancy entity      |
+| `organizationMembers` | organizationId, userId, role                     | Role assignment           |
 
 These 6 tables have identical structure across ProX, MediLink, and PalX, enabling future extraction into a shared `@sangletech/auth` package.
 
 ### Shared Packages (Future Extraction)
 
-| Package | Source | Shared By | Purpose |
-|---------|--------|-----------|---------|
-| `@sangletech/auth` | Better Auth config + Convex adapter | All 3 | Authentication + session management |
-| `@sangletech/rbac` | RBAC helpers (requireOrgRole, etc.) | All 3 | Role-based access control |
-| `@sangletech/ui` | shadcn/ui components | All 3 (web) | Design system |
-| `@sangletech/design-tokens` | Tailwind theme (colors, spacing) | All 3 | Consistent branding |
-| `@sangletech/validators` | Zod schemas for shared types | All 3 | Input validation |
-| `@sangletech/analytics` | Event tracking helpers | ProX, MediLink | Analytics integration |
+| Package                     | Source                              | Shared By      | Purpose                             |
+| --------------------------- | ----------------------------------- | -------------- | ----------------------------------- |
+| `@sangletech/auth`          | Better Auth config + Convex adapter | All 3          | Authentication + session management |
+| `@sangletech/rbac`          | RBAC helpers (requireOrgRole, etc.) | All 3          | Role-based access control           |
+| `@sangletech/ui`            | shadcn/ui components                | All 3 (web)    | Design system                       |
+| `@sangletech/design-tokens` | Tailwind theme (colors, spacing)    | All 3          | Consistent branding                 |
+| `@sangletech/validators`    | Zod schemas for shared types        | All 3          | Input validation                    |
+| `@sangletech/analytics`     | Event tracking helpers              | ProX, MediLink | Analytics integration               |
 
 ### Shared Middleware Pattern
 
 ```typescript
 // middleware.ts (same pattern for all 3 projects)
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 const PLATFORM_ADMIN_IPS = process.env.PLATFORM_ADMIN_IPS?.split(",") ?? [];
 
@@ -2555,7 +2533,10 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     const clientIp = request.headers.get("x-forwarded-for");
-    if (PLATFORM_ADMIN_IPS.length > 0 && !PLATFORM_ADMIN_IPS.includes(clientIp ?? "")) {
+    if (
+      PLATFORM_ADMIN_IPS.length > 0 &&
+      !PLATFORM_ADMIN_IPS.includes(clientIp ?? "")
+    ) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
     return NextResponse.next();
@@ -2628,16 +2609,16 @@ User: admin@sangletech.com (platformRole: platform_admin)
 
 ### Consistent Across All Projects
 
-| Pattern | Technology | Description |
-|---------|-----------|-------------|
-| Real-time data | Convex queries + subscriptions | Automatic re-renders on data change |
-| Non-reactive APIs | tRPC routers | File uploads, external service calls |
-| Type safety | Convex validators + Zod | End-to-end TypeScript types |
-| Error handling | ConvexError with typed codes | Consistent error responses |
-| Input validation | Convex `v.*` validators | Schema-level validation in mutations |
-| Auth context | `requireAuth()` + `requireOrgRole()` | Standardized auth helpers |
-| Audit logging | Convex mutation middleware | All data-changing actions logged |
-| Rate limiting | Middleware + Convex rate limiter | Prevent abuse |
+| Pattern           | Technology                           | Description                          |
+| ----------------- | ------------------------------------ | ------------------------------------ |
+| Real-time data    | Convex queries + subscriptions       | Automatic re-renders on data change  |
+| Non-reactive APIs | tRPC routers                         | File uploads, external service calls |
+| Type safety       | Convex validators + Zod              | End-to-end TypeScript types          |
+| Error handling    | ConvexError with typed codes         | Consistent error responses           |
+| Input validation  | Convex `v.*` validators              | Schema-level validation in mutations |
+| Auth context      | `requireAuth()` + `requireOrgRole()` | Standardized auth helpers            |
+| Audit logging     | Convex mutation middleware           | All data-changing actions logged     |
+| Rate limiting     | Middleware + Convex rate limiter     | Prevent abuse                        |
 
 ### Shared TypeScript Types
 
@@ -2677,46 +2658,46 @@ export type Plan = z.infer<typeof planSchema>;
 
 ### Table Counts
 
-| Project | Auth | Multi-Tenancy | Domain | Total |
-|---------|------|--------------|--------|-------|
-| ProX | 4 | 2 | 22 | 28 |
-| MediLink | 4 | 2 | 17 | 23 |
-| PalX | 4 | 2 | 15 | 21 |
-| **Unique tables** | 4 | 2 | 54 | **72** |
+| Project           | Auth | Multi-Tenancy | Domain | Total  |
+| ----------------- | ---- | ------------- | ------ | ------ |
+| ProX              | 4    | 2             | 22     | 28     |
+| MediLink          | 4    | 2             | 17     | 23     |
+| PalX              | 4    | 2             | 15     | 21     |
+| **Unique tables** | 4    | 2             | 54     | **72** |
 
 ### Index Counts
 
-| Project | Total Indexes | organizationId Indexes |
-|---------|--------------|----------------------|
-| ProX | 58 | 22 |
-| MediLink | 62 | 21 |
-| PalX | 46 | 14 |
+| Project  | Total Indexes | organizationId Indexes |
+| -------- | ------------- | ---------------------- |
+| ProX     | 58            | 22                     |
+| MediLink | 62            | 21                     |
+| PalX     | 46            | 14                     |
 
 ### Cross-Reference to GitHub Issues
 
-| Project | Total Issues | Feature Groups | Schema Issues | This Document Covers |
-|---------|-------------|----------------|--------------|---------------------|
-| ProX | 59 | 14 | 28 tables | 100% |
-| MediLink | 45 | 12 | 23 tables | 100% |
-| PalX | 44 | 8 + multi-tenancy | 21 tables | 100% |
-| **Total** | **148** | **34** | **72 tables** | **100%** |
+| Project   | Total Issues | Feature Groups    | Schema Issues | This Document Covers |
+| --------- | ------------ | ----------------- | ------------- | -------------------- |
+| ProX      | 59           | 14                | 28 tables     | 100%                 |
+| MediLink  | 45           | 12                | 23 tables     | 100%                 |
+| PalX      | 44           | 8 + multi-tenancy | 21 tables     | 100%                 |
+| **Total** | **148**      | **34**            | **72 tables** | **100%**             |
 
 ---
 
 ## Source Documents
 
-| Document | Path | Wave |
-|----------|------|------|
-| Feature Specifications | `plans/feature-specifications.md` | 5 |
-| User Role Architecture | `research/user-role-architecture-decision.md` | 5.2 |
-| Multi-Tenancy Validation | `research/multi-tenancy-schema-validation.md` | 5.3 |
-| PalX Multi-Tenancy Plan | `plans/palx-multi-tenancy-implementation.md` | 6.3 |
-| MediLink Migration Roadmap | `plans/medilink-migration-roadmap.md` | 3 |
-| PalX Architecture Audit | `research/palx-full-architecture-audit.md` | 0.3 |
-| Architecture Standard Update | `updates/architecture-standard-update.md` | 6.1 |
-| GitHub Issues Update Report | `updates/github-issues-update-report.md` | 6.2 |
-| ARCHITECTURE_STANDARD.md | `prox/architecture-decision/ARCHITECTURE_STANDARD.md` | -- |
+| Document                     | Path                                                  | Wave |
+| ---------------------------- | ----------------------------------------------------- | ---- |
+| Feature Specifications       | `plans/feature-specifications.md`                     | 5    |
+| User Role Architecture       | `research/user-role-architecture-decision.md`         | 5.2  |
+| Multi-Tenancy Validation     | `research/multi-tenancy-schema-validation.md`         | 5.3  |
+| PalX Multi-Tenancy Plan      | `plans/palx-multi-tenancy-implementation.md`          | 6.3  |
+| MediLink Migration Roadmap   | `plans/medilink-migration-roadmap.md`                 | 3    |
+| PalX Architecture Audit      | `research/palx-full-architecture-audit.md`            | 0.3  |
+| Architecture Standard Update | `updates/architecture-standard-update.md`             | 6.1  |
+| GitHub Issues Update Report  | `updates/github-issues-update-report.md`              | 6.2  |
+| ARCHITECTURE_STANDARD.md     | `prox/architecture-decision/ARCHITECTURE_STANDARD.md` | --   |
 
 ---
 
-*Generated: 2026-02-16 | Wave 6 - Standards & Issue Updates | Task 6.4*
+_Generated: 2026-02-16 | Wave 6 - Standards & Issue Updates | Task 6.4_

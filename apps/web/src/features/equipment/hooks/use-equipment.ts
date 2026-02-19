@@ -1,8 +1,8 @@
 "use client";
 
-import { usePaginatedQuery } from "convex/react";
 import type { PaginatedQueryReference } from "convex/react";
 import { api } from "convex/_generated/api";
+import { usePaginatedQuery } from "convex/react";
 
 import type { Equipment, EquipmentFilters } from "../types";
 

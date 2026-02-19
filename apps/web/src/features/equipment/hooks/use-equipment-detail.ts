@@ -1,10 +1,10 @@
 "use client";
 
-import { usePaginatedQuery, useQuery } from "convex/react";
+import type { Id } from "convex/_generated/dataModel";
 import type { PaginatedQueryReference } from "convex/react";
 import type { FunctionReference } from "convex/server";
 import { api } from "convex/_generated/api";
-import type { Id } from "convex/_generated/dataModel";
+import { usePaginatedQuery, useQuery } from "convex/react";
 
 import type { Equipment } from "../types";
 
@@ -35,11 +35,9 @@ export function useEquipmentDetail(id: Id<"equipment"> | undefined) {
     status: historyStatus,
     loadMore: loadMoreHistoryFn,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  } = usePaginatedQuery(
-    getHistoryFn,
-    id ? { equipmentId: id } : "skip",
-    { initialNumItems: 10 },
-  );
+  } = usePaginatedQuery(getHistoryFn, id ? { equipmentId: id } : "skip", {
+    initialNumItems: 10,
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const maintenanceSchedule = useQuery(

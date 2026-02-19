@@ -64,9 +64,7 @@ describe("StatusBadge", () => {
   });
 
   it("applies correct color class for retired status", () => {
-    const { container } = render(
-      <StatusBadge status="retired" locale="vi" />,
-    );
+    const { container } = render(<StatusBadge status="retired" locale="vi" />);
     const badge = container.firstChild as HTMLElement;
     expect(badge.className).toContain("bg-gray-100");
     expect(badge.className).toContain("text-gray-600");

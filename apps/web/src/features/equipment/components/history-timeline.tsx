@@ -1,15 +1,29 @@
 "use client";
 
-import { ArrowRightIcon, WrenchIcon, SearchIcon, AlertCircleIcon } from "lucide-react";
+import {
+  AlertCircleIcon,
+  ArrowRightIcon,
+  SearchIcon,
+  WrenchIcon,
+} from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 
 import { equipmentLabels } from "../labels";
 import { StatusBadge } from "./status-badge";
 
-type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
+type EquipmentStatus =
+  | "available"
+  | "in_use"
+  | "maintenance"
+  | "damaged"
+  | "retired";
 
-type HistoryActionType = "status_change" | "maintenance" | "repair" | "inspection";
+type HistoryActionType =
+  | "status_change"
+  | "maintenance"
+  | "repair"
+  | "inspection";
 
 interface HistoryEntry {
   _id: string;
@@ -110,7 +124,8 @@ export function HistoryTimeline({
               <div
                 className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
                   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                  actionColorMap[entry.actionType] ?? "bg-gray-100 text-gray-600"
+                  actionColorMap[entry.actionType] ??
+                  "bg-gray-100 text-gray-600"
                 }`}
               >
                 {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
@@ -119,7 +134,10 @@ export function HistoryTimeline({
                 )}
               </div>
               {index < history.length - 1 && (
-                <div className="bg-border w-px flex-1" style={{ minHeight: "24px" }} />
+                <div
+                  className="bg-border w-px flex-1"
+                  style={{ minHeight: "24px" }}
+                />
               )}
             </div>
 

@@ -2,31 +2,21 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { EquipmentFiltersBar } from "../components/equipment-filters";
 import type { EquipmentFilters } from "../types";
+import { EquipmentFiltersBar } from "../components/equipment-filters";
 
 describe("EquipmentFiltersBar", () => {
   const defaultFilters: EquipmentFilters = {};
 
   it("renders search input", () => {
-    render(
-      <EquipmentFiltersBar
-        filters={defaultFilters}
-        onChange={vi.fn()}
-      />,
-    );
+    render(<EquipmentFiltersBar filters={defaultFilters} onChange={vi.fn()} />);
     expect(
       screen.getByPlaceholderText("Tìm kiếm thiết bị..."),
     ).toBeInTheDocument();
   });
 
   it("renders status filter select", () => {
-    render(
-      <EquipmentFiltersBar
-        filters={defaultFilters}
-        onChange={vi.fn()}
-      />,
-    );
+    render(<EquipmentFiltersBar filters={defaultFilters} onChange={vi.fn()} />);
     // The filter trigger should be present
     expect(
       screen.getByRole("combobox", { name: /lọc theo trạng thái/i }),
@@ -34,12 +24,7 @@ describe("EquipmentFiltersBar", () => {
   });
 
   it("shows all statuses option by default when no status filter", () => {
-    render(
-      <EquipmentFiltersBar
-        filters={defaultFilters}
-        onChange={vi.fn()}
-      />,
-    );
+    render(<EquipmentFiltersBar filters={defaultFilters} onChange={vi.fn()} />);
     // Should show "Tất cả trạng thái" as default value
     expect(screen.getByText("Tất cả trạng thái")).toBeInTheDocument();
   });
@@ -48,10 +33,7 @@ describe("EquipmentFiltersBar", () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     render(
-      <EquipmentFiltersBar
-        filters={defaultFilters}
-        onChange={onChange}
-      />,
+      <EquipmentFiltersBar filters={defaultFilters} onChange={onChange} />,
     );
 
     const searchInput = screen.getByPlaceholderText("Tìm kiếm thiết bị...");

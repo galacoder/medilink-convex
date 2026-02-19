@@ -15,7 +15,8 @@
  */
 
 import type { GenericMutationCtx } from "convex/server";
-import type { Id, DataModel } from "../_generated/dataModel";
+
+import type { DataModel, Id } from "../_generated/dataModel";
 
 // ---------------------------------------------------------------------------
 // Types

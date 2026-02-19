@@ -36,113 +36,63 @@ describe("canManageMember", () => {
   // Owner can manage anyone except self
   it("owner can manage admin", () => {
     expect(
-      canManageMember(
-        "owner",
-        "admin",
-        ownerId as never,
-        adminId as never,
-      ),
+      canManageMember("owner", "admin", ownerId as never, adminId as never),
     ).toBe(true);
   });
 
   it("owner can manage member", () => {
     expect(
-      canManageMember(
-        "owner",
-        "member",
-        ownerId as never,
-        memberId as never,
-      ),
+      canManageMember("owner", "member", ownerId as never, memberId as never),
     ).toBe(true);
   });
 
   it("owner cannot manage self", () => {
     expect(
-      canManageMember(
-        "owner",
-        "owner",
-        ownerId as never,
-        ownerId as never,
-      ),
+      canManageMember("owner", "owner", ownerId as never, ownerId as never),
     ).toBe(false);
   });
 
   // Admin can only manage members, not other admins or owners
   it("admin can manage member", () => {
     expect(
-      canManageMember(
-        "admin",
-        "member",
-        adminId as never,
-        memberId as never,
-      ),
+      canManageMember("admin", "member", adminId as never, memberId as never),
     ).toBe(true);
   });
 
   it("admin cannot manage other admin", () => {
     expect(
-      canManageMember(
-        "admin",
-        "admin",
-        adminId as never,
-        otherId as never,
-      ),
+      canManageMember("admin", "admin", adminId as never, otherId as never),
     ).toBe(false);
   });
 
   it("admin cannot manage owner", () => {
     expect(
-      canManageMember(
-        "admin",
-        "owner",
-        adminId as never,
-        ownerId as never,
-      ),
+      canManageMember("admin", "owner", adminId as never, ownerId as never),
     ).toBe(false);
   });
 
   it("admin cannot manage self", () => {
     expect(
-      canManageMember(
-        "admin",
-        "admin",
-        adminId as never,
-        adminId as never,
-      ),
+      canManageMember("admin", "admin", adminId as never, adminId as never),
     ).toBe(false);
   });
 
   // Member cannot manage anyone
   it("member cannot manage any member", () => {
     expect(
-      canManageMember(
-        "member",
-        "member",
-        memberId as never,
-        otherId as never,
-      ),
+      canManageMember("member", "member", memberId as never, otherId as never),
     ).toBe(false);
   });
 
   it("member cannot manage admin", () => {
     expect(
-      canManageMember(
-        "member",
-        "admin",
-        memberId as never,
-        adminId as never,
-      ),
+      canManageMember("member", "admin", memberId as never, adminId as never),
     ).toBe(false);
   });
 
   it("member cannot manage owner", () => {
     expect(
-      canManageMember(
-        "member",
-        "owner",
-        memberId as never,
-        ownerId as never,
-      ),
+      canManageMember("member", "owner", memberId as never, ownerId as never),
     ).toBe(false);
   });
 });

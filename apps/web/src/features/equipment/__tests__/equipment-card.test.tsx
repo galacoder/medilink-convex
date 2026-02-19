@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-import { EquipmentCard } from "../components/equipment-card";
 import type { Equipment } from "../types";
+import { EquipmentCard } from "../components/equipment-card";
 
 // Mock Next.js router
 vi.mock("next/navigation", () => ({

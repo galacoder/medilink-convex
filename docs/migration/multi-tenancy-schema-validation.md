@@ -10,13 +10,14 @@
 
 **Overall Compliance**: 67% (2 of 3 projects compliant)
 
-| Project | Status | organizationId Coverage | Index Coverage | RLS Patterns | Migration Required |
-|---------|--------|------------------------|----------------|--------------|-------------------|
-| **ProX** | ✅ COMPLIANT | Schema ready (planned) | Indexes planned | Auth middleware ready | None (pre-implementation) |
-| **MediLink** | ✅ COMPLIANT | 100% coverage (planned) | 100% coverage (planned) | Convex-native scoping | None (pre-implementation) |
-| **PalX** | ❌ NON-COMPLIANT | 0% (0 of 17 tables) | 0% | None | Migration script required |
+| Project      | Status           | organizationId Coverage | Index Coverage          | RLS Patterns          | Migration Required        |
+| ------------ | ---------------- | ----------------------- | ----------------------- | --------------------- | ------------------------- |
+| **ProX**     | ✅ COMPLIANT     | Schema ready (planned)  | Indexes planned         | Auth middleware ready | None (pre-implementation) |
+| **MediLink** | ✅ COMPLIANT     | 100% coverage (planned) | 100% coverage (planned) | Convex-native scoping | None (pre-implementation) |
+| **PalX**     | ❌ NON-COMPLIANT | 0% (0 of 17 tables)     | 0%                      | None                  | Migration script required |
 
 **Key Findings**:
+
 1. **ProX**: Architecture standard requires organizationId from M1-1 (#53). Schema pre-validated against standard.
 2. **MediLink**: Migration roadmap includes organizationId in all domain tables. Full compliance by design.
 3. **PalX**: Existing production schema has ZERO multi-tenancy support. Requires data migration.
@@ -52,11 +53,11 @@ organization: defineTable({
 
 ### Phased Approach
 
-| Phase | When | Scope | ProX/MediLink Status | PalX Status |
-|-------|------|-------|----------------------|-------------|
-| **Phase 1** (Now, M0-M5) | Launch | Single-tenant with `organizationId` field ready | ✅ Compliant | ❌ Missing |
-| **Phase 2** (Month 3+) | Post-launch | Enable multi-tenancy: subdomain routing, org-switching UI | Not implemented (correct) | Not applicable |
-| **Phase 3** (Month 6+) | GalaTech SaaS | Per-org branding, billing, white-label | Not implemented (correct) | Not applicable |
+| Phase                    | When          | Scope                                                     | ProX/MediLink Status      | PalX Status    |
+| ------------------------ | ------------- | --------------------------------------------------------- | ------------------------- | -------------- |
+| **Phase 1** (Now, M0-M5) | Launch        | Single-tenant with `organizationId` field ready           | ✅ Compliant              | ❌ Missing     |
+| **Phase 2** (Month 3+)   | Post-launch   | Enable multi-tenancy: subdomain routing, org-switching UI | Not implemented (correct) | Not applicable |
+| **Phase 3** (Month 6+)   | GalaTech SaaS | Per-org branding, billing, white-label                    | Not implemented (correct) | Not applicable |
 
 **Critical Requirement**: Phase 1 (organizationId field) must be in place from M1-1 to avoid costly retrofit.
 
@@ -65,6 +66,7 @@ organization: defineTable({
 ## ProX Schema Validation
 
 ### Source Documents
+
 - **Issue**: M1-1 (#53) "Define Core Convex Schema"
 - **Verification**: `prox-issues-verification.md` lines 396-403
 - **Standard**: ARCHITECTURE_STANDARD.md Section 6
@@ -72,7 +74,9 @@ organization: defineTable({
 ### Validation Results
 
 #### ✅ User Table Compliance
+
 **Expected** (from Section 6):
+
 ```typescript
 user: defineTable({
   organizationId: v.optional(v.id("organization")),
@@ -80,12 +84,13 @@ user: defineTable({
     v.literal("student"),
     v.literal("instructor"),
     v.literal("admin"),
-    v.literal("superadmin")
+    v.literal("superadmin"),
   ),
-})
+});
 ```
 
 **ProX M1-1 Acceptance Criteria** (from verification):
+
 - [x] M1-1 schema includes `user.organizationId` field
 - [x] M1-1 schema includes `organization` table with slug + plan
 - [x] No multi-tenancy routing in M0-M5 (Phase 2, post-launch)
@@ -94,7 +99,9 @@ user: defineTable({
 **Status**: ✅ COMPLIANT (by design, pre-implementation)
 
 #### ✅ Organization Table Compliance
+
 **Expected** (from Section 6):
+
 ```typescript
 organization: defineTable({
   name: v.string(),
@@ -108,19 +115,21 @@ organization: defineTable({
 ```
 
 **ProX M1-1 Acceptance Criteria**:
+
 - [x] `organization` table with slug + plan
 - [x] Indexes on `by_slug`, `by_owner`
 
 **Status**: ✅ COMPLIANT (by design, pre-implementation)
 
 #### ✅ Domain Tables Compliance
+
 **Expected Pattern** (all domain tables):
+
 ```typescript
 courses: defineTable({
-  organizationId: v.id("organization"),  // Required for all domain data
+  organizationId: v.id("organization"), // Required for all domain data
   // ... other fields
-})
-  .index("by_organization", ["organizationId"])
+}).index("by_organization", ["organizationId"]);
 ```
 
 **ProX Status**: Not implemented yet (M1-M5 in planning). Architecture standard REQUIRES organizationId on all domain tables (courses, membership, community, etc.) from their initial creation.
@@ -129,13 +138,13 @@ courses: defineTable({
 
 ### ProX Compliance Summary
 
-| Requirement | Status | Evidence |
-|-------------|--------|----------|
-| `user.organizationId` field | ✅ Planned | M1-1 acceptance criteria |
-| `organization` table | ✅ Planned | M1-1 acceptance criteria |
-| `organization` indexes | ✅ Planned | M1-1 acceptance criteria |
-| Domain tables with organizationId | ⚠️ To verify | Check M2-M4 issues (#1-#37) |
-| RLS patterns (Convex queries) | ⚠️ To verify | Check query implementations in feature issues |
+| Requirement                       | Status       | Evidence                                      |
+| --------------------------------- | ------------ | --------------------------------------------- |
+| `user.organizationId` field       | ✅ Planned   | M1-1 acceptance criteria                      |
+| `organization` table              | ✅ Planned   | M1-1 acceptance criteria                      |
+| `organization` indexes            | ✅ Planned   | M1-1 acceptance criteria                      |
+| Domain tables with organizationId | ⚠️ To verify | Check M2-M4 issues (#1-#37)                   |
+| RLS patterns (Convex queries)     | ⚠️ To verify | Check query implementations in feature issues |
 
 **Overall ProX Status**: ✅ COMPLIANT (architecture), ⚠️ VERIFY (implementation)
 
@@ -146,13 +155,16 @@ courses: defineTable({
 ## MediLink Schema Validation
 
 ### Source Document
+
 - **Roadmap**: `medilink-migration-roadmap.md` Section 4
 - **Tables**: 17 domain tables + 4 auth tables = 21 total
 
 ### Validation Results
 
 #### ✅ Core Tables (Section 4.1)
+
 **Expected**:
+
 ```typescript
 user: defineTable({
   organizationId: v.optional(v.id("organization")),  // Hospital assignment
@@ -167,25 +179,29 @@ organization: defineTable({  // Represents hospitals
 ```
 
 **MediLink Roadmap** (lines 260-269):
+
 > "Merge with Better Auth user table. Add `organizationId`, `role` fields"
 > "`organizationId` FK becomes Convex `v.id("organization")`"
 
 **Status**: ✅ COMPLIANT (by design, M0-2 issue)
 
 #### ✅ Equipment Domain (Section 4.2)
+
 **Expected Pattern**:
+
 ```typescript
 equipment: defineTable({
-  organizationId: v.id("organization"),  // Hospital-scoped
+  organizationId: v.id("organization"), // Hospital-scoped
   // ... other fields
-})
-  .index("by_organization", ["organizationId"])
+}).index("by_organization", ["organizationId"]);
 ```
 
 **MediLink Roadmap** (lines 271-280):
+
 > "`organizationId` FK -> `v.id("organization")`. Indexes on `organizationId`, `categoryId`, `status`"
 
 **Tables Validated**:
+
 - ✅ `equipment` (organizationId + index)
 - ✅ `equipmentCategory` (organizationId scoped)
 - ✅ `equipmentHistory` (via equipmentId FK)
@@ -195,12 +211,15 @@ equipment: defineTable({
 **Status**: ✅ COMPLIANT (5/5 tables)
 
 #### ✅ Service Request Domain (Section 4.3)
+
 **Expected**: All service request tables scoped to organization via `equipmentId` or direct `organizationId`.
 
 **MediLink Roadmap** (lines 282-289):
+
 > "`serviceRequestId` -> `v.id("serviceRequest")`. `providerId` -> `v.id("provider")`"
 
 **Tables Validated**:
+
 - ✅ `serviceRequest` (via equipmentId -> organizationId)
 - ✅ `serviceQuote` (via serviceRequestId FK)
 - ✅ `serviceRating` (via serviceRequestId FK)
@@ -211,7 +230,9 @@ equipment: defineTable({
 **Note**: Service requests inherit organization scope from equipment. Direct organizationId NOT needed because equipment already scopes the data.
 
 #### ✅ Other Domains (Section 4.6)
+
 **Tables Validated**:
+
 - ✅ `provider` (organizationId explicit - line 314)
 - ✅ `consumable` (via equipmentId FK - line 315)
 - ✅ `dispute` (via serviceRequestId FK - line 316)
@@ -232,11 +253,13 @@ equipment: defineTable({
 **Organization Model**: Each hospital is an `organization`. Hospital users are scoped to their organization.
 
 **Data Scoping**:
+
 1. **Direct organizationId**: `user`, `organization`, `provider`, `supportTicket`, `automationRecipe`, `notificationTemplate`, `equipmentCategory`
 2. **Indirect via FK**: Equipment -> Service Request -> Quotes/Ratings/History
 3. **User-scoped**: Notifications, AI conversations, audit logs (via userId -> organizationId)
 
 **RLS Pattern** (Convex native):
+
 ```typescript
 // All queries filter by organizationId
 export const listEquipment = query({
@@ -255,13 +278,13 @@ export const listEquipment = query({
 
 ### MediLink Compliance Summary
 
-| Requirement | Status | Coverage |
-|-------------|--------|----------|
-| Core tables with organizationId | ✅ Compliant | 2/2 (user, organization) |
-| Domain tables with organizationId | ✅ Compliant | 17/17 (direct or FK-scoped) |
-| Indexes on organizationId | ✅ Planned | All direct organizationId tables |
-| RLS patterns | ✅ Planned | Convex-native query filters |
-| Migration strategy | ✅ Documented | M4-3, M4-4 (Postgres -> Convex) |
+| Requirement                       | Status        | Coverage                         |
+| --------------------------------- | ------------- | -------------------------------- |
+| Core tables with organizationId   | ✅ Compliant  | 2/2 (user, organization)         |
+| Domain tables with organizationId | ✅ Compliant  | 17/17 (direct or FK-scoped)      |
+| Indexes on organizationId         | ✅ Planned    | All direct organizationId tables |
+| RLS patterns                      | ✅ Planned    | Convex-native query filters      |
+| Migration strategy                | ✅ Documented | M4-3, M4-4 (Postgres -> Convex)  |
 
 **Overall MediLink Status**: ✅ COMPLIANT (100% by design)
 
@@ -272,13 +295,16 @@ export const listEquipment = query({
 ## PalX Schema Validation
 
 ### Source Document
+
 - **Schema**: `/Users/sangle/Dev/action/projects/apps/PalX/convex/schema.ts`
 - **Tables**: 17 total (4 auth + 13 domain)
 
 ### Validation Results
 
 #### ❌ Auth Tables (Lines 6-88)
+
 **Expected**:
+
 ```typescript
 user: defineTable({
   organizationId: v.optional(v.id("organization")),
@@ -287,6 +313,7 @@ user: defineTable({
 ```
 
 **PalX Schema** (lines 6-52):
+
 ```typescript
 user: defineTable({
   email: v.string(),
@@ -298,25 +325,28 @@ user: defineTable({
   // ... subscription fields
   // ❌ NO organizationId field
   // ❌ NO role field (uses tier instead)
-})
+});
 ```
 
 **Status**: ❌ NON-COMPLIANT
+
 - Missing `organizationId` field
 - Missing `role` field (uses `tier` for access control)
 - No `organization` table exists
 
 #### ❌ Knowledge Base Tables (Lines 90-143)
+
 **Expected**:
+
 ```typescript
 knowledgeBase: defineTable({
   organizationId: v.id("organization"),
   // ... other fields
-})
-  .index("by_organization", ["organizationId"])
+}).index("by_organization", ["organizationId"]);
 ```
 
 **PalX Schema** (lines 90-127):
+
 ```typescript
 knowledgeBase: defineTable({
   frameworkId: v.string(),
@@ -324,19 +354,21 @@ knowledgeBase: defineTable({
   subcategory: v.string(),
   // ... content fields
   // ❌ NO organizationId field
-})
-  .index("by_category", ["category"])
-  // ❌ NO index on organizationId
+}).index("by_category", ["category"]);
+// ❌ NO index on organizationId
 ```
 
 **Status**: ❌ NON-COMPLIANT
+
 - Missing `organizationId` field
 - Missing `by_organization` index
 
 #### ❌ User Knowledge Interactions (Lines 129-143)
+
 **Expected**: Scoped to organization via userId -> organizationId
 
 **PalX Schema** (lines 129-143):
+
 ```typescript
 userKnowledge: defineTable({
   userId: v.id("user"),
@@ -344,7 +376,7 @@ userKnowledge: defineTable({
   bookmarked: v.boolean(),
   completed: v.boolean(),
   // ❌ NO organizationId (relies on userId FK only)
-})
+});
 ```
 
 **Status**: ⚠️ INDIRECT (via userId FK, acceptable if user has organizationId)
@@ -352,36 +384,43 @@ userKnowledge: defineTable({
 **Note**: IF `user.organizationId` is added, this table inherits scoping via FK. No direct organizationId needed.
 
 #### ❌ Notifications (Lines 145-180)
+
 **Status**: ❌ NON-COMPLIANT (no organizationId, user-scoped only)
 
 #### ❌ YAML Flow System (Lines 182-243)
+
 **Expected**:
+
 ```typescript
 yamlFlows: defineTable({
-  organizationId: v.id("organization"),  // Organization-owned flows
+  organizationId: v.id("organization"), // Organization-owned flows
   // ...
-})
+});
 ```
 
 **PalX Schema** (lines 182-202):
+
 ```typescript
 yamlFlows: defineTable({
   flowId: v.string(),
   name: v.string(),
   category: v.union(v.literal("warriorx"), v.literal("busos")),
   // ❌ NO organizationId (flows are global, not org-scoped)
-})
+});
 ```
 
 **Status**: ❌ NON-COMPLIANT (global flows, not multi-tenant ready)
 
 #### ❌ Router Analytics (Lines 223-243)
+
 **Status**: ❌ NON-COMPLIANT (userId scoped only, no organizationId)
 
 #### ❌ Content Curations (Lines 245-268)
+
 **Expected**: Organization-scoped curated content
 
 **PalX Schema** (lines 245-268):
+
 ```typescript
 contentCurations: defineTable({
   contentType: v.union(...),
@@ -394,7 +433,9 @@ contentCurations: defineTable({
 **Status**: ❌ NON-COMPLIANT (user-owned content, not org-owned)
 
 #### ❌ Remaining Tables
+
 All remaining tables (lines 270-461) validated:
+
 - ❌ `usageTracking` (userId only)
 - ❌ `pluginConfig` (userId string, not FK)
 - ❌ `conversations` (userId only)
@@ -412,6 +453,7 @@ All remaining tables (lines 270-461) validated:
 **Current Architecture**: Single-user SaaS (each user is isolated, no organization grouping)
 
 **Gap vs. Standard**:
+
 1. ❌ No `organization` table
 2. ❌ No `user.organizationId` field
 3. ❌ No `user.role` field (uses `tier` instead)
@@ -420,6 +462,7 @@ All remaining tables (lines 270-461) validated:
 6. ❌ No RLS patterns (queries filter by userId only, not organizationId)
 
 **Impact**: PalX cannot support:
+
 - Multiple users within the same organization
 - Organization-level data sharing (e.g., team knowledge base)
 - Organization-level billing (e.g., company subscription)
@@ -431,17 +474,18 @@ All remaining tables (lines 270-461) validated:
 
 ### PalX Compliance Summary
 
-| Requirement | Status | Coverage |
-|-------------|--------|----------|
-| `user.organizationId` field | ❌ Missing | 0/1 |
-| `organization` table | ❌ Missing | 0/1 |
-| Domain tables with organizationId | ❌ Missing | 0/13 |
-| Indexes on organizationId | ❌ Missing | 0/0 |
-| RLS patterns | ❌ Missing | userId-only scoping |
+| Requirement                       | Status     | Coverage            |
+| --------------------------------- | ---------- | ------------------- |
+| `user.organizationId` field       | ❌ Missing | 0/1                 |
+| `organization` table              | ❌ Missing | 0/1                 |
+| Domain tables with organizationId | ❌ Missing | 0/13                |
+| Indexes on organizationId         | ❌ Missing | 0/0                 |
+| RLS patterns                      | ❌ Missing | userId-only scoping |
 
 **Overall PalX Status**: ❌ NON-COMPLIANT (0% coverage)
 
 **Recommendation**:
+
 - **Option A (Migrate)**: Add multi-tenancy if PalX needs team/enterprise features (e.g., company-wide warriorX training program). Requires data migration (see migration script below).
 - **Option B (Exemption)**: Declare PalX as "single-user app" and exempt from multi-tenancy requirement. Update ARCHITECTURE_STANDARD.md Section 9 to clarify scope.
 
@@ -475,41 +519,42 @@ export default defineSchema({
   // MODIFIED: Add organizationId to user
   user: defineTable({
     // ... existing fields
-    organizationId: v.optional(v.id("organization")),  // NEW
-    role: v.union(  // NEW
+    organizationId: v.optional(v.id("organization")), // NEW
+    role: v.union(
+      // NEW
       v.literal("member"),
       v.literal("admin"),
-      v.literal("owner")
+      v.literal("owner"),
     ),
   })
     .index("by_email", ["email"])
-    .index("by_organization", ["organizationId"])  // NEW
+    .index("by_organization", ["organizationId"]) // NEW
     .index("by_stripe_customer", ["stripeCustomerId"]),
 
   // MODIFIED: Add organizationId to knowledgeBase
   knowledgeBase: defineTable({
-    organizationId: v.optional(v.id("organization")),  // NEW (null = public)
+    organizationId: v.optional(v.id("organization")), // NEW (null = public)
     // ... existing fields
   })
     .index("by_category", ["category"])
     .index("by_framework_id", ["frameworkId"])
-    .index("by_organization", ["organizationId"])  // NEW
+    .index("by_organization", ["organizationId"]) // NEW
     .index("by_tags", ["tags"])
     .vectorIndex("by_embedding", {
       vectorField: "embedding",
       dimensions: 1536,
-      filterFields: ["category", "subcategory", "organizationId"],  // MODIFIED
+      filterFields: ["category", "subcategory", "organizationId"], // MODIFIED
     }),
 
   // MODIFIED: Add organizationId to yamlFlows
   yamlFlows: defineTable({
-    organizationId: v.optional(v.id("organization")),  // NEW (null = public)
+    organizationId: v.optional(v.id("organization")), // NEW (null = public)
     // ... existing fields
   })
     .index("by_flow_id", ["flowId"])
     .index("by_status", ["status"])
     .index("by_category", ["category"])
-    .index("by_organization", ["organizationId"]),  // NEW
+    .index("by_organization", ["organizationId"]), // NEW
 
   // ... repeat for all 13 domain tables
 });
@@ -519,8 +564,9 @@ export default defineSchema({
 
 ```typescript
 // convex/migrations/addMultiTenancy.ts
-import { internalMutation } from "./_generated/server";
 import { v } from "convex/values";
+
+import { internalMutation } from "./_generated/server";
 
 export const addDefaultOrganization = internalMutation({
   args: {},
@@ -530,7 +576,7 @@ export const addDefaultOrganization = internalMutation({
       name: "Default Organization",
       slug: "default",
       plan: "free",
-      ownerId: undefined as any,  // Will update after first user migration
+      ownerId: undefined as any, // Will update after first user migration
       createdAt: Date.now(),
     });
 
@@ -608,10 +654,10 @@ export const list = query({
         q.and(
           q.eq(q.field("category"), args.category),
           q.or(
-            q.eq(q.field("organizationId"), user.organizationId),  // Org-scoped
-            q.eq(q.field("organizationId"), null)  // Public content
-          )
-        )
+            q.eq(q.field("organizationId"), user.organizationId), // Org-scoped
+            q.eq(q.field("organizationId"), null), // Public content
+          ),
+        ),
       )
       .collect();
   },
@@ -631,6 +677,7 @@ export const list = query({
 **Action**: Audit M2-M4 feature issues to ensure all domain tables include organizationId.
 
 **Expected Tables** (from MIGRATION_ROADMAP):
+
 1. M2-1: `courses` (organizationId required)
 2. M2-2: `lessons` (via courseId FK, acceptable)
 3. M2-3: `enrollments` (via courseId FK, acceptable)
@@ -710,6 +757,7 @@ fi
 ## Implementation Checklist
 
 ### ProX (Pre-Implementation)
+
 - [ ] M1-1 (#53): Verify `user.organizationId` in acceptance criteria
 - [ ] M1-1 (#53): Verify `organization` table with indexes
 - [ ] Run `validate-prox-organizationid.sh` on M2-M4 issues
@@ -718,6 +766,7 @@ fi
 - [ ] Add organizationId to seed data script (M1-6 #58)
 
 ### MediLink (Pre-Implementation)
+
 - [ ] M0-2: Confirm `user.organizationId` in schema
 - [ ] M0-2: Confirm `organization` table with indexes
 - [ ] M1-M3: Confirm all domain tables have organizationId or FK scoping
@@ -725,9 +774,11 @@ fi
 - [ ] M1-8: Add organizationId to seed data (2 hospitals)
 
 ### PalX (Production)
+
 **Decision Required**: Migrate or Exempt?
 
 **Option A: Migrate to Multi-Tenancy**
+
 - [ ] Create migration issue (estimated 6-8h)
 - [ ] Run schema migration (add organizationId to 13 tables)
 - [ ] Run data migration (create default org, assign all data)
@@ -737,6 +788,7 @@ fi
 - [ ] Deploy migration to production
 
 **Option B: Exempt PalX from Multi-Tenancy**
+
 - [ ] Update ARCHITECTURE_STANDARD.md Section 9
 - [ ] Add PalX exemption: "Personal productivity app, single-user architecture"
 - [ ] Document decision rationale (no team/enterprise features planned)
@@ -749,32 +801,39 @@ fi
 **Overall Compliance**: 67% (2 of 3 projects)
 
 **Compliant Projects**:
+
 1. ✅ ProX (pre-implementation, architecture validated)
 2. ✅ MediLink (pre-implementation, 100% coverage by design)
 
 **Non-Compliant Projects**:
+
 1. ❌ PalX (production, 0% coverage - decision required: migrate or exempt)
 
 **Critical Actions**:
+
 1. ProX: Run organizationId validation script on M2-M4 issues
 2. MediLink: No action required (fully compliant)
 3. PalX: Decide migrate vs. exempt, execute migration script if needed
 
 **Migration Scripts Provided**:
+
 - PalX multi-tenancy migration (6-8h effort)
 - ProX validation script (10 min)
 - MediLink: No migration needed
 
 **Success Criteria Met**:
+
 - ✅ All tables checked for organizationId (17 PalX, 21 MediLink planned, ProX validated)
 - ✅ Proper indexes documented (MediLink roadmap, ProX M1-1 acceptance criteria)
 - ✅ RLS patterns documented (Convex-native query filters)
 - ✅ Migration scripts provided for gaps (PalX only)
 
 **Files Created**:
+
 - `/Users/sangle/Dev/action/projects/agents/prox/architecture-decision/migration-planning/multi-project/research/multi-tenancy-schema-validation.md`
 
 **Next Steps**:
+
 1. Review ProX validation script output
 2. Decide PalX migration strategy
 3. Track compliance in project registry

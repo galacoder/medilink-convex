@@ -11,10 +11,15 @@ import {
   SelectValue,
 } from "@medilink/ui/select";
 
-import { equipmentLabels } from "../labels";
 import type { EquipmentFilters } from "../types";
+import { equipmentLabels } from "../labels";
 
-type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
+type EquipmentStatus =
+  | "available"
+  | "in_use"
+  | "maintenance"
+  | "damaged"
+  | "retired";
 
 interface EquipmentFiltersProps {
   filters: EquipmentFilters;
@@ -30,15 +35,21 @@ const ALL_STATUSES_VALUE = "__all__";
  * see "available" equipment for borrowing). Search enables finding specific
  * devices by name in Vietnamese or English.
  */
-export function EquipmentFiltersBar({ filters, onChange }: EquipmentFiltersProps) {
+export function EquipmentFiltersBar({
+  filters,
+  onChange,
+}: EquipmentFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search ?? "");
-  const [searchTimer, setSearchTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [searchTimer, setSearchTimer] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(null);
 
   const handleStatusChange = useCallback(
     (value: string) => {
       onChange({
         ...filters,
-        status: value === ALL_STATUSES_VALUE ? undefined : (value as EquipmentStatus),
+        status:
+          value === ALL_STATUSES_VALUE ? undefined : (value as EquipmentStatus),
       });
     },
     [filters, onChange],
@@ -89,13 +100,19 @@ export function EquipmentFiltersBar({ filters, onChange }: EquipmentFiltersProps
             <SelectItem value={ALL_STATUSES_VALUE}>
               {equipmentLabels.allStatuses.vi}
             </SelectItem>
-            {(["available", "in_use", "maintenance", "damaged", "retired"] as const).map(
-              (status) => (
-                <SelectItem key={status} value={status}>
-                  {equipmentLabels.statusValues[status].vi}
-                </SelectItem>
-              ),
-            )}
+            {(
+              [
+                "available",
+                "in_use",
+                "maintenance",
+                "damaged",
+                "retired",
+              ] as const
+            ).map((status) => (
+              <SelectItem key={status} value={status}>
+                {equipmentLabels.statusValues[status].vi}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

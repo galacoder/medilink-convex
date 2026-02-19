@@ -1,19 +1,23 @@
 "use client";
 
+import type {
+  ColumnDef,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 import {
-  
-  
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  
-  useReactTable
+  useReactTable,
 } from "@tanstack/react-table";
-import type {ColumnDef, RowSelectionState, SortingState} from "@tanstack/react-table";
-import { ChevronDownIcon, ChevronUpIcon, MoreHorizontalIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  MoreHorizontalIcon,
+} from "lucide-react";
 
 import { Button } from "@medilink/ui/button";
 import { Checkbox } from "@medilink/ui/checkbox";
@@ -33,8 +37,8 @@ import {
   TableRow,
 } from "@medilink/ui/table";
 
-import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
+import { equipmentLabels } from "../labels";
 import { StatusBadge } from "./status-badge";
 
 // Valid transitions map for bulk actions
@@ -285,11 +289,7 @@ export function EquipmentTable({
           <span className="text-sm font-medium">
             {selectedCount} {equipmentLabels.selectedItems.vi}
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRowSelection({})}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setRowSelection({})}>
             {equipmentLabels.clearSelection.vi}
           </Button>
           {commonTransitions.length > 0 && onBulkUpdateStatus && (
@@ -306,7 +306,9 @@ export function EquipmentTable({
                     onClick={() => handleBulkUpdateStatus(status)}
                   >
                     {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                    {equipmentLabels.statusValues[status as keyof typeof equipmentLabels.statusValues]?.vi ?? status}
+                    {equipmentLabels.statusValues[
+                      status as keyof typeof equipmentLabels.statusValues
+                    ]?.vi ?? status}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
