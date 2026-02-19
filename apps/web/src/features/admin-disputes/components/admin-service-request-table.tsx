@@ -191,6 +191,7 @@ export function AdminServiceRequestTable({
     },
   ];
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: serviceRequests,
     columns,
