@@ -33,5 +33,4 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
-  globalSetup: require.resolve("./e2e/global-setup"),
 });
