@@ -1,4 +1,5 @@
-import { test as base, type Page } from "@playwright/test";
+import { test as base  } from "@playwright/test";
+import type {Page} from "@playwright/test";
 
 /**
  * Auth fixtures for MediLink E2E tests.
@@ -27,6 +28,7 @@ export const test = base.extend<AuthFixtures>({
       storageState: "./e2e/.auth/hospital.json",
     });
     const page = await context.newPage();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
     await context.close();
   },
@@ -40,6 +42,7 @@ export const test = base.extend<AuthFixtures>({
       storageState: "./e2e/.auth/provider.json",
     });
     const page = await context.newPage();
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
     await context.close();
   },

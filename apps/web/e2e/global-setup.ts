@@ -74,7 +74,9 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   }
 
   // Store test user emails so tests can reference them if needed
+  // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
   process.env.HOSPITAL_USER_EMAIL = HOSPITAL_USER.email;
+  // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
   process.env.PROVIDER_USER_EMAIL = PROVIDER_USER.email;
 }
 

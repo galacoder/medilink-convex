@@ -1,4 +1,4 @@
-import { type Page } from "@playwright/test";
+import type {Page} from "@playwright/test";
 
 /**
  * Page Object Model for the hospital service requests page (/hospital/service-requests).

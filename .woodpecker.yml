@@ -69,8 +69,6 @@ steps:
     image: mcr.microsoft.com/playwright:v1.50.0-noble
     depends_on: [smoke-test]
     environment:
-      - CONVEX_DEPLOYMENT
-      - AUTH_SECRET
       - NEXTAUTH_URL=http://localhost:3000
     commands:
       - corepack enable
