@@ -11,12 +11,21 @@
  */
 import { use } from "react";
 import Link from "next/link";
-import { useSession } from "~/auth/client";
+import { useQuery } from "convex/react";
+import type { FunctionReference } from "convex/server";
+import { anyApi } from "convex/server";
 import { useConsumable } from "~/features/consumables/hooks/useConsumables";
 import { StockAlertBadge } from "~/features/consumables/components/StockAlertBadge";
 import { UsageLogTable } from "~/features/consumables/components/UsageLogTable";
 import { ReorderForm } from "~/features/consumables/components/ReorderForm";
 import type { Id } from "../../../../../../../convex/_generated/dataModel";
+
+// WHY: anyApi.auth.getCurrentUser returns the Convex user document whose _id
+// is the correct Convex Id<"users"> for Convex mutations. The Better Auth
+// client-side session.user.id is the Better Auth internal string ID which
+// does NOT equal the Convex document _id.
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const getCurrentUserRef = anyApi.auth!.getCurrentUser as FunctionReference<"query">;
 
 // ---------------------------------------------------------------------------
 // Bilingual labels
@@ -68,9 +77,14 @@ export default function ConsumableDetailPage({
   const consumableId = id as Id<"consumables">;
   const consumable = useConsumable(consumableId);
 
-  // FIX 1: Get authenticated user to pass as requestedBy to ReorderForm
-  const { data: session } = useSession();
-  const currentUserId = session?.user.id as Id<"users"> | undefined;
+  // FIX 1: Get the Convex user document so we have the correct Convex Id<"users">
+  // WHY: session.user.id from Better Auth's client SDK is the Better Auth internal
+  // string ID. The reorderRequests.requestedBy field uses v.id("users") which
+  // requires a valid Convex document ID. getCurrentUser uses authComponent.getAuthUser
+  // which returns the Convex user document with the correct _id.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const convexUser = useQuery(getCurrentUserRef, {});
+  const currentUserId = (convexUser as { _id?: Id<"users"> } | null | undefined)?._id;
 
   if (consumable === undefined) {
     return (
