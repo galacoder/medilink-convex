@@ -4,15 +4,18 @@
  * WHY: Verifies empty state message in Vietnamese, correct card count rendering,
  * skeleton display during loading, and add offering callback invocation.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
+import type { ServiceOffering } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { OfferingList } from "../offering-list";
-import type { ServiceOffering } from "../../types";
 
-const makeOffering = (id: string, specialty: ServiceOffering["specialty"] = "calibration"): ServiceOffering => ({
+const makeOffering = (
+  id: string,
+  specialty: ServiceOffering["specialty"] = "calibration",
+): ServiceOffering => ({
   _id: id,
   _creationTime: Date.now(),
   providerId: "prov_001",
@@ -24,9 +27,7 @@ const makeOffering = (id: string, specialty: ServiceOffering["specialty"] = "cal
 
 describe("OfferingList", () => {
   it("test_OfferingList_showsEmptyStateInVietnamese", () => {
-    renderWithProviders(
-      <OfferingList offerings={[]} locale="vi" />,
-    );
+    renderWithProviders(<OfferingList offerings={[]} locale="vi" />);
 
     expect(screen.getByText("Chưa có dịch vụ nào")).toBeInTheDocument();
   });
@@ -38,9 +39,7 @@ describe("OfferingList", () => {
       makeOffering("off_003", "installation"),
     ];
 
-    renderWithProviders(
-      <OfferingList offerings={offerings} locale="vi" />,
-    );
+    renderWithProviders(<OfferingList offerings={offerings} locale="vi" />);
 
     // Each offering card has a specialty badge
     const badges = screen.getAllByTestId("specialty-badge");
@@ -48,9 +47,7 @@ describe("OfferingList", () => {
   });
 
   it("test_OfferingList_showsSkeletonWhenLoading", () => {
-    renderWithProviders(
-      <OfferingList offerings={[]} isLoading={true} />,
-    );
+    renderWithProviders(<OfferingList offerings={[]} isLoading={true} />);
 
     expect(screen.getByTestId("offering-list-skeleton")).toBeInTheDocument();
     // Empty state should not appear while loading
@@ -58,9 +55,7 @@ describe("OfferingList", () => {
   });
 
   it("test_OfferingList_hasCorrectTestId", () => {
-    renderWithProviders(
-      <OfferingList offerings={[]} locale="vi" />,
-    );
+    renderWithProviders(<OfferingList offerings={[]} locale="vi" />);
 
     expect(screen.getByTestId("offering-list")).toBeInTheDocument();
   });

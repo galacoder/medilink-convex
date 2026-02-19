@@ -5,8 +5,9 @@
  * data. Since the hook calls useQuery twice (profile + certifications),
  * we use mockReturnValueOnce for sequential call control.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { useProviderProfile } from "../use-provider-profile";
 
@@ -14,8 +15,6 @@ import { useProviderProfile } from "../use-provider-profile";
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -59,9 +58,7 @@ describe("useProviderProfile", () => {
         mockCertifications as unknown as ReturnType<typeof useQuery>,
       );
 
-    const { result } = renderHook(() =>
-      useProviderProfile("org_001"),
-    );
+    const { result } = renderHook(() => useProviderProfile("org_001"));
 
     expect(result.current.profile).toEqual(mockProfile);
     expect(result.current.isLoading).toBe(false);
@@ -76,9 +73,7 @@ describe("useProviderProfile", () => {
         mockCertifications as unknown as ReturnType<typeof useQuery>,
       );
 
-    const { result } = renderHook(() =>
-      useProviderProfile("org_001"),
-    );
+    const { result } = renderHook(() => useProviderProfile("org_001"));
 
     expect(result.current.certifications).toHaveLength(1);
     expect(result.current.certifications[0]?.nameVi).toBe(
@@ -92,9 +87,7 @@ describe("useProviderProfile", () => {
       undefined as unknown as ReturnType<typeof useQuery>,
     );
 
-    const { result } = renderHook(() =>
-      useProviderProfile("org_001"),
-    );
+    const { result } = renderHook(() => useProviderProfile("org_001"));
 
     expect(result.current.profile).toBeNull();
     expect(result.current.certifications).toEqual([]);

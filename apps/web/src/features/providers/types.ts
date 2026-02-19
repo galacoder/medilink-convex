@@ -166,18 +166,17 @@ export const SPECIALTY_OPTIONS: readonly {
  * SPECIALTY_LABELS — object lookup by specialty value.
  * vi: "Nhãn chuyên ngành" / en: "Specialty labels"
  */
-export const SPECIALTY_LABELS: Record<Specialty, { vi: string; en: string }> =
-  {
-    general_repair: { vi: "Sửa chữa tổng quát", en: "General Repair" },
-    calibration: { vi: "Hiệu chỉnh", en: "Calibration" },
-    installation: { vi: "Lắp đặt", en: "Installation" },
-    preventive_maint: {
-      vi: "Bảo trì phòng ngừa",
-      en: "Preventive Maintenance",
-    },
-    electrical: { vi: "Điện", en: "Electrical" },
-    software: { vi: "Phần mềm", en: "Software" },
-    diagnostics: { vi: "Chẩn đoán", en: "Diagnostics" },
-    training: { vi: "Đào tạo", en: "Training" },
-    other: { vi: "Khác", en: "Other" },
-  };
+export const SPECIALTY_LABELS: Record<Specialty, { vi: string; en: string }> = {
+  general_repair: { vi: "Sửa chữa tổng quát", en: "General Repair" },
+  calibration: { vi: "Hiệu chỉnh", en: "Calibration" },
+  installation: { vi: "Lắp đặt", en: "Installation" },
+  preventive_maint: {
+    vi: "Bảo trì phòng ngừa",
+    en: "Preventive Maintenance",
+  },
+  electrical: { vi: "Điện", en: "Electrical" },
+  software: { vi: "Phần mềm", en: "Software" },
+  diagnostics: { vi: "Chẩn đoán", en: "Diagnostics" },
+  training: { vi: "Đào tạo", en: "Training" },
+  other: { vi: "Khác", en: "Other" },
+};

@@ -5,8 +5,8 @@
  * Each mutation function is mocked at the convex/react level to avoid
  * needing a live Convex deployment.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { useProviderMutations } from "../use-provider-mutations";
 

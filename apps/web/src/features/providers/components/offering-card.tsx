@@ -14,8 +14,8 @@ import { Button } from "@medilink/ui/button";
 import { Card, CardContent, CardHeader } from "@medilink/ui/card";
 
 import type { ServiceOffering } from "../types";
-import { SPECIALTY_LABELS } from "../types";
 import { providerLabels } from "../labels";
+import { SPECIALTY_LABELS } from "../types";
 
 interface OfferingCardProps {
   offering: ServiceOffering;
@@ -96,7 +96,7 @@ export function OfferingCard({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive h-8 w-8 p-0"
                 onClick={() => onDelete(offering)}
                 aria-label={providerLabels.actions.delete[locale]}
               >
@@ -130,8 +130,7 @@ export function OfferingCard({
                 {providerLabels.offerings.turnaroundDays[locale]}:
               </span>
               <span className="font-medium">
-                {offering.turnaroundDays}{" "}
-                {locale === "vi" ? "ngày" : "days"}
+                {offering.turnaroundDays} {locale === "vi" ? "ngày" : "days"}
               </span>
             </div>
           )}

@@ -5,8 +5,9 @@
  * data, isolating the hook's loading logic and return shape from the
  * actual Convex runtime.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { useProviderOfferings } from "../use-provider-offerings";
 
@@ -14,8 +15,6 @@ import { useProviderOfferings } from "../use-provider-offerings";
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -44,9 +43,7 @@ describe("useProviderOfferings", () => {
       mockOfferings as unknown as ReturnType<typeof useQuery>,
     );
 
-    const { result } = renderHook(() =>
-      useProviderOfferings("org_test_001"),
-    );
+    const { result } = renderHook(() => useProviderOfferings("org_test_001"));
 
     expect(result.current.offerings).toHaveLength(2);
     expect(result.current.isLoading).toBe(false);
@@ -58,22 +55,16 @@ describe("useProviderOfferings", () => {
       undefined as unknown as ReturnType<typeof useQuery>,
     );
 
-    const { result } = renderHook(() =>
-      useProviderOfferings("org_test_001"),
-    );
+    const { result } = renderHook(() => useProviderOfferings("org_test_001"));
 
     expect(result.current.offerings).toEqual([]);
     expect(result.current.isLoading).toBe(true);
   });
 
   it("test_useProviderOfferings_returnsEmptyArrayForNoOfferings", () => {
-    mockUseQuery.mockReturnValue(
-      [] as unknown as ReturnType<typeof useQuery>,
-    );
+    mockUseQuery.mockReturnValue([] as unknown as ReturnType<typeof useQuery>);
 
-    const { result } = renderHook(() =>
-      useProviderOfferings("org_test_001"),
-    );
+    const { result } = renderHook(() => useProviderOfferings("org_test_001"));
 
     expect(result.current.offerings).toEqual([]);
     expect(result.current.isLoading).toBe(false);

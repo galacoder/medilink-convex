@@ -8,9 +8,8 @@
  * profile fields and submits via the updateProfile Convex mutation.
  */
 import { useState } from "react";
-
-import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
@@ -135,7 +134,7 @@ export function ProviderProfileForm({
         </Label>
         <textarea
           id="profileDescVi"
-          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
           value={form.descriptionVi}
           onChange={(e) =>
             setForm((prev) => ({ ...prev, descriptionVi: e.target.value }))
@@ -151,7 +150,7 @@ export function ProviderProfileForm({
         </Label>
         <textarea
           id="profileDescEn"
-          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2"
+          className="border-input bg-background placeholder:text-muted-foreground flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
           value={form.descriptionEn}
           onChange={(e) =>
             setForm((prev) => ({ ...prev, descriptionEn: e.target.value }))

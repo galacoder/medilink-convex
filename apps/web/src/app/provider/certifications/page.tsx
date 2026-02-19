@@ -14,8 +14,8 @@ import { useState } from "react";
 
 import { useActiveOrganization } from "~/auth/client";
 import { CertificationTable } from "~/features/providers/components/certification-table";
-import { useProviderProfile } from "~/features/providers/hooks/use-provider-profile";
 import { useProviderMutations } from "~/features/providers/hooks/use-provider-mutations";
+import { useProviderProfile } from "~/features/providers/hooks/use-provider-profile";
 
 interface AddCertFormState {
   nameVi: string;
@@ -83,9 +83,11 @@ export default function ProviderCertificationsPage() {
           className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium"
           onClick={() => setShowForm((prev) => !prev)}
         >
-          {showForm
-            ? "Hủy" /* Cancel */
-            : "Thêm chứng nhận" /* Add Certification */}
+          {
+            showForm
+              ? "Hủy" /* Cancel */
+              : "Thêm chứng nhận" /* Add Certification */
+          }
         </button>
       </div>
 
@@ -98,7 +100,8 @@ export default function ProviderCertificationsPage() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label htmlFor="certNameVi" className="text-sm font-medium">
-                Tên chứng nhận (Tiếng Việt) *{/* Certification Name (Vietnamese) */}
+                Tên chứng nhận (Tiếng Việt) *
+                {/* Certification Name (Vietnamese) */}
               </label>
               <input
                 id="certNameVi"

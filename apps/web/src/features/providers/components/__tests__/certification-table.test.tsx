@@ -4,12 +4,12 @@
  * WHY: Verifies bilingual name rendering, date formatting, expiry warning
  * for near-expiry certifications, and correct empty state.
  */
-import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
+import type { Certification } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { CertificationTable } from "../certification-table";
-import type { Certification } from "../../types";
 
 const now = Date.now();
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -73,10 +73,7 @@ describe("CertificationTable", () => {
     });
 
     renderWithProviders(
-      <CertificationTable
-        certifications={[expiringCert]}
-        locale="vi"
-      />,
+      <CertificationTable certifications={[expiringCert]} locale="vi" />,
     );
 
     expect(screen.getByTestId("cert-expiring-soon")).toBeInTheDocument();
@@ -89,10 +86,7 @@ describe("CertificationTable", () => {
     });
 
     renderWithProviders(
-      <CertificationTable
-        certifications={[expiredCert]}
-        locale="vi"
-      />,
+      <CertificationTable certifications={[expiredCert]} locale="vi" />,
     );
 
     expect(screen.getByTestId("cert-expired")).toBeInTheDocument();
@@ -100,9 +94,7 @@ describe("CertificationTable", () => {
   });
 
   it("test_CertificationTable_showsEmptyState", () => {
-    renderWithProviders(
-      <CertificationTable certifications={[]} locale="vi" />,
-    );
+    renderWithProviders(<CertificationTable certifications={[]} locale="vi" />);
 
     expect(screen.getByText("Chưa có chứng nhận nào")).toBeInTheDocument();
   });
