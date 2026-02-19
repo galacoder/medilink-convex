@@ -73,12 +73,10 @@ interface BaseEntityIds {
 }
 
 interface EquipmentDataIds {
-  categoryIds: {
-    diagnostic: Id<"equipmentCategories">;
-    patient_monitoring: Id<"equipmentCategories">;
-    surgical: Id<"equipmentCategories">;
-    medical_it: Id<"equipmentCategories">;
-  };
+  categoryIdDiagnostic: Id<"equipmentCategories">;
+  categoryIdPatientMonitoring: Id<"equipmentCategories">;
+  categoryIdSurgical: Id<"equipmentCategories">;
+  categoryIdMedicalIt: Id<"equipmentCategories">;
   equipmentIds: Id<"equipment">[];
   maintenanceEquipmentId: Id<"equipment">; // XRAY — will get overdue maintenance record
 }

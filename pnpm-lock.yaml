@@ -45,6 +45,9 @@ catalogs:
     better-auth:
       specifier: 1.4.9
       version: 1.4.9
+    convex-test:
+      specifier: ^0.0.34
+      version: 0.0.34
     eslint:
       specifier: ^9.38.0
       version: 9.38.0
@@ -383,6 +386,42 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+
+  convex:
+    devDependencies:
+      '@convex-dev/better-auth':
+        specifier: ^0.10.10
+        version: 0.10.10(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.0)(kysely@0.28.5)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.1.0)(better-auth@1.4.9(4cac339b8880a1d5099c53f0878b8531))(better-call@1.1.8(zod@4.3.6))(convex@1.31.7(react@19.1.4))(nanostores@1.0.1)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
+      '@edge-runtime/vm':
+        specifier: 'catalog:'
+        version: 5.0.0
+      '@medilink/prettier-config':
+        specifier: workspace:*
+        version: link:../tooling/prettier
+      '@medilink/tsconfig':
+        specifier: workspace:*
+        version: link:../tooling/typescript
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.18.12
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.4.9(4cac339b8880a1d5099c53f0878b8531)
+      convex:
+        specifier: ^1.31.7
+        version: 1.31.7(react@19.1.4)
+      convex-test:
+        specifier: 'catalog:'
+        version: 0.0.34(convex@1.31.7(react@19.1.4))
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vite:
+        specifier: 7.1.12
+        version: 7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
       vitest:
         specifier: 'catalog:'
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
@@ -4780,6 +4819,11 @@ packages:
         optional: true
       zod:
         optional: true
+
+  convex-test@0.0.34:
+    resolution: {integrity: sha512-srntn1drKy0Aa8zzatvJ10ZJFVpBYvLWQrhTibdfnslQqNdzQV5Ui4XKFtmrEmqw+DjmeJATgvZHbLzhP7Dh4w==}
+    peerDependencies:
+      convex: ^1.16.4
 
   convex-test@0.0.41:
     resolution: {integrity: sha512-GPHeYFOi70n7UtW0eCEQFVhzl/+m8PvbWkDCbKpHLybI1MrScf4sVpGeM0cC2qmtxiduxa2nLPbehPalhh9oyQ==}
@@ -14345,6 +14389,10 @@ snapshots:
       react: 19.1.4
       typescript: 5.9.3
       zod: 4.1.12
+
+  convex-test@0.0.34(convex@1.31.7(react@19.1.4)):
+    dependencies:
+      convex: 1.31.7(react@19.1.4)
 
   convex-test@0.0.41(convex@1.31.7(react@19.1.4)):
     dependencies:

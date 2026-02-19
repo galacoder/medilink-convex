@@ -39,16 +39,8 @@ const BOTTLENECK_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7 days in ms
  */
 async function requirePlatformAdmin(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
-  db: {
-    query: (table: string) => {
-      filter: (
-        fn: (q: {
-          eq: (a: unknown, b: unknown) => unknown;
-          field: (name: string) => unknown;
-        }) => unknown,
-      ) => { first: () => Promise<Record<string, unknown> | null> };
-    };
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
 }): Promise<{ userId: Id<"users"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {

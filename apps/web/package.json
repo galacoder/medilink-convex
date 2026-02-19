@@ -5,7 +5,7 @@
   "scripts": {
     "build": "pnpm with-env next build",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
-    "dev": "pnpm with-env next dev",
+    "dev": "dotenv -e ../../.env -e ../../.env.local -- next dev",
     "e2e": "pnpm with-env playwright test",
     "e2e:ci": "playwright test --config=playwright.config.ci.ts",
     "e2e:ui": "pnpm with-env playwright test --ui",

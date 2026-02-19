@@ -15,6 +15,7 @@
   "exclude": [
     "node_modules",
     "_generated",
+    "__tests__",
     "auth.ts",
     "auth.config.ts",
     "convex.config.ts"

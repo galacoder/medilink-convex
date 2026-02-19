@@ -4,8 +4,8 @@ import { z } from "zod/v4";
 export function authEnv() {
   return createEnv({
     server: {
-      AUTH_GOOGLE_ID: z.string().min(1),
-      AUTH_GOOGLE_SECRET: z.string().min(1),
+      AUTH_GOOGLE_ID: z.string().optional(),
+      AUTH_GOOGLE_SECRET: z.string().optional(),
       AUTH_SECRET:
         process.env.NODE_ENV === "production"
           ? z.string().min(1)
