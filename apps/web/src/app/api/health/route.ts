@@ -33,12 +33,14 @@ interface HealthResponse {
 }
 
 /**
- * Checks Convex connectivity by verifying the CONVEX_URL is set.
- * In production, a more thorough check would make a lightweight ping request
- * to the Convex deployment. For now, we verify configuration is present.
+ * Checks Convex connectivity by verifying CONVEX_URL is set and not a CI placeholder.
  *
- * WHY: A missing CONVEX_URL means all database operations will fail.
- * This is the most critical dependency — without it the app cannot function.
+ * WHY: A missing or placeholder CONVEX_URL causes all database/auth operations
+ * to fail with cryptic errors like "InvalidDeploymentName". Detecting this early
+ * here surfaces the misconfiguration clearly at the HTTP layer.
+ *
+ * Placeholder detection is skipped in CI (process.env.CI is set by Woodpecker/GitHub
+ * Actions) because CI intentionally uses placeholder values for build/test isolation.
  */
 function checkConvexConnectivity(): ServiceStatus {
   const convexUrl = env.NEXT_PUBLIC_CONVEX_URL;
@@ -46,6 +48,17 @@ function checkConvexConnectivity(): ServiceStatus {
     return {
       status: "unavailable",
       message: "CONVEX_URL not configured",
+    };
+  }
+  // In non-CI environments, detect CI placeholder values that would break auth.
+  // Placeholder URLs pass z.string().url() validation but fail at runtime with
+  // "InvalidDeploymentName" — catch it here before requests fail silently.
+  // eslint-disable-next-line no-restricted-properties
+  if (!process.env.CI && convexUrl.includes("placeholder")) {
+    return {
+      status: "unavailable",
+      message:
+        "CONVEX_URL is a CI placeholder — set real value in .env.local (run: npx convex dev)",
     };
   }
   return { status: "ok" };

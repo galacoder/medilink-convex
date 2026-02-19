@@ -17,7 +17,8 @@ const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
  * Provides methods for integrating Convex with Better Auth and
  * helper methods for auth-gated queries/mutations.
  */
-export const authComponent = createClient<DataModel>(components.betterAuth);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const authComponent = createClient<DataModel>(components.betterAuth as any);
 
 /**
  * Creates the Better Auth options for a given Convex context.

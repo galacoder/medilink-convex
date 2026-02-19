@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const mocksDir = resolve(__dirname, "../__mocks__");
+const mocksDir = resolve(__dirname, "../../convex-test-mocks");
 
 export default defineConfig({
   resolve: {

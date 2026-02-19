@@ -229,22 +229,23 @@ describe("qrCodes.recordScan", () => {
   it("test_recordScan_rejects_invalid_qr_code_id", async () => {
     const t = convexTest(schema, modules);
     const orgId = await seedOrganization(t);
-    await seedUser(t, DEFAULT_USER_EMAIL);
+    const catId = await seedCategory(t, orgId);
+    const equipId = await seedEquipment(t, orgId, catId);
+    const userId = await seedUser(t, DEFAULT_USER_EMAIL);
 
     const asOrg = t.withIdentity({
       organizationId: orgId,
       subject: DEFAULT_USER_EMAIL,
     });
 
-    // Use a non-existent QR code ID
+    // Use a non-existent QR code ID (insert with valid IDs + delete to get orphaned ID)
     const fakeId = await t.run(async (ctx) => {
-      // Insert a dummy record to get a valid ID format, then delete it
       const id = await ctx.db.insert("qrCodes", {
-        equipmentId: "nonexistent" as any,
+        equipmentId: equipId as any,
         organizationId: orgId as any,
         code: "fake-code",
         isActive: false,
-        createdBy: "fake" as any,
+        createdBy: userId as any,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
