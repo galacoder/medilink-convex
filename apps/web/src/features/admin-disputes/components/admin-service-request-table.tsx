@@ -112,8 +112,7 @@ export function AdminServiceRequestTable({
       header: adminDisputeLabels.columns.status.vi,
       cell: ({ row }) => {
         const status = row.original.status;
-        const label =
-          adminDisputeLabels.serviceRequestStatuses[status].vi;
+        const label = adminDisputeLabels.serviceRequestStatuses[status].vi;
         const colorClass = STATUS_COLORS[status];
         return (
           <span
