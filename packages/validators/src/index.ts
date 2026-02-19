@@ -5,3 +5,4 @@ export * from "./serviceRequests";
 export * from "./providers";
 export * from "./consumables";
 export * from "./disputes";
+export * from "./qrCodes";
