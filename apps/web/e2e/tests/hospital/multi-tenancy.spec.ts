@@ -33,65 +33,64 @@ test.describe("Multi-tenancy isolation", () => {
    * vi: "Bệnh viện thứ hai không thể xem thiết bị bệnh viện thứ nhất"
    * en: "Second hospital cannot see first hospital equipment"
    */
-  test(
-    "second hospital user cannot see first hospital equipment",
-    async ({ browser }) => {
-      const timestamp = Date.now();
+  test("second hospital user cannot see first hospital equipment", async ({
+    browser,
+  }) => {
+    const timestamp = Date.now();
 
-      // Create a second hospital user (different org from global-setup hospital)
-      const secondHospitalUser = {
-        name: "Second Hospital Staff",
-        email: `hospital-b-${timestamp}@test.medilink.com`,
-        password: "TestPassword@123",
-        orgName: `Second Hospital Org ${timestamp}`,
-      };
+    // Create a second hospital user (different org from global-setup hospital)
+    const secondHospitalUser = {
+      name: "Second Hospital Staff",
+      email: `hospital-b-${timestamp}@test.medilink.com`,
+      password: "TestPassword@123",
+      orgName: `Second Hospital Org ${timestamp}`,
+    };
 
-      const secondContext = await browser.newContext();
-      const secondPage = await secondContext.newPage();
+    const secondContext = await browser.newContext();
+    const secondPage = await secondContext.newPage();
 
-      try {
-        // Sign up second hospital user with a new organization
-        // WHY: Using relative path so playwright baseURL config applies
-        await secondPage.goto("/sign-up");
-        await secondPage.fill("#name", secondHospitalUser.name);
-        await secondPage.fill("#email", secondHospitalUser.email);
-        await secondPage.fill("#password", secondHospitalUser.password);
+    try {
+      // Sign up second hospital user with a new organization
+      // WHY: Using relative path so playwright baseURL config applies
+      await secondPage.goto("/sign-up");
+      await secondPage.fill("#name", secondHospitalUser.name);
+      await secondPage.fill("#email", secondHospitalUser.email);
+      await secondPage.fill("#password", secondHospitalUser.password);
 
-        // Select hospital role
-        await secondPage.click("#hospital");
+      // Select hospital role
+      await secondPage.click("#hospital");
 
-        // Fill organization name for new org creation
-        await secondPage.fill("#orgName", secondHospitalUser.orgName);
+      // Fill organization name for new org creation
+      await secondPage.fill("#orgName", secondHospitalUser.orgName);
 
-        await secondPage.click('button[type="submit"]');
+      await secondPage.click('button[type="submit"]');
 
-        // Wait for redirect to second hospital's dashboard
-        await secondPage.waitForURL("**/hospital/dashboard", {
-          timeout: 20000,
-        });
+      // Wait for redirect to second hospital's dashboard
+      await secondPage.waitForURL("**/hospital/dashboard", {
+        timeout: 20000,
+      });
 
-        // Navigate to equipment list — should show empty list for new org
-        await secondPage.goto("/hospital/equipment");
-        await expect(secondPage).toHaveURL(/\/hospital\/equipment/, {
-          timeout: 15000,
-        });
+      // Navigate to equipment list — should show empty list for new org
+      await secondPage.goto("/hospital/equipment");
+      await expect(secondPage).toHaveURL(/\/hospital\/equipment/, {
+        timeout: 15000,
+      });
 
-        // The equipment list container should be visible (even if empty)
-        await expect(
-          secondPage.locator('[data-testid="equipment-list"]'),
-        ).toBeVisible({ timeout: 10000 });
+      // The equipment list container should be visible (even if empty)
+      await expect(
+        secondPage.locator('[data-testid="equipment-list"]'),
+      ).toBeVisible({ timeout: 10000 });
 
-        // CRITICAL SECURITY ASSERTION: Second hospital should see 0 equipment rows.
-        // All equipment belongs to the first hospital org (created in global-setup).
-        // If any rows appear, multi-tenancy isolation is BROKEN.
-        const rowCount = await secondPage
-          .locator('[data-testid="equipment-row"]')
-          .count();
-        expect(rowCount).toBe(0);
-      } finally {
-        // Always clean up the second browser context
-        await secondContext.close();
-      }
-    },
-  );
+      // CRITICAL SECURITY ASSERTION: Second hospital should see 0 equipment rows.
+      // All equipment belongs to the first hospital org (created in global-setup).
+      // If any rows appear, multi-tenancy isolation is BROKEN.
+      const rowCount = await secondPage
+        .locator('[data-testid="equipment-row"]')
+        .count();
+      expect(rowCount).toBe(0);
+    } finally {
+      // Always clean up the second browser context
+      await secondContext.close();
+    }
+  });
 });

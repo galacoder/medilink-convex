@@ -1,6 +1,6 @@
 import { expect, test } from "../../fixtures/auth";
-import { ProviderServiceRequestsPage } from "../../pages/provider/service-requests.page";
 import { ProviderQuotesPage } from "../../pages/provider/quotes.page";
+import { ProviderServiceRequestsPage } from "../../pages/provider/service-requests.page";
 
 /**
  * Provider service requests E2E tests (REQ-006).

@@ -99,10 +99,7 @@ export class EquipmentFormPage {
    *
    * WHY: Helper method extracts the common fill pattern to keep tests concise.
    */
-  async fillBasicInfo(data: {
-    nameVi: string;
-    nameEn: string;
-  }): Promise<void> {
+  async fillBasicInfo(data: { nameVi: string; nameEn: string }): Promise<void> {
     await this.nameViInput.fill(data.nameVi);
     await this.nameEnInput.fill(data.nameEn);
   }
