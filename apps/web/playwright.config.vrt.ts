@@ -37,10 +37,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
+    // Use production server — Stage 1 built .next/ (shared workspace in CI)
+    // Ensures consistent screenshots matching production rendering
+    command: "pnpm start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 60 * 1000,
   },
   // No globalSetup — VRT tests use public pages only
 });

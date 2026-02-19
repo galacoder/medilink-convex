@@ -11,6 +11,11 @@ import { defineConfig, devices } from "@playwright/test";
  * a live Convex backend: health endpoint, landing, sign-in, sign-up,
  * security headers, 404 handling.
  *
+ * Uses `pnpm start` (production server) instead of `pnpm dev` because:
+ * 1. Faster startup — Stage 1 already built `.next/` which is shared in workspace
+ * 2. Identical to production — security headers, cache-control, same behavior
+ * 3. Avoids dev-mode compilation timeout in Docker containers
+ *
  * For full E2E with auth, run: pnpm e2e (requires live Convex backend)
  */
 export default defineConfig({
@@ -33,10 +38,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
+    // Use production server — Stage 1 already built .next/ (shared workspace)
+    // This is faster and matches production behavior (headers, caching, etc.)
+    command: "pnpm start",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 60 * 1000,
   },
   // No globalSetup — smoke tests don't require authenticated sessions
 });
