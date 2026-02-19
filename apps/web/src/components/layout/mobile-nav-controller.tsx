@@ -1,12 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import type { NavItem } from "./nav-config";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
 import { Sidebar } from "./sidebar";
+import { useServiceRequestNotifications } from "~/features/service-requests/hooks/use-service-request-notifications";
 
 interface MobileNavControllerProps {
   children: ReactNode;
@@ -30,11 +31,24 @@ export function MobileNavController({
   locale = "vi",
 }: MobileNavControllerProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { totalBadge } = useServiceRequestNotifications();
+
+  // Inject the notification badge onto the service-requests nav item when count > 0.
+  // WHY: The badge must be computed client-side from live Convex data, so we
+  // merge it here rather than hardcoding it in the static nav config.
+  const navItemsWithBadge = useMemo<NavItem[]>(() => {
+    return navItems.map((item) => {
+      if (item.href.endsWith("/service-requests") && totalBadge > 0) {
+        return { ...item, badge: String(totalBadge) };
+      }
+      return item;
+    });
+  }, [navItems, totalBadge]);
 
   return (
     <>
       {/* Desktop sidebar — hidden on mobile */}
-      <Sidebar navItems={navItems} locale={locale} />
+      <Sidebar navItems={navItemsWithBadge} locale={locale} />
 
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -48,7 +62,7 @@ export function MobileNavController({
 
       {/* Mobile navigation sheet */}
       <MobileNav
-        navItems={navItems}
+        navItems={navItemsWithBadge}
         locale={locale}
         isOpen={mobileNavOpen}
         onOpenChange={setMobileNavOpen}

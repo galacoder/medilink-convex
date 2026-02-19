@@ -5,6 +5,7 @@
     "jsx": "preserve",
     "paths": {
       "~/*": ["./src/*"],
+      "convex/_generated/api": ["./src/__mocks__/convex-api-typed.ts", "../../convex/_generated/api"],
       "convex/_generated/*": ["../../convex/_generated/*"]
     },
     "plugins": [{ "name": "next" }]
