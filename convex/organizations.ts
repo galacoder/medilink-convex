@@ -35,9 +35,7 @@ export const getOrganization = query({
   handler: async (ctx, args) => {
     const authUser = await authComponent.getAuthUser(ctx);
     if (!authUser) {
-      throw new ConvexError(
-        "Bạn chưa đăng nhập (Not authenticated)",
-      );
+      throw new ConvexError("Bạn chưa đăng nhập (Not authenticated)");
     }
 
     // Find the user record by email
@@ -461,7 +459,10 @@ export const removeMember = mutation({
       action: "organization.member_removed",
       resourceType: "organizationMembership",
       resourceId: targetMembership._id,
-      previousValues: { userId: args.targetUserId, role: targetMembership.role },
+      previousValues: {
+        userId: args.targetUserId,
+        role: targetMembership.role,
+      },
       newValues: null,
       createdAt: now,
       updatedAt: now,

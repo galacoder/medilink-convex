@@ -2,6 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { EquipmentForm } from "../components/equipment-form";
+
 // Mock the entire convex/react module to avoid server-side deps
 vi.mock("convex/react", () => ({
   useMutation: () => vi.fn().mockResolvedValue("new-id"),
@@ -15,8 +17,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { EquipmentForm } from "../components/equipment-form";
 
 describe("EquipmentForm", () => {
   it("renders all required fields in create mode", () => {
@@ -38,7 +38,9 @@ describe("EquipmentForm", () => {
     expect(screen.getByLabelText(/danh mục/i)).toBeInTheDocument();
 
     // Check for submit button
-    expect(screen.getByRole("button", { name: /tạo mới/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /tạo mới/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows validation errors for empty required fields", async () => {
@@ -57,9 +59,7 @@ describe("EquipmentForm", () => {
     await waitFor(() => {
       // Should show Vietnamese validation error for nameVi
       expect(
-        screen.getByText(
-          /tên thiết bị phải có ít nhất 2 ký tự/i,
-        ),
+        screen.getByText(/tên thiết bị phải có ít nhất 2 ký tự/i),
       ).toBeInTheDocument();
     });
   });

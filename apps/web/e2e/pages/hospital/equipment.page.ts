@@ -33,3 +33,74 @@ export class EquipmentListPage {
     return this.page.locator('[data-testid="equipment-empty"]');
   }
 }
+
+/**
+ * Page Object Model for the hospital equipment create/edit form.
+ *
+ * WHY: Encapsulates form field interactions for equipment CRUD E2E tests.
+ * The form uses #id selectors for all inputs (nameVi, nameEn, categoryId,
+ * status, condition, criticality, serialNumber, model, manufacturer, location).
+ *
+ * vi: "Mô hình trang biểu mẫu thiết bị" / en: "Equipment form page object model"
+ */
+export class EquipmentFormPage {
+  constructor(private readonly page: Page) {}
+
+  async gotoNew(): Promise<void> {
+    await this.page.goto("/hospital/equipment/new");
+  }
+
+  async gotoEdit(id: string): Promise<void> {
+    await this.page.goto(`/hospital/equipment/${id}/edit`);
+  }
+
+  /** Vietnamese name input (#nameVi) */
+  get nameViInput() {
+    return this.page.locator("#nameVi");
+  }
+
+  /** English name input (#nameEn) */
+  get nameEnInput() {
+    return this.page.locator("#nameEn");
+  }
+
+  /** Category select (#categoryId) */
+  get categorySelect() {
+    return this.page.locator("#categoryId");
+  }
+
+  /** Status select (#status) */
+  get statusSelect() {
+    return this.page.locator("#status");
+  }
+
+  /** Condition select (#condition) */
+  get conditionSelect() {
+    return this.page.locator("#condition");
+  }
+
+  /** Criticality select (#criticality) */
+  get criticalitySelect() {
+    return this.page.locator("#criticality");
+  }
+
+  /** Serial number input (#serialNumber) */
+  get serialNumberInput() {
+    return this.page.locator("#serialNumber");
+  }
+
+  /** Form submit button */
+  get submitButton() {
+    return this.page.locator('button[type="submit"]');
+  }
+
+  /**
+   * Fill the basic name fields.
+   *
+   * WHY: Helper method extracts the common fill pattern to keep tests concise.
+   */
+  async fillBasicInfo(data: { nameVi: string; nameEn: string }): Promise<void> {
+    await this.nameViInput.fill(data.nameVi);
+    await this.nameEnInput.fill(data.nameEn);
+  }
+}

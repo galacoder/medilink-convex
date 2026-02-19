@@ -1,12 +1,12 @@
 import { ConvexError } from "convex/values";
 import { describe, expect, it } from "vitest";
 
+import type { EquipmentStatus } from "../lib/statusMachine";
 import {
   assertTransition,
   canTransition,
   EQUIPMENT_TRANSITIONS,
   getValidTransitions,
-  type EquipmentStatus,
 } from "../lib/statusMachine";
 
 // ---------------------------------------------------------------------------

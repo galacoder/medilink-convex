@@ -32,11 +32,11 @@ A [2025 Gartner report](https://codingplainenglish.medium.com/why-teams-are-movi
 
 ### 1.2 Real-World Examples
 
-| Company | Change | Impact |
-|---------|--------|--------|
-| **Amazon Prime Video** | Distributed microservices → monolithic application | [90% cost reduction](https://medium.com/@ntiinsd/microservices-are-fading-monoliths-are-back-the-surprising-shift-in-2025-885b29c2713c) |
-| **Twilio Segment** | 140+ microservices → single monolith | 3 full-time engineers freed from firefighting to feature development |
-| **Anonymous startup (4 devs)** | Micro-frontend architecture → Next.js monolith | 3 months of infrastructure headaches eliminated |
+| Company                        | Change                                             | Impact                                                                                                                                  |
+| ------------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Amazon Prime Video**         | Distributed microservices → monolithic application | [90% cost reduction](https://medium.com/@ntiinsd/microservices-are-fading-monoliths-are-back-the-surprising-shift-in-2025-885b29c2713c) |
+| **Twilio Segment**             | 140+ microservices → single monolith               | 3 full-time engineers freed from firefighting to feature development                                                                    |
+| **Anonymous startup (4 devs)** | Micro-frontend architecture → Next.js monolith     | 3 months of infrastructure headaches eliminated                                                                                         |
 
 [Full consolidation analysis](https://byteiota.com/modular-monolith-42-ditch-microservices-in-2026/)
 
@@ -85,23 +85,23 @@ Large language models have limited context windows of approximately 1 million to
 
 ProX's original plugin architecture:
 
-| Metric | Value | AI Impact |
-|--------|-------|-----------|
-| Files | 950 | Context fragmentation across packages |
-| Languages | 2 (Python + TypeScript) | Zero compile-time type safety |
-| Coordination mechanisms | 7 | Turborepo build, plugin manifest, shared-core deps, backend router registration, hooks interface, event pub/sub, component registry |
-| Nesting depth | 3 | `packages/@galatek/plugin-X/backend/models/` |
-| **Complexity score** | **39,900** | **133x over AI threshold of 300** |
+| Metric                  | Value                   | AI Impact                                                                                                                           |
+| ----------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Files                   | 950                     | Context fragmentation across packages                                                                                               |
+| Languages               | 2 (Python + TypeScript) | Zero compile-time type safety                                                                                                       |
+| Coordination mechanisms | 7                       | Turborepo build, plugin manifest, shared-core deps, backend router registration, hooks interface, event pub/sub, component registry |
+| Nesting depth           | 3                       | `packages/@galatek/plugin-X/backend/models/`                                                                                        |
+| **Complexity score**    | **39,900**              | **133x over AI threshold of 300**                                                                                                   |
 
 T3 Turbo + Convex standard:
 
-| Metric | Value | AI Impact |
-|--------|-------|-----------|
-| Files | ~200 | Single tree, flat structure |
-| Languages | 1 (TypeScript end-to-end) | 94% of AI errors eliminated at compile time |
-| Coordination mechanisms | 1 | TypeScript imports only |
-| Nesting depth | 1 | `apps/web/src/features/courses/` |
-| **Complexity score** | **200** | **Well within AI threshold of 300** |
+| Metric                  | Value                     | AI Impact                                   |
+| ----------------------- | ------------------------- | ------------------------------------------- |
+| Files                   | ~200                      | Single tree, flat structure                 |
+| Languages               | 1 (TypeScript end-to-end) | 94% of AI errors eliminated at compile time |
+| Coordination mechanisms | 1                         | TypeScript imports only                     |
+| Nesting depth           | 1                         | `apps/web/src/features/courses/`            |
+| **Complexity score**    | **200**                   | **Well within AI threshold of 300**         |
 
 **Result**: 199x reduction in complexity score.
 
@@ -114,6 +114,7 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 - Build structure understanding
 
 [Three shifts made AI-driven monorepo development practical](https://www.spectrocloud.com/blog/will-ai-turn-2026-into-the-year-of-the-monorepo):
+
 1. Large context windows (200K-1M tokens by end of 2025)
 2. IDE-native embeddings
 3. Safe bulk edits
@@ -130,18 +131,19 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 
 **Original architecture**: WordPress-like plugin system (Python FastAPI + Supabase + SQLAlchemy)
 
-| Metric | Value |
-|--------|-------|
-| Plugins | 29 |
-| Backend files | 633 |
-| Frontend files | 1,121 |
-| Total files | 1,754 |
-| Data models | 69 (SQLAlchemy) |
-| Business functions | 300+ |
-| Service classes | 68 |
-| Complexity score | 39,900 |
+| Metric             | Value           |
+| ------------------ | --------------- |
+| Plugins            | 29              |
+| Backend files      | 633             |
+| Frontend files     | 1,121           |
+| Total files        | 1,754           |
+| Data models        | 69 (SQLAlchemy) |
+| Business functions | 300+            |
+| Service classes    | 68              |
+| Complexity score   | 39,900          |
 
 **Coordination mechanisms required** (7 total):
+
 1. Turborepo build orchestration
 2. Plugin manifest registration
 3. Shared-core dependencies
@@ -151,6 +153,7 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 7. Component registry
 
 **Fix attempt history**:
+
 - 2.5 months of development
 - 68 attempted fixes
 - 0% convergence (no pattern emerged that reduced complexity)
@@ -164,14 +167,15 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 
 **Current state**: Partial T3 stack with Supabase (not Convex)
 
-| Metric | Value |
-|--------|-------|
-| Plugins | 16 |
-| Coordination overhead | Plugin loader + dynamic routing |
-| Database | Supabase (requires manual schema migrations) |
-| Status | Stalled — migration path unclear |
+| Metric                | Value                                        |
+| --------------------- | -------------------------------------------- |
+| Plugins               | 16                                           |
+| Coordination overhead | Plugin loader + dynamic routing              |
+| Database              | Supabase (requires manual schema migrations) |
+| Status                | Stalled — migration path unclear             |
 
 **Problems**:
+
 - Plugin infrastructure adds no business value for healthcare platform
 - Supabase requires SQL migrations instead of TypeScript-native schema
 - No AI agent executed successfully on plugin-based codebase
@@ -183,19 +187,21 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 
 **Current state**: T3 Turbo + Convex (validated production) BUT over-engineered with plugins
 
-| Component | Count | Purpose |
-|-----------|-------|---------|
-| **Business plugins** | 10 | billing, ai-chat, marketplace, user-management, content, calendar, analytics, wellness, integration-api, mobile-sync |
-| **Infrastructure packages** | 5 | plugin-loader, extension-registry, event-bus, hook-registry, plugin-config |
-| **Total plugin files** | 341 | Across 15 packages |
-| **Complexity score** | ~3,200 | 10x over threshold, but manageable |
+| Component                   | Count  | Purpose                                                                                                              |
+| --------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Business plugins**        | 10     | billing, ai-chat, marketplace, user-management, content, calendar, analytics, wellness, integration-api, mobile-sync |
+| **Infrastructure packages** | 5      | plugin-loader, extension-registry, event-bus, hook-registry, plugin-config                                           |
+| **Total plugin files**      | 341    | Across 15 packages                                                                                                   |
+| **Complexity score**        | ~3,200 | 10x over threshold, but manageable                                                                                   |
 
 **Additional problem**: GlueStack UI vendor lock-in
+
 - Unified UI library for web + native
 - Performance ceiling, limited ecosystem
 - Migration required for platform optimization
 
 **Result**: PalX works in production BUT refactor recommended:
+
 1. Separate `apps/web/` and `apps/expo/` (currently co-mingled)
 2. Replace 10 plugins → feature modules in `apps/web/src/features/`
 3. Delete 5 infrastructure packages (plugin-loader, etc.)
@@ -212,6 +218,7 @@ Rather than relying on brute-force context processing, [smart monorepo tooling](
 **Decision**: Feature module inside ProX at `apps/web/src/features/busos/`
 
 **Rationale**:
+
 - BusOS is ProX-specific (72-framework business operating system for ProX users)
 - No need for separate deployment or versioning
 - No other app will consume BusOS
@@ -242,15 +249,15 @@ apps/web/src/features/courses/
 
 ### 4.2 Advantages vs Plugin Architecture
 
-| Factor | Plugin Architecture | Modular Monolith |
-|--------|-------------------|------------------|
-| **Dependencies** | package.json, peer deps, version conflicts | Import from relative path |
-| **Type safety** | Manual type exports, version drift | TypeScript auto-infers |
-| **Build time** | Turborepo orchestration, publish steps | Single `turbo build` |
-| **AI context** | Split across packages, hard to reason | Single directory tree |
-| **Coordination** | 7 mechanisms (manifest, hooks, events, etc.) | 1 mechanism (imports) |
-| **Team size** | Justified at 50+ devs | Works for 1-50 devs |
-| **Migration cost** | 2-3 months to extract/consolidate | 2-3 hours to reorganize dirs |
+| Factor             | Plugin Architecture                          | Modular Monolith             |
+| ------------------ | -------------------------------------------- | ---------------------------- |
+| **Dependencies**   | package.json, peer deps, version conflicts   | Import from relative path    |
+| **Type safety**    | Manual type exports, version drift           | TypeScript auto-infers       |
+| **Build time**     | Turborepo orchestration, publish steps       | Single `turbo build`         |
+| **AI context**     | Split across packages, hard to reason        | Single directory tree        |
+| **Coordination**   | 7 mechanisms (manifest, hooks, events, etc.) | 1 mechanism (imports)        |
+| **Team size**      | Justified at 50+ devs                        | Works for 1-50 devs          |
+| **Migration cost** | 2-3 months to extract/consolidate            | 2-3 hours to reorganize dirs |
 
 [Modular Monolith vs Microservices](https://medium.com/codex/what-is-better-modular-monolith-vs-microservices-994e1ec70994)
 
@@ -311,6 +318,7 @@ apps/web/src/
 ```
 
 **Rules**:
+
 - Features import from `components/`, `hooks/`, `lib/` (downward dependency)
 - `components/` CANNOT import from `features/` (no upward dependency)
 - Features can import from each other if explicitly allowed (peer dependency)
@@ -323,26 +331,26 @@ AI agents understand this structure because it's a directory tree, not a build g
 
 ### 6.1 Plugin Architecture Costs
 
-| Cost Type | ProX Example | Industry Average |
-|-----------|-------------|------------------|
-| **Infrastructure overhead** | 5 core packages (plugin-loader, extension-registry, event-bus, hook-registry, plugin-config) | 3.75x to 6x cost vs monolith |
-| **Operational burden** | 2-4 platform engineers needed | vs 1-2 for modular monolith |
-| **Developer time** | 60% debugging, 40% features | Small teams lose velocity |
-| **Migration cost** | 16-22 weeks to consolidate 29 plugins | Sunk cost, but lesson learned |
-| **AI complexity** | 39,900 score → 0% AI convergence | AI cannot execute on plugin codebases |
+| Cost Type                   | ProX Example                                                                                 | Industry Average                      |
+| --------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------- |
+| **Infrastructure overhead** | 5 core packages (plugin-loader, extension-registry, event-bus, hook-registry, plugin-config) | 3.75x to 6x cost vs monolith          |
+| **Operational burden**      | 2-4 platform engineers needed                                                                | vs 1-2 for modular monolith           |
+| **Developer time**          | 60% debugging, 40% features                                                                  | Small teams lose velocity             |
+| **Migration cost**          | 16-22 weeks to consolidate 29 plugins                                                        | Sunk cost, but lesson learned         |
+| **AI complexity**           | 39,900 score → 0% AI convergence                                                             | AI cannot execute on plugin codebases |
 
 [Infrastructure cost analysis](https://byteiota.com/microservices-consolidation-42-return-to-monoliths/)
 
 ### 6.2 Monolithic Feature Module Benefits
 
-| Benefit | ProX Impact | Industry Validation |
-|---------|-------------|---------------------|
-| **Reduced complexity** | 39,900 → 200 score (199x reduction) | 42% of orgs consolidating (CNCF 2025) |
-| **AI execution** | AI agents complete issues end-to-end | Monorepos + AI practical in 2025 |
-| **Build time** | Single `turbo build` (not 29 plugin builds) | Turborepo caching 60-80% hit rate |
-| **Type safety** | TypeScript end-to-end (94% AI errors eliminated) | Zero manual type bridging |
-| **Developer velocity** | 1 developer = 4-5 parallel agents | Small team productivity 2x-3x vs plugins |
-| **Migration cost** | $288K-$468K saved vs full rebuild | Time-to-market 16-22 weeks faster |
+| Benefit                | ProX Impact                                      | Industry Validation                      |
+| ---------------------- | ------------------------------------------------ | ---------------------------------------- |
+| **Reduced complexity** | 39,900 → 200 score (199x reduction)              | 42% of orgs consolidating (CNCF 2025)    |
+| **AI execution**       | AI agents complete issues end-to-end             | Monorepos + AI practical in 2025         |
+| **Build time**         | Single `turbo build` (not 29 plugin builds)      | Turborepo caching 60-80% hit rate        |
+| **Type safety**        | TypeScript end-to-end (94% AI errors eliminated) | Zero manual type bridging                |
+| **Developer velocity** | 1 developer = 4-5 parallel agents                | Small team productivity 2x-3x vs plugins |
+| **Migration cost**     | $288K-$468K saved vs full rebuild                | Time-to-market 16-22 weeks faster        |
 
 [Modular monolith benefits analysis](https://www.javacodegeeks.com/2025/12/microservices-vs-modular-monoliths-in-2025-when-each-approach-wins.html)
 
@@ -364,11 +372,11 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 
 ### Section 4: Anti-Patterns
 
-| Anti-Pattern | Why NOT | Evidence |
-|-------------|---------|---------|
-| WordPress-style plugin architecture | Complexity score 39,900 vs 200 for flat monorepo. 68 fix attempts, 0% convergence. | Wave 0: failure-patterns.md |
-| Nested workspace paths (`packages/core/*`, `packages/plugins/*`) | Adds dependency resolution complexity for no benefit at ProX scale. PalX lesson learned. | Wave 4: monorepo-architecture-patterns.md |
-| Runtime plugin discovery | PalX's `plugin-provider.tsx` uses `useEffect` for filesystem discovery. Adds latency. Use static imports. | Wave 4: monorepo-architecture-patterns.md |
+| Anti-Pattern                                                     | Why NOT                                                                                                   | Evidence                                  |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| WordPress-style plugin architecture                              | Complexity score 39,900 vs 200 for flat monorepo. 68 fix attempts, 0% convergence.                        | Wave 0: failure-patterns.md               |
+| Nested workspace paths (`packages/core/*`, `packages/plugins/*`) | Adds dependency resolution complexity for no benefit at ProX scale. PalX lesson learned.                  | Wave 4: monorepo-architecture-patterns.md |
+| Runtime plugin discovery                                         | PalX's `plugin-provider.tsx` uses `useEffect` for filesystem discovery. Adds latency. Use static imports. | Wave 4: monorepo-architecture-patterns.md |
 
 [Full anti-patterns list: ARCHITECTURE_STANDARD.md, Section 4](../../ARCHITECTURE_STANDARD.md#4-anti-patterns-do-not)
 
@@ -381,6 +389,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 **Status**: In progress (M0-M5, 59 issues)
 
 **Action**:
+
 - ✅ Already decided: T3 Turbo + Convex with feature modules
 - ✅ No plugin system in new architecture
 - ✅ 19 plugins → feature modules in `apps/web/src/features/`
@@ -393,6 +402,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 **Status**: Stalled on Supabase + 16 plugins
 
 **Action**:
+
 1. Create 6-milestone plan similar to ProX (M0: infrastructure, M1: core, M2-4: features, M5: polish)
 2. Consolidate 16 plugins → feature modules
 3. Migrate Supabase → Convex (reference PalX adapter pattern)
@@ -405,6 +415,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 **Status**: Production but over-engineered
 
 **Action**:
+
 1. Separate `apps/web/` and `apps/expo/` (currently co-mingled)
 2. Replace 10 plugins → `apps/web/src/features/` directories
 3. Delete 5 infrastructure packages (plugin-loader, extension-registry, event-bus, hook-registry, plugin-config)
@@ -419,6 +430,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 **Status**: Decided as feature module
 
 **Action**:
+
 - Implement BusOS at `apps/web/src/features/busos/` inside ProX
 - No separate plugin package
 - Follow same directory structure as courses/membership/community
@@ -430,6 +442,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 **Standard**: All new SangLeTech projects use monolithic feature modules by default.
 
 **Template**: After ProX completes, extract `create-sangle-app` scaffold:
+
 - T3 Turbo + Convex base
 - Better Auth adapter
 - Woodpecker CI 6-stage pipeline
@@ -437,6 +450,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 - CLAUDE.md with agent instructions
 
 **Exception**: Only adopt plugin architecture IF:
+
 - Team > 50 developers, OR
 - Marketplace model (3rd-party plugins from external developers), OR
 - White-label product (customers customize via plugins)
@@ -447,16 +461,16 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 
 ## 9. Decision Rationale Summary
 
-| Criteria | Plugin Architecture | Monolithic Feature Modules | Winner |
-|----------|-------------------|---------------------------|--------|
-| **AI execution** | 39,900 complexity, 0% convergence | 200 complexity, 100% convergence | ✅ Monolith |
-| **Team size** | Justified at 50+ devs | Optimal for 1-50 devs | ✅ Monolith |
-| **Infrastructure cost** | 3.75x-6x higher | Baseline | ✅ Monolith |
-| **Developer velocity** | 60% debugging, 40% features | 90% features, 10% debugging | ✅ Monolith |
-| **Industry trend** | 42% consolidating away | Renaissance in 2025-2026 | ✅ Monolith |
-| **Type safety** | Manual bridging | TypeScript end-to-end | ✅ Monolith |
-| **Build time** | 29 plugin builds | 1 monorepo build | ✅ Monolith |
-| **Operational burden** | 2-4 platform engineers | 1-2 ops engineers | ✅ Monolith |
+| Criteria                | Plugin Architecture               | Monolithic Feature Modules       | Winner      |
+| ----------------------- | --------------------------------- | -------------------------------- | ----------- |
+| **AI execution**        | 39,900 complexity, 0% convergence | 200 complexity, 100% convergence | ✅ Monolith |
+| **Team size**           | Justified at 50+ devs             | Optimal for 1-50 devs            | ✅ Monolith |
+| **Infrastructure cost** | 3.75x-6x higher                   | Baseline                         | ✅ Monolith |
+| **Developer velocity**  | 60% debugging, 40% features       | 90% features, 10% debugging      | ✅ Monolith |
+| **Industry trend**      | 42% consolidating away            | Renaissance in 2025-2026         | ✅ Monolith |
+| **Type safety**         | Manual bridging                   | TypeScript end-to-end            | ✅ Monolith |
+| **Build time**          | 29 plugin builds                  | 1 monorepo build                 | ✅ Monolith |
+| **Operational burden**  | 2-4 platform engineers            | 1-2 ops engineers                | ✅ Monolith |
 
 **Confidence Level**: 95% (validated by industry data + ProX empirical failure + PalX production success)
 
@@ -467,6 +481,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 ## 10. Sources
 
 ### Industry Research
+
 - [42% of Organizations Consolidating Microservices (CNCF 2025)](https://byteiota.com/microservices-consolidation-42-return-to-monoliths/)
 - [Microservices Consolidation Analysis](https://byteiota.com/modular-monolith-42-ditch-microservices-in-2026/)
 - [Why Teams Are Moving Back to Modular Monoliths in 2026](https://codingplainenglish.medium.com/why-teams-are-moving-back-from-microservices-to-modular-monoliths-in-2026-76a3eb7162b8)
@@ -476,6 +491,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 - [Microservices vs Monoliths: 2025 Decision Framework](https://medium.com/@kittikawin_ball/microservices-vs-monoliths-architecture-decision-framework-for-2025-98c8ff2ec484)
 
 ### AI Context Window Research
+
 - [The Context Window Problem: Scaling Agents Beyond Token Limits](https://factory.ai/news/context-window-problem)
 - [Monorepos Are Back — And AI Is Driving the Comeback](https://medium.com/@dani.garcia.jimenez/monorepos-are-back-and-ai-is-driving-the-comeback-f4abbb7bb55f)
 - [Will AI turn 2026 into the year of the monorepo?](https://www.spectrocloud.com/blog/will-ai-turn-2026-into-the-year-of-the-monorepo)
@@ -483,15 +499,18 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 - [Monorepo vs Multi-Repo AI: Architecture-based AI Tool Selection](https://www.augmentcode.com/tools/monorepo-vs-multi-repo-ai-architecture-based-ai-tool-selection)
 
 ### SaaS Architecture
+
 - [SaaS Development in 2026: Features, Stack & Architecture](https://www.tvlitsolutions.com/saas-development-in-2026-features-stack-architecture/)
 - [How to Build SaaS Applications in 2026](https://seedium.io/blog/how-to-build-a-saas-application/)
 
 ### Modular Monolith Analysis
+
 - [Microservices vs. Modular Monoliths in 2025](https://www.javacodegeeks.com/2025/12/microservices-vs-modular-monoliths-in-2025-when-each-approach-wins.html)
 - [What is Better? Modular Monolith vs Microservices](https://medium.com/codex/what-is-better-modular-monolith-vs-microservices-994e1ec70994)
 - [Monolith vs Microservices vs Modular Monoliths](https://blog.bytebytego.com/p/monolith-vs-microservices-vs-modular)
 
 ### Internal References
+
 - [ARCHITECTURE_STANDARD.md](../../ARCHITECTURE_STANDARD.md)
 - [MIGRATION_ROADMAP.md](../../MIGRATION_ROADMAP.md)
 - [ProX GitHub Issues](https://github.com/Sang-Le-Tech/prox-convex/issues)
@@ -499,6 +518,7 @@ This decision aligns with the canonical T3 Turbo + Convex Architecture Standard:
 ---
 
 **Next Steps**:
+
 1. Share this document with project stakeholders
 2. Use as reference for MediLink migration planning
 3. Schedule PalX refactor (post-ProX launch)

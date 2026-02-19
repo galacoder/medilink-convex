@@ -1,9 +1,8 @@
 "use client";
 
+import type { Id } from "convex/_generated/dataModel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-import type { Id } from "convex/_generated/dataModel";
 
 import { useActiveOrganization } from "~/auth/client";
 import { EquipmentForm } from "~/features/equipment/components/equipment-form";

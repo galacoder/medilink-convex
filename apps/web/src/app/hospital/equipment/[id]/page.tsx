@@ -1,9 +1,8 @@
 "use client";
 
+import type { Id } from "convex/_generated/dataModel";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-
-import type {Id} from "convex/_generated/dataModel";
 
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
@@ -95,7 +94,9 @@ export default function EquipmentDetailPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">{equipment.nameVi}</h1>
-          <p className="text-muted-foreground mt-1 text-sm">{equipment.nameEn}</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {equipment.nameEn}
+          </p>
         </div>
         <Button asChild variant="outline">
           <Link href={`/hospital/equipment/${equipment._id}/edit`}>

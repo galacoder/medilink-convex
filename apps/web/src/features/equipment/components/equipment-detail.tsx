@@ -1,20 +1,14 @@
 "use client";
 
-import { useState } from "react";
-
-import { useMutation } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -31,8 +25,8 @@ import {
   SelectValue,
 } from "@medilink/ui/select";
 
-import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
+import { equipmentLabels } from "../labels";
 import { StatusBadge } from "./status-badge";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -50,7 +44,12 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   retired: [],
 };
 
-type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
+type EquipmentStatus =
+  | "available"
+  | "in_use"
+  | "maintenance"
+  | "damaged"
+  | "retired";
 
 interface EquipmentDetailProps {
   equipment: Equipment;
@@ -108,15 +107,11 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const conditionLabel =
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    equipmentLabels.conditionValues[equipment.condition]?.vi ?? equipment.condition;
+    equipmentLabels.conditionValues[equipment.condition].vi;
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const criticalityLabel =
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    equipmentLabels.criticalityValues[equipment.criticality]?.vi ?? equipment.criticality;
+    equipmentLabels.criticalityValues[equipment.criticality].vi;
 
   return (
     <div className="space-y-6">
@@ -142,8 +137,14 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="divide-y">
-          <FieldRow label={equipmentLabels.nameVi.vi} value={equipment.nameVi} />
-          <FieldRow label={equipmentLabels.nameEn.vi} value={equipment.nameEn} />
+          <FieldRow
+            label={equipmentLabels.nameVi.vi}
+            value={equipment.nameVi}
+          />
+          <FieldRow
+            label={equipmentLabels.nameEn.vi}
+            value={equipment.nameEn}
+          />
           {equipment.descriptionVi && (
             <FieldRow
               label={equipmentLabels.descriptionVi.vi}
@@ -162,7 +163,10 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
               </Badge>
             }
           />
-          <FieldRow label={equipmentLabels.location.vi} value={equipment.location} />
+          <FieldRow
+            label={equipmentLabels.location.vi}
+            value={equipment.location}
+          />
         </CardContent>
       </Card>
 
@@ -230,8 +234,10 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
                 <SelectContent>
                   {validTransitions.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                      {equipmentLabels.statusValues[status as EquipmentStatus]?.vi ?? status}
+                      {
+                        equipmentLabels.statusValues[status as EquipmentStatus]
+                          .vi
+                      }
                     </SelectItem>
                   ))}
                 </SelectContent>

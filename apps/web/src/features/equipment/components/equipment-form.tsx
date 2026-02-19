@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
-
-import { useMutation } from "convex/react";
-import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import type { FunctionReference } from "convex/server";
+import { useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
@@ -18,8 +17,8 @@ import {
   SelectValue,
 } from "@medilink/ui/select";
 
-import { equipmentLabels } from "../labels";
 import type { Equipment } from "../types";
+import { equipmentLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 const equipmentApi = api.equipment as any;
@@ -55,7 +54,12 @@ interface EquipmentFormProps {
   onCancel?: () => void;
 }
 
-type EquipmentStatus = "available" | "in_use" | "maintenance" | "damaged" | "retired";
+type EquipmentStatus =
+  | "available"
+  | "in_use"
+  | "maintenance"
+  | "damaged"
+  | "retired";
 type EquipmentCondition = "excellent" | "good" | "fair" | "poor";
 type Criticality = "A" | "B" | "C";
 
@@ -91,10 +95,11 @@ function equipmentToFormData(equipment: Equipment): EquipmentFormData {
     criticality: equipment.criticality,
     location: equipment.location ?? "",
     purchaseDate: equipment.purchaseDate
-      ? new Date(equipment.purchaseDate).toISOString().split("T")[0] ?? ""
+      ? (new Date(equipment.purchaseDate).toISOString().split("T")[0] ?? "")
       : "",
     warrantyExpiryDate: equipment.warrantyExpiryDate
-      ? new Date(equipment.warrantyExpiryDate).toISOString().split("T")[0] ?? ""
+      ? (new Date(equipment.warrantyExpiryDate).toISOString().split("T")[0] ??
+        "")
       : "",
   };
 }
@@ -108,7 +113,10 @@ interface FieldErrors {
   criticality?: string;
 }
 
-function validateForm(data: EquipmentFormData, mode: "create" | "edit"): FieldErrors {
+function validateForm(
+  data: EquipmentFormData,
+  mode: "create" | "edit",
+): FieldErrors {
   const errors: FieldErrors = {};
 
   if (!data.nameVi || data.nameVi.length < 2) {
@@ -157,10 +165,7 @@ export function EquipmentForm({
   const createMutation = useMutation(createFn);
   const updateMutation = useMutation(updateFn);
 
-  function handleChange(
-    field: keyof EquipmentFormData,
-    value: string,
-  ) {
+  function handleChange(field: keyof EquipmentFormData, value: string) {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear field error on change
     if (errors[field as keyof FieldErrors]) {
@@ -214,7 +219,7 @@ export function EquipmentForm({
         if (onSuccess && newId) {
           onSuccess(newId as Id<"equipment">);
         }
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (mode === "edit" && equipment) {
         await updateMutation({
           id: equipment._id as Id<"equipment">,
@@ -348,13 +353,19 @@ export function EquipmentForm({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(["available", "in_use", "maintenance", "damaged", "retired"] as const).map(
-                (s) => (
-                  <SelectItem key={s} value={s}>
-                    {equipmentLabels.statusValues[s].vi}
-                  </SelectItem>
-                ),
-              )}
+              {(
+                [
+                  "available",
+                  "in_use",
+                  "maintenance",
+                  "damaged",
+                  "retired",
+                ] as const
+              ).map((s) => (
+                <SelectItem key={s} value={s}>
+                  {equipmentLabels.statusValues[s].vi}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -412,9 +423,7 @@ export function EquipmentForm({
 
       {/* Serial number */}
       <div className="space-y-1.5">
-        <Label htmlFor="serialNumber">
-          {equipmentLabels.serialNumber.vi}
-        </Label>
+        <Label htmlFor="serialNumber">{equipmentLabels.serialNumber.vi}</Label>
         <Input
           id="serialNumber"
           value={formData.serialNumber}
@@ -434,9 +443,7 @@ export function EquipmentForm({
 
       {/* Manufacturer */}
       <div className="space-y-1.5">
-        <Label htmlFor="manufacturer">
-          {equipmentLabels.manufacturer.vi}
-        </Label>
+        <Label htmlFor="manufacturer">{equipmentLabels.manufacturer.vi}</Label>
         <Input
           id="manufacturer"
           value={formData.manufacturer}
@@ -457,9 +464,7 @@ export function EquipmentForm({
 
       {/* Purchase date */}
       <div className="space-y-1.5">
-        <Label htmlFor="purchaseDate">
-          {equipmentLabels.purchaseDate.vi}
-        </Label>
+        <Label htmlFor="purchaseDate">{equipmentLabels.purchaseDate.vi}</Label>
         <Input
           id="purchaseDate"
           type="date"

@@ -69,7 +69,9 @@ function SubRating({
 }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-muted-foreground min-w-0 flex-1">{label}</span>
+      <span className="text-muted-foreground min-w-0 flex-1 text-sm">
+        {label}
+      </span>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button

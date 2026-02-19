@@ -4,9 +4,10 @@
  *
  * vi: "Kiểm tra tích hợp các đột biến mã QR" / en: "QR code mutation integration tests"
  */
-import { ConvexError } from "convex/values";
 import { convexTest } from "convex-test";
+import { ConvexError } from "convex/values";
 import { describe, expect, it } from "vitest";
+
 import { api } from "../_generated/api";
 import schema from "../schema";
 
@@ -49,10 +50,7 @@ async function seedUser(
   });
 }
 
-async function seedCategory(
-  t: ReturnType<typeof convexTest>,
-  orgId: string,
-) {
+async function seedCategory(t: ReturnType<typeof convexTest>, orgId: string) {
   return t.run(async (ctx) => {
     const now = Date.now();
     return ctx.db.insert("equipmentCategories", {
@@ -295,9 +293,18 @@ describe("qrCodes.batchGenerateQRCodes", () => {
     const t = convexTest(schema, modules);
     const orgId = await seedOrganization(t);
     const catId = await seedCategory(t, orgId);
-    await seedEquipment(t, orgId, catId, { nameVi: "Thiết bị 1", nameEn: "Device 1" });
-    await seedEquipment(t, orgId, catId, { nameVi: "Thiết bị 2", nameEn: "Device 2" });
-    await seedEquipment(t, orgId, catId, { nameVi: "Thiết bị 3", nameEn: "Device 3" });
+    await seedEquipment(t, orgId, catId, {
+      nameVi: "Thiết bị 1",
+      nameEn: "Device 1",
+    });
+    await seedEquipment(t, orgId, catId, {
+      nameVi: "Thiết bị 2",
+      nameEn: "Device 2",
+    });
+    await seedEquipment(t, orgId, catId, {
+      nameVi: "Thiết bị 3",
+      nameEn: "Device 3",
+    });
     await seedUser(t, DEFAULT_USER_EMAIL);
 
     const asOrg = t.withIdentity({

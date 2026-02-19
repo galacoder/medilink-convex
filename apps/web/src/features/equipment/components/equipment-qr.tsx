@@ -1,17 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-
-import QRCode from "react-qr-code";
 import { PrinterIcon } from "lucide-react";
+import QRCode from "react-qr-code";
 
 import { Button } from "@medilink/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 
 import { equipmentLabels } from "../labels";
 
@@ -88,7 +82,7 @@ export function EquipmentQR({
           />
         </div>
 
-        <p className="text-muted-foreground max-w-[180px] break-all text-center text-xs">
+        <p className="text-muted-foreground max-w-[180px] text-center text-xs break-all">
           {qrValue}
         </p>
 

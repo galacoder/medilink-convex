@@ -7,8 +7,8 @@
  * component focused. The list handles empty state and maps the quotes
  * array to cards, while QuoteComparisonCard handles individual quote UI.
  */
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 import type { Quote } from "../types";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 import { QuoteComparisonCard } from "./quote-comparison-card";
 
 interface QuotesListProps {

@@ -12,11 +12,13 @@
  */
 
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+
 import type { Id } from "./_generated/dataModel";
-import { requireOrgAuth } from "./lib/auth";
-import { canTransitionQuote, type QuoteStatus } from "./lib/workflowStateMachine";
+import type { QuoteStatus } from "./lib/workflowStateMachine";
+import { mutation, query } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
+import { requireOrgAuth } from "./lib/auth";
+import { canTransitionQuote } from "./lib/workflowStateMachine";
 
 // ---------------------------------------------------------------------------
 // Mutations
@@ -46,7 +48,9 @@ export const submit = mutation({
     const auth = await requireOrgAuth(ctx);
 
     // 2. Verify the caller's org is a provider
-    const callerOrg = await ctx.db.get(auth.organizationId as Id<"organizations">);
+    const callerOrg = await ctx.db.get(
+      auth.organizationId as Id<"organizations">,
+    );
     if (!callerOrg || callerOrg.org_type !== "provider") {
       throw new ConvexError({
         message:
@@ -59,8 +63,7 @@ export const submit = mutation({
     const serviceRequest = await ctx.db.get(args.serviceRequestId);
     if (!serviceRequest) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -277,7 +280,10 @@ export const accept = mutation({
       action: "serviceRequest.statusUpdated",
       resourceType: "serviceRequests",
       resourceId: quote.serviceRequestId,
-      previousValues: { status: serviceRequest.status, assignedProviderId: null },
+      previousValues: {
+        status: serviceRequest.status,
+        assignedProviderId: null,
+      },
       newValues: { status: "accepted", assignedProviderId: quote.providerId },
     });
 
@@ -389,8 +395,7 @@ export const listByServiceRequest = query({
     const serviceRequest = await ctx.db.get(args.serviceRequestId);
     if (!serviceRequest) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -465,7 +470,9 @@ export const listByProvider = query({
     const auth = await requireOrgAuth(ctx);
 
     // Verify the caller's org is a provider
-    const callerOrg = await ctx.db.get(auth.organizationId as Id<"organizations">);
+    const callerOrg = await ctx.db.get(
+      auth.organizationId as Id<"organizations">,
+    );
     if (!callerOrg || callerOrg.org_type !== "provider") {
       throw new ConvexError({
         message:

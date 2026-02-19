@@ -6,6 +6,7 @@
  */
 import { convexTest } from "convex-test";
 import { describe, expect, it } from "vitest";
+
 import { api } from "../_generated/api";
 import schema from "../schema";
 
@@ -116,8 +117,16 @@ describe("consumables.list", () => {
     const orgId = await seedOrganization(t);
 
     await seedConsumable(t, orgId, { nameVi: "Găng tay", nameEn: "Gloves" });
-    await seedConsumable(t, orgId, { nameVi: "Điện cực ECG", nameEn: "ECG Electrodes", categoryType: "electrodes" });
-    await seedConsumable(t, orgId, { nameVi: "Cồn sát khuẩn", nameEn: "Disinfectant", categoryType: "cleaning_agents" });
+    await seedConsumable(t, orgId, {
+      nameVi: "Điện cực ECG",
+      nameEn: "ECG Electrodes",
+      categoryType: "electrodes",
+    });
+    await seedConsumable(t, orgId, {
+      nameVi: "Cồn sát khuẩn",
+      nameEn: "Disinfectant",
+      categoryType: "cleaning_agents",
+    });
 
     const asOrg = t.withIdentity({ organizationId: orgId });
     const result = await asOrg.query(api.consumables.list, {
@@ -171,11 +180,23 @@ describe("consumables.list", () => {
     const orgId = await seedOrganization(t);
 
     // in_stock: currentStock > reorderPoint
-    await seedConsumable(t, orgId, { currentStock: 100, reorderPoint: 30, nameEn: "In Stock Item" });
+    await seedConsumable(t, orgId, {
+      currentStock: 100,
+      reorderPoint: 30,
+      nameEn: "In Stock Item",
+    });
     // low_stock: 0 < currentStock <= reorderPoint
-    await seedConsumable(t, orgId, { currentStock: 20, reorderPoint: 30, nameEn: "Low Stock Item" });
+    await seedConsumable(t, orgId, {
+      currentStock: 20,
+      reorderPoint: 30,
+      nameEn: "Low Stock Item",
+    });
     // out_of_stock: currentStock === 0
-    await seedConsumable(t, orgId, { currentStock: 0, reorderPoint: 30, nameEn: "Out Of Stock Item" });
+    await seedConsumable(t, orgId, {
+      currentStock: 0,
+      reorderPoint: 30,
+      nameEn: "Out Of Stock Item",
+    });
 
     const asOrg = t.withIdentity({ organizationId: orgId });
 
@@ -199,8 +220,14 @@ describe("consumables.list", () => {
     const t = convexTest(schema, modules);
     const orgId = await seedOrganization(t);
 
-    await seedConsumable(t, orgId, { nameVi: "Găng tay y tế", nameEn: "Medical Gloves" });
-    await seedConsumable(t, orgId, { nameVi: "Điện cực ECG", nameEn: "ECG Electrodes" });
+    await seedConsumable(t, orgId, {
+      nameVi: "Găng tay y tế",
+      nameEn: "Medical Gloves",
+    });
+    await seedConsumable(t, orgId, {
+      nameVi: "Điện cực ECG",
+      nameEn: "ECG Electrodes",
+    });
 
     const asOrg = t.withIdentity({ organizationId: orgId });
 
@@ -231,7 +258,9 @@ describe("consumables.getById", () => {
     const orgId = await seedOrganization(t);
     const catId = await seedEquipmentCategory(t, orgId);
     const equipId = await seedEquipment(t, orgId, catId);
-    const consumableId = await seedConsumable(t, orgId, { relatedEquipmentId: equipId });
+    const consumableId = await seedConsumable(t, orgId, {
+      relatedEquipmentId: equipId,
+    });
 
     const asOrg = t.withIdentity({ organizationId: orgId });
     const result = await asOrg.query(api.consumables.getById, {
@@ -268,10 +297,22 @@ describe("consumables.getLowStock", () => {
     const orgId = await seedOrganization(t);
 
     // currentStock <= reorderPoint — should appear in low stock
-    await seedConsumable(t, orgId, { currentStock: 10, reorderPoint: 30, nameEn: "Low A" });
-    await seedConsumable(t, orgId, { currentStock: 0, reorderPoint: 20, nameEn: "Out B" });
+    await seedConsumable(t, orgId, {
+      currentStock: 10,
+      reorderPoint: 30,
+      nameEn: "Low A",
+    });
+    await seedConsumable(t, orgId, {
+      currentStock: 0,
+      reorderPoint: 20,
+      nameEn: "Out B",
+    });
     // currentStock > reorderPoint — should NOT appear
-    await seedConsumable(t, orgId, { currentStock: 100, reorderPoint: 30, nameEn: "OK C" });
+    await seedConsumable(t, orgId, {
+      currentStock: 100,
+      reorderPoint: 30,
+      nameEn: "OK C",
+    });
 
     const asOrg = t.withIdentity({ organizationId: orgId });
     const result = await asOrg.query(api.consumables.getLowStock, {});
@@ -398,16 +439,22 @@ describe("consumables.getReorderRequests", () => {
     expect(allResult).toHaveLength(3);
 
     // Pending only
-    const pendingResult = await asOrg.query(api.consumables.getReorderRequests, {
-      status: "pending",
-    });
+    const pendingResult = await asOrg.query(
+      api.consumables.getReorderRequests,
+      {
+        status: "pending",
+      },
+    );
     expect(pendingResult).toHaveLength(1);
     expect(pendingResult[0].status).toBe("pending");
 
     // Approved only
-    const approvedResult = await asOrg.query(api.consumables.getReorderRequests, {
-      status: "approved",
-    });
+    const approvedResult = await asOrg.query(
+      api.consumables.getReorderRequests,
+      {
+        status: "approved",
+      },
+    );
     expect(approvedResult).toHaveLength(1);
   });
 });

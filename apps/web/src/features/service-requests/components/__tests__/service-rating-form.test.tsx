@@ -4,18 +4,16 @@
  * WHY: Verifies star rating interaction, sub-rating fields, and submit callback.
  * Critical for AC-06 (rate completed service: 1-5 stars with optional comment).
  */
-import { describe, expect, it, vi } from "vitest";
-import userEvent from "@testing-library/user-event";
 import { screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { ServiceRatingForm } from "../service-rating-form";
 
 describe("ServiceRatingForm", () => {
   it("test_ServiceRatingForm_rendersStarInput", () => {
-    renderWithProviders(
-      <ServiceRatingForm onSubmit={vi.fn()} />,
-    );
+    renderWithProviders(<ServiceRatingForm onSubmit={vi.fn()} />);
 
     // 5 star buttons should be visible
     const stars = screen.getAllByRole("button", { name: /sao/ });
@@ -45,9 +43,7 @@ describe("ServiceRatingForm", () => {
   });
 
   it("test_ServiceRatingForm_showsSubRatings", () => {
-    renderWithProviders(
-      <ServiceRatingForm onSubmit={vi.fn()} />,
-    );
+    renderWithProviders(<ServiceRatingForm onSubmit={vi.fn()} />);
 
     // Sub-rating fields should be visible
     expect(screen.getByText(/Chất lượng dịch vụ/)).toBeInTheDocument();
@@ -66,7 +62,9 @@ describe("ServiceRatingForm", () => {
 
     // Should show validation error
     await waitFor(() => {
-      expect(screen.getByText(/Vui lòng chọn ít nhất 1 sao/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Vui lòng chọn ít nhất 1 sao/),
+      ).toBeInTheDocument();
     });
 
     expect(onSubmit).not.toHaveBeenCalled();

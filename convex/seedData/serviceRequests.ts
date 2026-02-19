@@ -36,8 +36,10 @@ export const TECHMED_PROFILE: SeedProviderProfile = {
   nameVi: "TechMed Dịch vụ Kỹ thuật Y tế",
   nameEn: "TechMed Medical Technical Services",
   companyName: "TechMed Services Co., Ltd.",
-  descriptionVi: "Công ty chuyên cung cấp dịch vụ sửa chữa, bảo trì và hiệu chỉnh thiết bị y tế chuyên nghiệp tại TP. Hồ Chí Minh và các tỉnh lân cận",
-  descriptionEn: "Professional medical equipment repair, maintenance, and calibration services in Ho Chi Minh City and surrounding provinces",
+  descriptionVi:
+    "Công ty chuyên cung cấp dịch vụ sửa chữa, bảo trì và hiệu chỉnh thiết bị y tế chuyên nghiệp tại TP. Hồ Chí Minh và các tỉnh lân cận",
+  descriptionEn:
+    "Professional medical equipment repair, maintenance, and calibration services in Ho Chi Minh City and surrounding provinces",
   status: "active",
   verificationStatus: "verified",
   contactEmail: "contact@techmed.vn",
@@ -73,7 +75,8 @@ export interface SeedServiceOffering {
 export const OFFERING_GENERAL_REPAIR: SeedServiceOffering = {
   specialty: "general_repair",
   descriptionVi: "Sửa chữa tổng quát các loại thiết bị y tế điện tử và cơ khí",
-  descriptionEn: "General repair of electronic and mechanical medical equipment",
+  descriptionEn:
+    "General repair of electronic and mechanical medical equipment",
   priceEstimate: 2500000, // VND
   turnaroundDays: 5,
 };
@@ -81,8 +84,10 @@ export const OFFERING_GENERAL_REPAIR: SeedServiceOffering = {
 // vi: "Dịch vụ 2: Hiệu chỉnh" / en: "Offering 2: Calibration"
 export const OFFERING_CALIBRATION: SeedServiceOffering = {
   specialty: "calibration",
-  descriptionVi: "Hiệu chỉnh và kiểm định thiết bị y tế theo tiêu chuẩn ISO 13485",
-  descriptionEn: "Medical equipment calibration and verification per ISO 13485 standards",
+  descriptionVi:
+    "Hiệu chỉnh và kiểm định thiết bị y tế theo tiêu chuẩn ISO 13485",
+  descriptionEn:
+    "Medical equipment calibration and verification per ISO 13485 standards",
   priceEstimate: 1800000, // VND
   turnaroundDays: 2,
 };
@@ -91,7 +96,8 @@ export const OFFERING_CALIBRATION: SeedServiceOffering = {
 export const OFFERING_PREVENTIVE_MAINT: SeedServiceOffering = {
   specialty: "preventive_maint",
   descriptionVi: "Bảo trì định kỳ phòng ngừa sự cố theo lịch cho thiết bị y tế",
-  descriptionEn: "Scheduled preventive maintenance to prevent equipment failures",
+  descriptionEn:
+    "Scheduled preventive maintenance to prevent equipment failures",
   priceEstimate: 1200000, // VND
   turnaroundDays: 1,
 };
@@ -132,7 +138,8 @@ export const CERT_CALIBRATION_EXPIRED: SeedCertification = {
   issuingBody: "Viện Đo lường Việt Nam (VMI)",
   issuedAt: NOW - 18 * MONTH_MS,
   expiresAt: NOW - 6 * MONTH_MS, // Expired 6 months ago
-  documentUrl: "https://docs.techmed.vn/certifications/calibration-vmi-2022.pdf",
+  documentUrl:
+    "https://docs.techmed.vn/certifications/calibration-vmi-2022.pdf",
 };
 
 export const ALL_SEED_CERTIFICATIONS: SeedCertification[] = [
@@ -175,7 +182,13 @@ export interface SeedServiceRequest {
   // References by key names (resolved to IDs at insertion time)
   equipmentKey: string;
   requestedByKey: "hospital_owner" | "hospital_staff_1" | "hospital_staff_2";
-  type: "repair" | "maintenance" | "calibration" | "inspection" | "installation" | "other";
+  type:
+    | "repair"
+    | "maintenance"
+    | "calibration"
+    | "inspection"
+    | "installation"
+    | "other";
   status:
     | "pending"
     | "quoted"
@@ -200,7 +213,8 @@ export const REQUEST_PENDING: SeedServiceRequest = {
   status: "pending",
   priority: "medium",
   descriptionVi: "Kiểm tra định kỳ máy sốc điện tim theo lịch bảo trì hàng quý",
-  descriptionEn: "Routine inspection of defibrillator per quarterly maintenance schedule",
+  descriptionEn:
+    "Routine inspection of defibrillator per quarterly maintenance schedule",
   scheduledAt: NOW + 2 * WEEK_MS,
 };
 
@@ -211,8 +225,10 @@ export const REQUEST_QUOTED: SeedServiceRequest = {
   type: "repair",
   status: "quoted",
   priority: "high",
-  descriptionVi: "Sửa chữa máy X-quang gặp sự cố bộ nguồn, không khởi động được",
-  descriptionEn: "Repair X-ray machine with power supply failure, unable to start",
+  descriptionVi:
+    "Sửa chữa máy X-quang gặp sự cố bộ nguồn, không khởi động được",
+  descriptionEn:
+    "Repair X-ray machine with power supply failure, unable to start",
   hasProvider: true,
 };
 
@@ -223,8 +239,10 @@ export const REQUEST_ACCEPTED: SeedServiceRequest = {
   type: "maintenance",
   status: "accepted",
   priority: "medium",
-  descriptionVi: "Bảo trì định kỳ nồi hấp tiệt trùng, kiểm tra van áp suất và nhiệt độ",
-  descriptionEn: "Routine autoclave maintenance, inspect pressure valves and temperature sensors",
+  descriptionVi:
+    "Bảo trì định kỳ nồi hấp tiệt trùng, kiểm tra van áp suất và nhiệt độ",
+  descriptionEn:
+    "Routine autoclave maintenance, inspect pressure valves and temperature sensors",
   scheduledAt: NOW + WEEK_MS,
   hasProvider: true,
 };
@@ -237,7 +255,8 @@ export const REQUEST_IN_PROGRESS: SeedServiceRequest = {
   status: "in_progress",
   priority: "high",
   descriptionVi: "Hiệu chỉnh máy siêu âm sau 12 tháng sử dụng theo quy định",
-  descriptionEn: "Calibration of ultrasound machine after 12 months of use per regulations",
+  descriptionEn:
+    "Calibration of ultrasound machine after 12 months of use per regulations",
   scheduledAt: NOW - 2 * DAY_MS,
   hasProvider: true,
 };
@@ -263,8 +282,10 @@ export const REQUEST_DISPUTED: SeedServiceRequest = {
   type: "repair",
   status: "disputed",
   priority: "critical",
-  descriptionVi: "Sửa chữa monitor theo dõi bệnh nhân - tranh chấp về chất lượng dịch vụ sau sửa chữa",
-  descriptionEn: "Patient monitor repair - dispute over service quality after repair",
+  descriptionVi:
+    "Sửa chữa monitor theo dõi bệnh nhân - tranh chấp về chất lượng dịch vụ sau sửa chữa",
+  descriptionEn:
+    "Patient monitor repair - dispute over service quality after repair",
   scheduledAt: NOW - 6 * WEEK_MS,
   completedAt: NOW - 4 * WEEK_MS,
   hasProvider: true,
@@ -306,7 +327,8 @@ export const QUOTE_PENDING: SeedQuote = {
   amount: 1500000, // 1.5M VND
   currency: "VND",
   validUntil: NOW + 2 * WEEK_MS,
-  notes: "Bao gồm linh kiện thay thế nếu cần / Includes replacement parts if needed",
+  notes:
+    "Bao gồm linh kiện thay thế nếu cần / Includes replacement parts if needed",
 };
 
 // vi: "Báo giá 2: Đã chấp nhận" / en: "Quote 2: Accepted"
@@ -316,7 +338,8 @@ export const QUOTE_ACCEPTED: SeedQuote = {
   amount: 3200000, // 3.2M VND
   currency: "VND",
   validUntil: NOW + MONTH_MS,
-  notes: "Giá đã bao gồm nhân công và hiệu chỉnh / Price includes labor and calibration",
+  notes:
+    "Giá đã bao gồm nhân công và hiệu chỉnh / Price includes labor and calibration",
 };
 
 // vi: "Báo giá 3: Đã từ chối" / en: "Quote 3: Rejected"
@@ -336,7 +359,8 @@ export const QUOTE_EXPIRED: SeedQuote = {
   amount: 4200000, // 4.2M VND
   currency: "VND",
   validUntil: NOW - MONTH_MS, // Expired 1 month ago
-  notes: "Báo giá đã hết hạn, cần thương lượng lại / Quote expired, renegotiation required",
+  notes:
+    "Báo giá đã hết hạn, cần thương lượng lại / Quote expired, renegotiation required",
 };
 
 export const ALL_SEED_QUOTES: SeedQuote[] = [

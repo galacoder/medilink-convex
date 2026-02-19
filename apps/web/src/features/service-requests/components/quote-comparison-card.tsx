@@ -33,8 +33,8 @@ import {
   CardTitle,
 } from "@medilink/ui/card";
 
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 import type { Quote, QuoteStatus } from "../types";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
 interface QuoteComparisonCardProps {
   quote: Quote;
@@ -104,10 +104,14 @@ export function QuoteComparisonCard({
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div>
           <CardTitle className="text-base">
-            {quote.providerOrgName ?? quote.providerNameVi ?? labels.provider.vi}
+            {quote.providerOrgName ??
+              quote.providerNameVi ??
+              labels.provider.vi}
           </CardTitle>
           {quote.providerNameVi && quote.providerOrgName && (
-            <p className="text-muted-foreground text-sm">{quote.providerNameVi}</p>
+            <p className="text-muted-foreground text-sm">
+              {quote.providerNameVi}
+            </p>
           )}
         </div>
         <Badge variant={quoteStatusVariant[quote.status]}>
@@ -118,14 +122,18 @@ export function QuoteComparisonCard({
       <CardContent className="space-y-3">
         {/* Amount */}
         <div className="flex items-center justify-between">
-          <span className="text-muted-foreground text-sm">{labels.amount.vi}</span>
+          <span className="text-muted-foreground text-sm">
+            {labels.amount.vi}
+          </span>
           <span className="text-2xl font-bold">{formatVND(quote.amount)}</span>
         </div>
 
         {/* Valid until */}
         {quote.validUntil && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">{labels.validUntil.vi}</span>
+            <span className="text-muted-foreground">
+              {labels.validUntil.vi}
+            </span>
             <span>{formatDate(quote.validUntil)}</span>
           </div>
         )}
@@ -151,7 +159,9 @@ export function QuoteComparisonCard({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{labels.acceptConfirmTitle.vi}</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {labels.acceptConfirmTitle.vi}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {labels.acceptConfirmDesc.vi}
                 </AlertDialogDescription>
@@ -176,7 +186,9 @@ export function QuoteComparisonCard({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{labels.rejectConfirmTitle.vi}</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {labels.rejectConfirmTitle.vi}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {labels.rejectConfirmDesc.vi}
                 </AlertDialogDescription>

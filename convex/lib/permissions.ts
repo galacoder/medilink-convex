@@ -15,7 +15,7 @@
 import { ConvexError } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import type { QueryCtx, MutationCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 
 export type OrgRole = "owner" | "admin" | "member";
 

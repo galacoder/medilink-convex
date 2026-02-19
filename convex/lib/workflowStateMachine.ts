@@ -104,7 +104,10 @@ export function getNextStatuses(
  * Returns true if transitioning a quote from `from` to `to` is valid.
  * Self-transitions are always invalid.
  */
-export function canTransitionQuote(from: QuoteStatus, to: QuoteStatus): boolean {
+export function canTransitionQuote(
+  from: QuoteStatus,
+  to: QuoteStatus,
+): boolean {
   if (from === to) return false;
   return VALID_QUOTE_TRANSITIONS[from].includes(to);
 }

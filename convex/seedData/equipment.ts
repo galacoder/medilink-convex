@@ -20,8 +20,10 @@ export interface SeedEquipmentCategory {
 export const CATEGORY_DIAGNOSTIC: SeedEquipmentCategory = {
   nameVi: "Thiết bị chẩn đoán",
   nameEn: "Diagnostic Equipment",
-  descriptionVi: "Thiết bị dùng để chẩn đoán bệnh lý và theo dõi chức năng cơ thể",
-  descriptionEn: "Equipment used for disease diagnosis and body function monitoring",
+  descriptionVi:
+    "Thiết bị dùng để chẩn đoán bệnh lý và theo dõi chức năng cơ thể",
+  descriptionEn:
+    "Equipment used for disease diagnosis and body function monitoring",
 };
 
 // vi: "Danh mục 2: Thiết bị theo dõi bệnh nhân"
@@ -37,7 +39,8 @@ export const CATEGORY_SURGICAL: SeedEquipmentCategory = {
   nameVi: "Dụng cụ phẫu thuật",
   nameEn: "Surgical Instruments",
   descriptionVi: "Dụng cụ và thiết bị dùng trong phẫu thuật và thủ thuật y tế",
-  descriptionEn: "Instruments and devices used in surgical and medical procedures",
+  descriptionEn:
+    "Instruments and devices used in surgical and medical procedures",
 };
 
 // vi: "Danh mục 4: Thiết bị CNTT y tế"
@@ -45,7 +48,8 @@ export const CATEGORY_MEDICAL_IT: SeedEquipmentCategory = {
   nameVi: "Thiết bị CNTT y tế",
   nameEn: "Medical IT Equipment",
   descriptionVi: "Hệ thống công nghệ thông tin hỗ trợ quản lý và vận hành y tế",
-  descriptionEn: "Information technology systems supporting healthcare management and operations",
+  descriptionEn:
+    "Information technology systems supporting healthcare management and operations",
 };
 
 export const ALL_SEED_CATEGORIES: SeedEquipmentCategory[] = [
@@ -101,7 +105,8 @@ export const EQUIPMENT_ECG: SeedEquipment = {
   nameVi: "Máy đo điện tim 12 chuyển đạo",
   nameEn: "12-Lead ECG Machine",
   descriptionVi: "Máy điện tâm đồ để ghi nhận hoạt động điện của tim",
-  descriptionEn: "Electrocardiograph machine for recording cardiac electrical activity",
+  descriptionEn:
+    "Electrocardiograph machine for recording cardiac electrical activity",
   categoryKey: "diagnostic",
   status: "available",
   condition: "good",
@@ -152,7 +157,8 @@ export const EQUIPMENT_DEFIBRILLATOR: SeedEquipment = {
   nameVi: "Máy sốc điện tim",
   nameEn: "Defibrillator",
   descriptionVi: "Thiết bị phục hồi nhịp tim bình thường bằng dòng điện",
-  descriptionEn: "Device that restores normal heart rhythm using electrical current",
+  descriptionEn:
+    "Device that restores normal heart rhythm using electrical current",
   categoryKey: "patient_monitoring",
   status: "available",
   condition: "excellent",
@@ -187,7 +193,8 @@ export const EQUIPMENT_INFUSION_PUMP: SeedEquipment = {
   nameVi: "Máy bơm tiêm tự động",
   nameEn: "Infusion Pump",
   descriptionVi: "Thiết bị truyền dịch và thuốc chính xác vào cơ thể bệnh nhân",
-  descriptionEn: "Device for precise delivery of fluids and medications to patients",
+  descriptionEn:
+    "Device for precise delivery of fluids and medications to patients",
   categoryKey: "patient_monitoring",
   status: "in_use",
   condition: "good",
@@ -203,7 +210,8 @@ export const EQUIPMENT_INFUSION_PUMP: SeedEquipment = {
 export const EQUIPMENT_ENDOSCOPE: SeedEquipment = {
   nameVi: "Máy nội soi ống mềm",
   nameEn: "Flexible Endoscope",
-  descriptionVi: "Ống nội soi mềm dùng để kiểm tra và điều trị bên trong cơ thể",
+  descriptionVi:
+    "Ống nội soi mềm dùng để kiểm tra và điều trị bên trong cơ thể",
   descriptionEn: "Flexible endoscope for internal examination and treatment",
   categoryKey: "diagnostic",
   status: "in_use",
@@ -239,7 +247,8 @@ export const EQUIPMENT_AUTOCLAVE: SeedEquipment = {
   nameVi: "Nồi hấp tiệt trùng",
   nameEn: "Autoclave Sterilizer",
   descriptionVi: "Thiết bị tiệt trùng dụng cụ y tế bằng hơi nước áp suất cao",
-  descriptionEn: "High-pressure steam sterilization unit for medical instruments",
+  descriptionEn:
+    "High-pressure steam sterilization unit for medical instruments",
   categoryKey: "surgical",
   status: "maintenance",
   condition: "fair",
@@ -274,8 +283,10 @@ export const EQUIPMENT_VENTILATOR: SeedEquipment = {
 export const EQUIPMENT_OLD_ECG: SeedEquipment = {
   nameVi: "Máy điện tim cũ (Đã thanh lý)",
   nameEn: "Legacy ECG Machine (Retired)",
-  descriptionVi: "Máy điện tim thế hệ cũ đã được thanh lý, thay thế bằng thiết bị hiện đại",
-  descriptionEn: "Legacy ECG machine, retired and replaced with modern equipment",
+  descriptionVi:
+    "Máy điện tim thế hệ cũ đã được thanh lý, thay thế bằng thiết bị hiện đại",
+  descriptionEn:
+    "Legacy ECG machine, retired and replaced with modern equipment",
   categoryKey: "diagnostic",
   status: "retired",
   condition: "poor",
@@ -289,18 +300,18 @@ export const EQUIPMENT_OLD_ECG: SeedEquipment = {
 };
 
 export const ALL_SEED_EQUIPMENT: SeedEquipment[] = [
-  EQUIPMENT_ULTRASOUND,       // available
-  EQUIPMENT_ECG,              // available
-  EQUIPMENT_PULSE_OXIMETER,   // available
-  EQUIPMENT_PATIENT_MONITOR,  // available
-  EQUIPMENT_DEFIBRILLATOR,    // available
-  EQUIPMENT_SURGICAL_LIGHT,   // available
-  EQUIPMENT_INFUSION_PUMP,    // in_use
-  EQUIPMENT_ENDOSCOPE,        // in_use
-  EQUIPMENT_XRAY,             // maintenance (will have overdue maintenance record)
-  EQUIPMENT_AUTOCLAVE,        // maintenance
-  EQUIPMENT_VENTILATOR,       // damaged
-  EQUIPMENT_OLD_ECG,          // retired
+  EQUIPMENT_ULTRASOUND, // available
+  EQUIPMENT_ECG, // available
+  EQUIPMENT_PULSE_OXIMETER, // available
+  EQUIPMENT_PATIENT_MONITOR, // available
+  EQUIPMENT_DEFIBRILLATOR, // available
+  EQUIPMENT_SURGICAL_LIGHT, // available
+  EQUIPMENT_INFUSION_PUMP, // in_use
+  EQUIPMENT_ENDOSCOPE, // in_use
+  EQUIPMENT_XRAY, // maintenance (will have overdue maintenance record)
+  EQUIPMENT_AUTOCLAVE, // maintenance
+  EQUIPMENT_VENTILATOR, // damaged
+  EQUIPMENT_OLD_ECG, // retired
 ];
 
 // ---------------------------------------------------------------------------

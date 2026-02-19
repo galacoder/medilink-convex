@@ -15,8 +15,12 @@ import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 
+import type {
+  ServiceRequest,
+  ServiceRequestPriority,
+  ServiceRequestStatus,
+} from "../types";
 import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
-import type { ServiceRequest, ServiceRequestPriority, ServiceRequestStatus } from "../types";
 
 interface ServiceRequestTableProps {
   requests: ServiceRequest[];

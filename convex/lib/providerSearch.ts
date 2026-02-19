@@ -9,6 +9,7 @@
  */
 
 import type { GenericQueryCtx } from "convex/server";
+
 import type { DataModel, Doc } from "../_generated/dataModel";
 
 type QueryCtx = GenericQueryCtx<DataModel>;
@@ -127,9 +128,7 @@ export async function findProvidersByRegion(
 ): Promise<ProviderWithCoverage[]> {
   // Step 1: Get all active coverage areas matching the region
   const allAreas = await ctx.db.query("coverageAreas").take(100);
-  let matchingAreas = allAreas.filter(
-    (a) => a.isActive && a.region === region,
-  );
+  let matchingAreas = allAreas.filter((a) => a.isActive && a.region === region);
 
   // Step 2: Apply optional district filter
   if (district !== undefined) {

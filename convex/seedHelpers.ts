@@ -8,8 +8,8 @@
  * making the seed safe to run multiple times without creating duplicates.
  */
 
-import { MutationCtx } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { MutationCtx } from "./_generated/server";
 
 /**
  * Find an organization by its unique slug.

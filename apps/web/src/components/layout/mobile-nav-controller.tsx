@@ -1,13 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import type { NavItem } from "./nav-config";
+import { useServiceRequestNotifications } from "~/features/service-requests/hooks/use-service-request-notifications";
 import { Header } from "./header";
 import { MobileNav } from "./mobile-nav";
 import { Sidebar } from "./sidebar";
-import { useServiceRequestNotifications } from "~/features/service-requests/hooks/use-service-request-notifications";
 
 interface MobileNavControllerProps {
   children: ReactNode;

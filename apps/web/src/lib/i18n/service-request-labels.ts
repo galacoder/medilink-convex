@@ -66,8 +66,8 @@ export const serviceRequestLabels = {
     actions: { vi: "Thao tác", en: "Actions" },
     view: { vi: "Xem", en: "View" },
     empty: {
-      vi: "Không có yêu cầu dịch vụ nào. Nhấn \"Tạo mới\" để bắt đầu.",
-      en: "No service requests found. Click \"Create\" to get started.",
+      vi: 'Không có yêu cầu dịch vụ nào. Nhấn "Tạo mới" để bắt đầu.',
+      en: 'No service requests found. Click "Create" to get started.',
     },
   },
 
@@ -81,21 +81,36 @@ export const serviceRequestLabels = {
       review: { vi: "Xem lại và gửi", en: "Review & Submit" },
     },
     equipment: { vi: "Thiết bị", en: "Equipment" },
-    equipmentPlaceholder: { vi: "Chọn thiết bị cần dịch vụ", en: "Select equipment to service" },
+    equipmentPlaceholder: {
+      vi: "Chọn thiết bị cần dịch vụ",
+      en: "Select equipment to service",
+    },
     issueType: { vi: "Loại vấn đề", en: "Issue Type" },
     priority: { vi: "Mức ưu tiên", en: "Priority" },
-    description: { vi: "Mô tả chi tiết (tiếng Việt)", en: "Detailed description (Vietnamese)" },
+    description: {
+      vi: "Mô tả chi tiết (tiếng Việt)",
+      en: "Detailed description (Vietnamese)",
+    },
     descriptionPlaceholder: {
       vi: "Mô tả vấn đề của thiết bị bằng tiếng Việt...",
       en: "Describe the equipment issue in Vietnamese...",
     },
-    descriptionEn: { vi: "Mô tả chi tiết (tiếng Anh - tùy chọn)", en: "Detailed description (English - optional)" },
+    descriptionEn: {
+      vi: "Mô tả chi tiết (tiếng Anh - tùy chọn)",
+      en: "Detailed description (English - optional)",
+    },
     descriptionEnPlaceholder: {
       vi: "Describe the equipment issue in English (optional)...",
       en: "Describe the equipment issue in English (optional)...",
     },
-    scheduledDate: { vi: "Ngày dự kiến (tùy chọn)", en: "Scheduled Date (optional)" },
-    reviewTitle: { vi: "Xem lại thông tin yêu cầu", en: "Review Request Details" },
+    scheduledDate: {
+      vi: "Ngày dự kiến (tùy chọn)",
+      en: "Scheduled Date (optional)",
+    },
+    reviewTitle: {
+      vi: "Xem lại thông tin yêu cầu",
+      en: "Review Request Details",
+    },
   },
 
   // ---------------------------------------------------------------------------
@@ -119,12 +134,18 @@ export const serviceRequestLabels = {
     },
     accept: { vi: "Chấp nhận báo giá", en: "Accept Quote" },
     reject: { vi: "Từ chối báo giá", en: "Reject Quote" },
-    acceptConfirmTitle: { vi: "Xác nhận chấp nhận báo giá", en: "Confirm Accept Quote" },
+    acceptConfirmTitle: {
+      vi: "Xác nhận chấp nhận báo giá",
+      en: "Confirm Accept Quote",
+    },
     acceptConfirmDesc: {
       vi: "Bạn có chắc chắn muốn chấp nhận báo giá này? Các báo giá khác sẽ bị từ chối tự động.",
       en: "Are you sure you want to accept this quote? Other quotes will be automatically rejected.",
     },
-    rejectConfirmTitle: { vi: "Xác nhận từ chối báo giá", en: "Confirm Reject Quote" },
+    rejectConfirmTitle: {
+      vi: "Xác nhận từ chối báo giá",
+      en: "Confirm Reject Quote",
+    },
     rejectConfirmDesc: {
       vi: "Bạn có chắc chắn muốn từ chối báo giá này?",
       en: "Are you sure you want to reject this quote?",
@@ -141,31 +162,52 @@ export const serviceRequestLabels = {
     steps: {
       pending: {
         label: { vi: "Yêu cầu đã gửi", en: "Request Submitted" },
-        description: { vi: "Đang chờ báo giá từ nhà cung cấp", en: "Waiting for provider quotes" },
+        description: {
+          vi: "Đang chờ báo giá từ nhà cung cấp",
+          en: "Waiting for provider quotes",
+        },
       },
       quoted: {
         label: { vi: "Đã nhận báo giá", en: "Quotes Received" },
-        description: { vi: "Đang xem xét báo giá từ nhà cung cấp", en: "Reviewing provider quotes" },
+        description: {
+          vi: "Đang xem xét báo giá từ nhà cung cấp",
+          en: "Reviewing provider quotes",
+        },
       },
       accepted: {
         label: { vi: "Đã chấp nhận báo giá", en: "Quote Accepted" },
-        description: { vi: "Nhà cung cấp đang chuẩn bị thực hiện dịch vụ", en: "Provider preparing to perform service" },
+        description: {
+          vi: "Nhà cung cấp đang chuẩn bị thực hiện dịch vụ",
+          en: "Provider preparing to perform service",
+        },
       },
       in_progress: {
         label: { vi: "Đang thực hiện", en: "Service In Progress" },
-        description: { vi: "Nhà cung cấp đang thực hiện dịch vụ", en: "Provider is performing the service" },
+        description: {
+          vi: "Nhà cung cấp đang thực hiện dịch vụ",
+          en: "Provider is performing the service",
+        },
       },
       completed: {
         label: { vi: "Hoàn thành", en: "Completed" },
-        description: { vi: "Dịch vụ đã hoàn thành thành công", en: "Service has been completed successfully" },
+        description: {
+          vi: "Dịch vụ đã hoàn thành thành công",
+          en: "Service has been completed successfully",
+        },
       },
       cancelled: {
         label: { vi: "Đã hủy", en: "Cancelled" },
-        description: { vi: "Yêu cầu dịch vụ đã bị hủy", en: "Service request was cancelled" },
+        description: {
+          vi: "Yêu cầu dịch vụ đã bị hủy",
+          en: "Service request was cancelled",
+        },
       },
       disputed: {
         label: { vi: "Đang tranh chấp", en: "Disputed" },
-        description: { vi: "Yêu cầu đang trong quá trình giải quyết tranh chấp", en: "Request is under dispute resolution" },
+        description: {
+          vi: "Yêu cầu đang trong quá trình giải quyết tranh chấp",
+          en: "Request is under dispute resolution",
+        },
       },
     },
   },
@@ -202,7 +244,10 @@ export const serviceRequestLabels = {
   buttons: {
     create: { vi: "Tạo yêu cầu mới", en: "New Request" },
     cancel: { vi: "Hủy yêu cầu", en: "Cancel Request" },
-    cancelConfirmTitle: { vi: "Hủy yêu cầu dịch vụ", en: "Cancel Service Request" },
+    cancelConfirmTitle: {
+      vi: "Hủy yêu cầu dịch vụ",
+      en: "Cancel Service Request",
+    },
     cancelConfirmDesc: {
       vi: "Bạn có chắc chắn muốn hủy yêu cầu dịch vụ này? Hành động này không thể hoàn tác.",
       en: "Are you sure you want to cancel this service request? This action cannot be undone.",

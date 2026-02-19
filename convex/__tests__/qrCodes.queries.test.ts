@@ -6,6 +6,7 @@
  */
 import { convexTest } from "convex-test";
 import { describe, expect, it } from "vitest";
+
 import { api } from "../_generated/api";
 import schema from "../schema";
 
@@ -48,10 +49,7 @@ async function seedUser(
   });
 }
 
-async function seedCategory(
-  t: ReturnType<typeof convexTest>,
-  orgId: string,
-) {
+async function seedCategory(t: ReturnType<typeof convexTest>, orgId: string) {
   return t.run(async (ctx) => {
     const now = Date.now();
     return ctx.db.insert("equipmentCategories", {

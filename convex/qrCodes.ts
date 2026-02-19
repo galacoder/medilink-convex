@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
-import { mutation, query } from "./_generated/server";
 import { type Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 
 // ---------------------------------------------------------------------------
 // Helper: extract authenticated organizationId from JWT identity
@@ -21,9 +21,7 @@ async function requireAuth(ctx: {
 }): Promise<{ subject: string; organizationId: Id<"organizations"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
-    throw new ConvexError(
-      "Không có quyền truy cập (Not authenticated)",
-    );
+    throw new ConvexError("Không có quyền truy cập (Not authenticated)");
   }
   const organizationId = identity.organizationId as Id<"organizations"> | null;
   if (!organizationId) {
@@ -201,9 +199,7 @@ export const recordScan = mutation({
     // Verify the QR code exists and belongs to this organization
     const qrCode = await ctx.db.get(args.qrCodeId);
     if (!qrCode || qrCode.organizationId !== organizationId) {
-      throw new ConvexError(
-        "Mã QR không hợp lệ / Invalid QR code",
-      );
+      throw new ConvexError("Mã QR không hợp lệ / Invalid QR code");
     }
 
     // Look up the user record

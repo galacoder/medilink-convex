@@ -11,8 +11,8 @@
  *
  * Design: Simple CSS circles + lines, no external library needed.
  */
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 import type { ServiceRequestStatus } from "../types";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
 interface StatusTimelineProps {
   currentStatus: ServiceRequestStatus;
@@ -30,7 +30,8 @@ const MAIN_STEPS: ServiceRequestStatus[] = [
 const labels = serviceRequestLabels.timeline.steps;
 
 export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
-  const isTerminal = currentStatus === "cancelled" || currentStatus === "disputed";
+  const isTerminal =
+    currentStatus === "cancelled" || currentStatus === "disputed";
 
   // Determine the step index for the current status
   const currentStepIndex = MAIN_STEPS.indexOf(
@@ -86,7 +87,7 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                 </p>
                 <p
                   className={[
-                    "text-xs mt-0.5",
+                    "mt-0.5 text-xs",
                     isFuture
                       ? "text-muted-foreground/40"
                       : "text-muted-foreground",
@@ -102,12 +103,12 @@ export function StatusTimeline({ currentStatus }: StatusTimelineProps) {
 
       {/* Terminal states (cancelled / disputed) */}
       {isTerminal && (
-        <div className="flex items-start gap-4 rounded-md border border-destructive/30 bg-destructive/10 p-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-destructive text-xs font-bold text-white">
+        <div className="border-destructive/30 bg-destructive/10 flex items-start gap-4 rounded-md border p-3">
+          <div className="bg-destructive flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white">
             !
           </div>
           <div>
-            <p className="text-sm font-medium text-destructive">
+            <p className="text-destructive text-sm font-medium">
               {labels[currentStatus].label.vi}
             </p>
             <p className="text-muted-foreground mt-0.5 text-xs">

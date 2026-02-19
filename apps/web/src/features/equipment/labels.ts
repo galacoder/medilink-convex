@@ -74,7 +74,10 @@ export const equipmentLabels = {
     created: { vi: "Tạo mới", en: "Created" },
     updated: { vi: "Cập nhật", en: "Updated" },
     status_changed: { vi: "Thay đổi trạng thái", en: "Status Changed" },
-    maintenance_scheduled: { vi: "Lên lịch bảo trì", en: "Maintenance Scheduled" },
+    maintenance_scheduled: {
+      vi: "Lên lịch bảo trì",
+      en: "Maintenance Scheduled",
+    },
     failure_reported: { vi: "Báo cáo sự cố", en: "Failure Reported" },
   },
 
@@ -94,13 +97,19 @@ export const equipmentLabels = {
 
   // Bulk actions
   selectAll: { vi: "Chọn tất cả", en: "Select All" },
-  bulkUpdateStatus: { vi: "Cập nhật trạng thái hàng loạt", en: "Bulk Update Status" },
+  bulkUpdateStatus: {
+    vi: "Cập nhật trạng thái hàng loạt",
+    en: "Bulk Update Status",
+  },
   selectedItems: { vi: "mục đã chọn", en: "items selected" },
   clearSelection: { vi: "Bỏ chọn", en: "Clear Selection" },
 
   // Loading
   loading: { vi: "Đang tải...", en: "Loading..." },
-  loadingOrganization: { vi: "Đang tải thông tin tổ chức...", en: "Loading organization info..." },
+  loadingOrganization: {
+    vi: "Đang tải thông tin tổ chức...",
+    en: "Loading organization info...",
+  },
   loadMore: { vi: "Tải thêm", en: "Load More" },
 
   // Placeholders
@@ -112,10 +121,16 @@ export const equipmentLabels = {
   },
 
   // Status update dialog
-  updateStatusTitle: { vi: "Cập nhật trạng thái thiết bị", en: "Update Equipment Status" },
+  updateStatusTitle: {
+    vi: "Cập nhật trạng thái thiết bị",
+    en: "Update Equipment Status",
+  },
   newStatus: { vi: "Trạng thái mới", en: "New Status" },
   updateNotes: { vi: "Ghi chú cập nhật", en: "Update Notes" },
-  updateNotesPlaceholder: { vi: "Ghi chú về lý do thay đổi trạng thái...", en: "Notes about the status change reason..." },
+  updateNotesPlaceholder: {
+    vi: "Ghi chú về lý do thay đổi trạng thái...",
+    en: "Notes about the status change reason...",
+  },
 
   // Breadcrumbs
   backToList: { vi: "Quay lại danh sách", en: "Back to List" },
@@ -126,11 +141,23 @@ export const equipmentLabels = {
   technicalInfo: { vi: "Thông tin kỹ thuật", en: "Technical Details" },
   dateInfo: { vi: "Thông tin ngày tháng", en: "Date Information" },
   maintenanceInfo: { vi: "Lịch bảo trì", en: "Maintenance Schedule" },
-  noMaintenanceScheduled: { vi: "Chưa có lịch bảo trì", en: "No maintenance scheduled" },
+  noMaintenanceScheduled: {
+    vi: "Chưa có lịch bảo trì",
+    en: "No maintenance scheduled",
+  },
 
   // Success/Error messages
-  createSuccess: { vi: "Tạo thiết bị thành công", en: "Equipment created successfully" },
-  updateSuccess: { vi: "Cập nhật thiết bị thành công", en: "Equipment updated successfully" },
-  statusUpdateSuccess: { vi: "Cập nhật trạng thái thành công", en: "Status updated successfully" },
+  createSuccess: {
+    vi: "Tạo thiết bị thành công",
+    en: "Equipment created successfully",
+  },
+  updateSuccess: {
+    vi: "Cập nhật thiết bị thành công",
+    en: "Equipment updated successfully",
+  },
+  statusUpdateSuccess: {
+    vi: "Cập nhật trạng thái thành công",
+    en: "Status updated successfully",
+  },
   error: { vi: "Có lỗi xảy ra", en: "An error occurred" },
 } as const;

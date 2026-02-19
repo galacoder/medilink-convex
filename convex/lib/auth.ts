@@ -11,15 +11,12 @@
  * vi: "Tiện ích xác thực" / en: "Auth helper utilities"
  */
 
+import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 import { ConvexError } from "convex/values";
-import type {
-  GenericMutationCtx,
-  GenericQueryCtx,
-} from "convex/server";
-import type { QueryCtx, MutationCtx } from "../_generated/server";
 
-import { authComponent } from "../auth";
 import type { DataModel, Id } from "../_generated/dataModel";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
+import { authComponent } from "../auth";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -231,7 +228,10 @@ export async function requireOrgMembership(
  *
  * @throws ConvexError if the org does not exist or is not a provider org
  */
-export async function requireProviderOrg(ctx: AnyCtx, orgId: Id<"organizations">) {
+export async function requireProviderOrg(
+  ctx: AnyCtx,
+  orgId: Id<"organizations">,
+) {
   const org = await ctx.db.get(orgId);
 
   if (!org) {
@@ -263,7 +263,10 @@ export async function requireProviderOrg(ctx: AnyCtx, orgId: Id<"organizations">
  *
  * vi: "Lấy nhà cung cấp theo tổ chức" / en: "Get provider for org"
  */
-export async function getProviderForOrg(ctx: AnyCtx, orgId: Id<"organizations">) {
+export async function getProviderForOrg(
+  ctx: AnyCtx,
+  orgId: Id<"organizations">,
+) {
   return await ctx.db
     .query("providers")
     .withIndex("by_org", (q) => q.eq("organizationId", orgId))

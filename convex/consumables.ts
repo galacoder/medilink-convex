@@ -1,8 +1,8 @@
-import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
+import { ConvexError, v } from "convex/values";
 
-import { mutation, query } from "./_generated/server";
 import { type Id } from "./_generated/dataModel";
+import { mutation, query } from "./_generated/server";
 
 // ---------------------------------------------------------------------------
 // Helper: extract authenticated organizationId from JWT identity
@@ -14,9 +14,7 @@ async function requireAuth(ctx: {
 }): Promise<{ subject: string; organizationId: Id<"organizations"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
-    throw new ConvexError(
-      "Không có quyền truy cập (Not authenticated)",
-    );
+    throw new ConvexError("Không có quyền truy cập (Not authenticated)");
   }
   const organizationId = identity.organizationId as Id<"organizations"> | null;
   if (!organizationId) {
@@ -617,9 +615,7 @@ export const updateReorderStatus = mutation({
       const consumable = await ctx.db.get(request.consumableId);
       // FIX 4: Explicit error when consumable doesn't exist (instead of silent skip)
       if (!consumable) {
-        throw new ConvexError(
-          "Vật tư không tồn tại (Consumable not found)",
-        );
+        throw new ConvexError("Vật tư không tồn tại (Consumable not found)");
       }
 
       // ATOMIC: increase stock + log receipt

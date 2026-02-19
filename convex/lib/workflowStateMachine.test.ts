@@ -12,15 +12,15 @@
  *   disputed -> (terminal)
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import type { QuoteStatus, ServiceRequestStatus } from "./workflowStateMachine";
 import {
   canTransition,
-  getNextStatuses,
   canTransitionQuote,
-  VALID_TRANSITIONS,
+  getNextStatuses,
   VALID_QUOTE_TRANSITIONS,
-  type ServiceRequestStatus,
-  type QuoteStatus,
+  VALID_TRANSITIONS,
 } from "./workflowStateMachine";
 
 describe("workflowStateMachine - ServiceRequest", () => {
@@ -161,10 +161,7 @@ describe("workflowStateMachine - ServiceRequest", () => {
     });
 
     it("getNextStatuses('in_progress') returns ['completed', 'disputed']", () => {
-      expect(getNextStatuses("in_progress")).toEqual([
-        "completed",
-        "disputed",
-      ]);
+      expect(getNextStatuses("in_progress")).toEqual(["completed", "disputed"]);
     });
 
     it("getNextStatuses('completed') returns ['disputed']", () => {

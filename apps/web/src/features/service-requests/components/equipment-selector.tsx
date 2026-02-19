@@ -10,8 +10,8 @@
  * Only shows available and in_use equipment (damaged/retired not shown since
  * they may already have service requests or be decommissioned).
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import {
   Select,
@@ -55,9 +55,7 @@ export function EquipmentSelector({ value, onSelect }: EquipmentSelectorProps) {
   return (
     <Select value={value} onValueChange={handleValueChange}>
       <SelectTrigger>
-        <SelectValue
-          placeholder={labels.form.equipmentPlaceholder.vi}
-        />
+        <SelectValue placeholder={labels.form.equipmentPlaceholder.vi} />
       </SelectTrigger>
       <SelectContent>
         {equipment.length === 0 && (

@@ -5,8 +5,9 @@
  * Critical for AC-07 (notification indicators: badge count for new quotes
  * and status updates).
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
 import { createMockServiceRequest } from "~/test-utils";
 import { useServiceRequestNotifications } from "../use-service-request-notifications";
@@ -14,8 +15,6 @@ import { useServiceRequestNotifications } from "../use-service-request-notificat
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 

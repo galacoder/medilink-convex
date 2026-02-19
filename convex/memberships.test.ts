@@ -24,46 +24,26 @@ describe("Membership role change permissions", () => {
   describe("Owner role change permissions", () => {
     it("owner can change admin to member", () => {
       expect(
-        canManageMember(
-          "owner",
-          "admin",
-          ownerId as never,
-          adminId as never,
-        ),
+        canManageMember("owner", "admin", ownerId as never, adminId as never),
       ).toBe(true);
     });
 
     it("owner can change member to admin", () => {
       expect(
-        canManageMember(
-          "owner",
-          "member",
-          ownerId as never,
-          memberId as never,
-        ),
+        canManageMember("owner", "member", ownerId as never, memberId as never),
       ).toBe(true);
     });
 
     it("owner can change member to owner", () => {
       // Owner can promote anyone to owner (last-owner guard is separate)
       expect(
-        canManageMember(
-          "owner",
-          "member",
-          ownerId as never,
-          memberId as never,
-        ),
+        canManageMember("owner", "member", ownerId as never, memberId as never),
       ).toBe(true);
     });
 
     it("owner cannot change own role (self-modification blocked)", () => {
       expect(
-        canManageMember(
-          "owner",
-          "owner",
-          ownerId as never,
-          ownerId as never,
-        ),
+        canManageMember("owner", "owner", ownerId as never, ownerId as never),
       ).toBe(false);
     });
   });
@@ -71,34 +51,19 @@ describe("Membership role change permissions", () => {
   describe("Admin role change permissions", () => {
     it("admin can change member role", () => {
       expect(
-        canManageMember(
-          "admin",
-          "member",
-          adminId as never,
-          memberId as never,
-        ),
+        canManageMember("admin", "member", adminId as never, memberId as never),
       ).toBe(true);
     });
 
     it("admin cannot change another admin's role", () => {
       expect(
-        canManageMember(
-          "admin",
-          "admin",
-          adminId as never,
-          member2Id as never,
-        ),
+        canManageMember("admin", "admin", adminId as never, member2Id as never),
       ).toBe(false);
     });
 
     it("admin cannot change owner's role", () => {
       expect(
-        canManageMember(
-          "admin",
-          "owner",
-          adminId as never,
-          ownerId as never,
-        ),
+        canManageMember("admin", "owner", adminId as never, ownerId as never),
       ).toBe(false);
     });
   });
@@ -117,23 +82,13 @@ describe("Membership role change permissions", () => {
 
     it("member cannot change admin role", () => {
       expect(
-        canManageMember(
-          "member",
-          "admin",
-          memberId as never,
-          adminId as never,
-        ),
+        canManageMember("member", "admin", memberId as never, adminId as never),
       ).toBe(false);
     });
 
     it("member cannot change owner role", () => {
       expect(
-        canManageMember(
-          "member",
-          "owner",
-          memberId as never,
-          ownerId as never,
-        ),
+        canManageMember("member", "owner", memberId as never, ownerId as never),
       ).toBe(false);
     });
   });
@@ -146,56 +101,31 @@ describe("Membership removal permissions", () => {
 
   it("owner can remove admin", () => {
     expect(
-      canManageMember(
-        "owner",
-        "admin",
-        ownerId as never,
-        adminId as never,
-      ),
+      canManageMember("owner", "admin", ownerId as never, adminId as never),
     ).toBe(true);
   });
 
   it("owner can remove member", () => {
     expect(
-      canManageMember(
-        "owner",
-        "member",
-        ownerId as never,
-        memberId as never,
-      ),
+      canManageMember("owner", "member", ownerId as never, memberId as never),
     ).toBe(true);
   });
 
   it("admin can remove member", () => {
     expect(
-      canManageMember(
-        "admin",
-        "member",
-        adminId as never,
-        memberId as never,
-      ),
+      canManageMember("admin", "member", adminId as never, memberId as never),
     ).toBe(true);
   });
 
   it("admin cannot remove owner", () => {
     expect(
-      canManageMember(
-        "admin",
-        "owner",
-        adminId as never,
-        ownerId as never,
-      ),
+      canManageMember("admin", "owner", adminId as never, ownerId as never),
     ).toBe(false);
   });
 
   it("member cannot remove anyone", () => {
     expect(
-      canManageMember(
-        "member",
-        "member",
-        memberId as never,
-        adminId as never,
-      ),
+      canManageMember("member", "member", memberId as never, adminId as never),
     ).toBe(false);
   });
 

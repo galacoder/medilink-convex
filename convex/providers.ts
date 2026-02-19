@@ -15,16 +15,16 @@
 import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
-import {
-  getAuthenticatedUser,
-  requireOrgMembership,
-  requireProviderOrg,
-  getProviderForOrg,
-} from "./lib/auth";
 import { createAuditLogEntry } from "./lib/auditLog";
 import {
-  findProvidersBySpecialty,
+  getAuthenticatedUser,
+  getProviderForOrg,
+  requireOrgMembership,
+  requireProviderOrg,
+} from "./lib/auth";
+import {
   findProvidersByRegion,
+  findProvidersBySpecialty,
 } from "./lib/providerSearch";
 
 // ===========================================================================
@@ -151,11 +151,10 @@ export const updateProfile = mutation({
     const { organizationId, ...profileFields } = args;
 
     // RBAC: only owner/admin can update the provider profile
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     // Verify this org is a provider org (not a hospital)
     await requireProviderOrg(ctx, organizationId);
@@ -237,11 +236,10 @@ export const addServiceOffering = mutation({
     const { organizationId, ...offeringFields } = args;
 
     // RBAC: only owner/admin can add offerings
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     await requireProviderOrg(ctx, organizationId);
 
@@ -312,11 +310,10 @@ export const updateServiceOffering = mutation({
     const { organizationId, offeringId, ...updateFields } = args;
 
     // RBAC: only owner/admin can update offerings
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     await requireProviderOrg(ctx, organizationId);
 
@@ -393,11 +390,10 @@ export const removeServiceOffering = mutation({
     const { organizationId, offeringId } = args;
 
     // RBAC: only owner/admin can remove offerings
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     await requireProviderOrg(ctx, organizationId);
 
@@ -470,11 +466,10 @@ export const addCertification = mutation({
     const { organizationId, ...certFields } = args;
 
     // RBAC: only owner/admin can add certifications
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     await requireProviderOrg(ctx, organizationId);
 
@@ -534,11 +529,10 @@ export const setCoverageArea = mutation({
     const { organizationId, areas } = args;
 
     // RBAC: only owner/admin can set coverage areas
-    const { convexUser } = await requireOrgMembership(
-      ctx,
-      organizationId,
-      ["owner", "admin"],
-    );
+    const { convexUser } = await requireOrgMembership(ctx, organizationId, [
+      "owner",
+      "admin",
+    ]);
 
     await requireProviderOrg(ctx, organizationId);
 

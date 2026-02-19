@@ -10,9 +10,9 @@
  *
  * Route: /hospital/service-requests/[id]
  */
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   AlertDialog,
@@ -27,21 +27,19 @@ import {
 } from "@medilink/ui/alert-dialog";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 
-import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
-import { useServiceRequestDetail } from "~/features/service-requests/hooks/use-service-request-detail";
-import { useServiceRequestMutations } from "~/features/service-requests/hooks/use-service-request-mutations";
-import { StatusTimeline } from "~/features/service-requests/components/status-timeline";
+import type {
+  ServiceRequestPriority,
+  ServiceRequestStatus,
+} from "~/features/service-requests/types";
 import { QuotesList } from "~/features/service-requests/components/quotes-list";
 import { ServiceRatingForm } from "~/features/service-requests/components/service-rating-form";
-import type { ServiceRequestPriority, ServiceRequestStatus } from "~/features/service-requests/types";
+import { StatusTimeline } from "~/features/service-requests/components/status-timeline";
+import { useServiceRequestDetail } from "~/features/service-requests/hooks/use-service-request-detail";
+import { useServiceRequestMutations } from "~/features/service-requests/hooks/use-service-request-mutations";
+import { serviceRequestLabels } from "~/lib/i18n/service-request-labels";
 
 const labels = serviceRequestLabels;
 
@@ -75,7 +73,8 @@ export default function ServiceRequestDetailPage() {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const { detail, isLoading, notFound } = useServiceRequestDetail(id);
-  const { cancelRequest, acceptQuote, rejectQuote, rateService } = useServiceRequestMutations();
+  const { cancelRequest, acceptQuote, rejectQuote, rateService } =
+    useServiceRequestMutations();
 
   async function handleCancel() {
     setIsCancelling(true);
@@ -117,7 +116,7 @@ export default function ServiceRequestDetailPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="mb-1 flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
               <Link href="/hospital/service-requests">
                 ← {labels.buttons.back.vi}
@@ -125,7 +124,7 @@ export default function ServiceRequestDetailPage() {
             </Button>
           </div>
           <h1 className="text-2xl font-semibold">{labels.pages.detail.vi}</h1>
-          <p className="text-muted-foreground text-sm font-mono mt-1">
+          <p className="text-muted-foreground mt-1 font-mono text-sm">
             {detail._id}
           </p>
         </div>
@@ -134,13 +133,20 @@ export default function ServiceRequestDetailPage() {
         {canCancel && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive/10">
-                {isCancelling ? labels.buttons.cancelling.vi : labels.buttons.cancel.vi}
+              <Button
+                variant="outline"
+                className="text-destructive border-destructive hover:bg-destructive/10"
+              >
+                {isCancelling
+                  ? labels.buttons.cancelling.vi
+                  : labels.buttons.cancel.vi}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>{labels.buttons.cancelConfirmTitle.vi}</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {labels.buttons.cancelConfirmTitle.vi}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
                   {labels.buttons.cancelConfirmDesc.vi}
                 </AlertDialogDescription>
@@ -165,7 +171,9 @@ export default function ServiceRequestDetailPage() {
           {/* Request info card */}
           <Card data-testid="request-info">
             <CardHeader>
-              <CardTitle className="text-base">{labels.common.requestId.vi}</CardTitle>
+              <CardTitle className="text-base">
+                {labels.common.requestId.vi}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Equipment */}
@@ -214,7 +222,9 @@ export default function ServiceRequestDetailPage() {
                 <span className="text-muted-foreground text-sm">
                   {labels.form.description.vi}
                 </span>
-                <p className="text-sm whitespace-pre-wrap">{detail.descriptionVi}</p>
+                <p className="text-sm whitespace-pre-wrap">
+                  {detail.descriptionVi}
+                </p>
               </div>
 
               {/* Hospital */}
@@ -231,7 +241,9 @@ export default function ServiceRequestDetailPage() {
 
           {/* Quotes section */}
           <div data-testid="quotes-section">
-            <h2 className="text-lg font-semibold mb-4">{labels.quotes.title.vi}</h2>
+            <h2 className="mb-4 text-lg font-semibold">
+              {labels.quotes.title.vi}
+            </h2>
             <QuotesList
               quotes={detail.quotes}
               onAccept={acceptQuote}
@@ -243,12 +255,12 @@ export default function ServiceRequestDetailPage() {
           {detail.status === "completed" && !detail.rating && (
             <Card data-testid="rating-section">
               <CardHeader>
-                <CardTitle className="text-base">{labels.rating.title.vi}</CardTitle>
+                <CardTitle className="text-base">
+                  {labels.rating.title.vi}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <ServiceRatingForm
-                  onSubmit={(data) => rateService(id, data)}
-                />
+                <ServiceRatingForm onSubmit={(data) => rateService(id, data)} />
               </CardContent>
             </Card>
           )}
@@ -256,7 +268,9 @@ export default function ServiceRequestDetailPage() {
 
         {/* Right column: timeline */}
         <div>
-          <h2 className="text-lg font-semibold mb-4">{labels.timeline.title.vi}</h2>
+          <h2 className="mb-4 text-lg font-semibold">
+            {labels.timeline.title.vi}
+          </h2>
           <StatusTimeline currentStatus={detail.status} />
         </div>
       </div>
