@@ -124,4 +124,28 @@ describe("useProviderQuotes", () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.quotes).toEqual([]);
   });
+
+  it("test_useProviderQuotes_returnsErrorOnQueryFailure - hasError=true when Convex returns null", () => {
+    // Convex returns null when the query handler throws a ConvexError
+    mockUseQuery.mockReturnValue(null as unknown as ReturnType<typeof useQuery>);
+
+    const { result } = renderHook(() => useProviderQuotes());
+
+    expect(result.current.hasError).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.quotes).toEqual([]);
+  });
+
+  it("hasError=false and isLoading=false on successful response", () => {
+    const mockQuotes = [createMockProviderQuote({ _id: "q_001" })];
+    mockUseQuery.mockReturnValue(
+      mockQuotes as unknown as ReturnType<typeof useQuery>,
+    );
+
+    const { result } = renderHook(() => useProviderQuotes());
+
+    expect(result.current.hasError).toBe(false);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.quotes).toHaveLength(1);
+  });
 });

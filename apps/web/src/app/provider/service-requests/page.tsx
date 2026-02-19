@@ -32,7 +32,7 @@ const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
 
 export default function ProviderServiceRequestsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const { requests, isLoading } = useIncomingRequests(statusFilter);
+  const { requests, isLoading, hasError } = useIncomingRequests(statusFilter);
 
   return (
     <div className="space-y-6">
@@ -63,7 +63,21 @@ export default function ProviderServiceRequestsPage() {
 
         {STATUS_TABS.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
-            {isLoading ? (
+            {hasError ? (
+              <div
+                className="text-destructive flex min-h-[200px] items-center justify-center rounded-lg border border-dashed"
+                data-testid="provider-request-list-error"
+              >
+                <div className="text-center">
+                  <p className="text-sm font-medium">
+                    Không thể tải danh sách yêu cầu. Vui lòng thử lại.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Unable to load service requests. Please try again.
+                  </p>
+                </div>
+              </div>
+            ) : isLoading ? (
               <div
                 className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 data-testid="provider-request-list"

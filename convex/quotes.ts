@@ -42,6 +42,10 @@ export const submit = mutation({
     notes: v.optional(v.string()),
     // How many days until this quote expires
     validUntilDays: v.optional(v.number()),
+    // vi: "Số ngày ước tính để hoàn thành" / en: "Estimated days to complete the job"
+    estimatedDurationDays: v.optional(v.number()),
+    // vi: "Ngày bắt đầu sớm nhất (epoch ms)" / en: "Earliest available start date (epoch ms)"
+    availableStartDate: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     // 1. Authenticate
@@ -110,6 +114,8 @@ export const submit = mutation({
       currency: args.currency ?? "VND",
       notes: args.notes,
       validUntil,
+      estimatedDurationDays: args.estimatedDurationDays,
+      availableStartDate: args.availableStartDate,
       createdAt: now,
       updatedAt: now,
     });

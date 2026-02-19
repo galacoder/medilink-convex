@@ -19,6 +19,10 @@ export interface UseProviderQuotesOptions {
 export interface UseProviderQuotesResult {
   quotes: ProviderQuote[];
   isLoading: boolean;
+  // WHY: Convex useQuery returns null when the query handler throws a ConvexError.
+  // This is distinct from undefined (loading). hasError=true means the server
+  // denied access or encountered an error — show error UI instead of empty list.
+  hasError: boolean;
   stats: QuoteDashboardStats;
 }
 
@@ -33,18 +37,25 @@ export function useProviderQuotes(
   const convexStatus =
     status && status !== "all" ? status : undefined;
 
-  const quotes = useQuery(api.quotes.listByProvider, {
+  // Convex useQuery returns:
+  //   undefined = loading (not yet received response)
+  //   null      = query threw an error (ConvexError, permission denied, etc.)
+  //   T[]       = success
+  const result = useQuery(api.quotes.listByProvider, {
     ...(convexStatus ? { status: convexStatus } : {}),
-  }) as ProviderQuote[] | undefined;
+  }) as ProviderQuote[] | null | undefined;
 
-  const resolvedQuotes = quotes ?? [];
+  const isLoading = result === undefined;
+  const hasError = result === null;
+  const resolvedQuotes = isLoading || hasError ? [] : result;
 
   // Calculate dashboard stats from all quotes (use unfiltered when possible)
   // WHY: Stats should always reflect total history, not just the filtered view
-  const allQuotes = useQuery(api.quotes.listByProvider, {}) as
+  const allResult = useQuery(api.quotes.listByProvider, {}) as
     | ProviderQuote[]
+    | null
     | undefined;
-  const statsQuotes = allQuotes ?? [];
+  const statsQuotes = allResult && allResult !== null ? allResult : [];
 
   const pendingCount = statsQuotes.filter((q) => q.status === "pending").length;
   const acceptedCount = statsQuotes.filter(
@@ -63,7 +74,8 @@ export function useProviderQuotes(
 
   return {
     quotes: resolvedQuotes,
-    isLoading: quotes === undefined,
+    isLoading,
+    hasError,
     stats: {
       pendingCount,
       acceptedCount,

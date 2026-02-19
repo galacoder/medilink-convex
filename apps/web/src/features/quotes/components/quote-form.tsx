@@ -135,6 +135,11 @@ export function QuoteForm({ serviceRequestId, onSuccess }: QuoteFormProps) {
         amount: amountNum,
         currency: "VND",
         notes: formState.notes.trim() || undefined,
+        estimatedDurationDays:
+          parseInt(formState.estimatedDurationDays, 10) || undefined,
+        availableStartDate: formState.availableStartDate
+          ? new Date(formState.availableStartDate).getTime()
+          : undefined,
       });
       setIsConfirmOpen(false);
       setFormState({

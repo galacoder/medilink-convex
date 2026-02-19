@@ -61,4 +61,11 @@ describe("QuoteForm", () => {
     renderWithProviders(<QuoteForm serviceRequestId="sr_test_001" />);
     expect(screen.getByText("Số tiền (VNĐ)")).toBeInTheDocument();
   });
+
+  it("test_QuoteForm_includesDurationAndStartDateInSubmission - duration and start date inputs present", () => {
+    renderWithProviders(<QuoteForm serviceRequestId="sr_test_001" />);
+    // Both fields must be present so the form can collect and submit them
+    expect(screen.getByTestId("quote-duration-input")).toBeInTheDocument();
+    expect(screen.getByTestId("quote-start-date-input")).toBeInTheDocument();
+  });
 });

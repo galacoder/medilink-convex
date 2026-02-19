@@ -107,4 +107,24 @@ describe("useIncomingRequests", () => {
     expect(result.current.requests).toEqual([]);
     expect(result.current.isLoading).toBe(false);
   });
+
+  it("test_useIncomingRequests_returnsErrorOnQueryFailure - hasError=true when Convex returns null", () => {
+    // Convex returns null when the query handler throws a ConvexError
+    mockUseQuery.mockReturnValue(null as unknown as ReturnType<typeof useQuery>);
+
+    const { result } = renderHook(() => useIncomingRequests());
+
+    expect(result.current.hasError).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.requests).toEqual([]);
+  });
+
+  it("hasError=false and isLoading=false on successful empty response", () => {
+    mockUseQuery.mockReturnValue([] as unknown as ReturnType<typeof useQuery>);
+
+    const { result } = renderHook(() => useIncomingRequests());
+
+    expect(result.current.hasError).toBe(false);
+    expect(result.current.isLoading).toBe(false);
+  });
 });

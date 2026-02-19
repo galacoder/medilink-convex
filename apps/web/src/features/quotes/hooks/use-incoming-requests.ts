@@ -20,6 +20,10 @@ export interface UseIncomingRequestsOptions {
 export interface UseIncomingRequestsResult {
   requests: IncomingServiceRequest[];
   isLoading: boolean;
+  // WHY: Convex useQuery returns null when the query handler throws a ConvexError.
+  // This is distinct from undefined (loading). hasError=true means the server
+  // denied access or encountered an error — show error UI instead of empty list.
+  hasError: boolean;
 }
 
 /**
@@ -34,12 +38,21 @@ export function useIncomingRequests(
   const convexStatus =
     status && status !== "all" ? status : undefined;
 
-  const requests = useQuery(api.serviceRequests.listByProvider, {
+  // Convex useQuery returns:
+  //   undefined = loading (not yet received response)
+  //   null      = query threw an error (ConvexError, permission denied, etc.)
+  //   T[]       = success
+  const result = useQuery(api.serviceRequests.listByProvider, {
     ...(convexStatus ? { status: convexStatus } : {}),
-  }) as IncomingServiceRequest[] | undefined;
+  }) as IncomingServiceRequest[] | null | undefined;
+
+  const isLoading = result === undefined;
+  const hasError = result === null;
+  const requests = isLoading || hasError ? [] : result;
 
   return {
-    requests: requests ?? [],
-    isLoading: requests === undefined,
+    requests,
+    isLoading,
+    hasError,
   };
 }

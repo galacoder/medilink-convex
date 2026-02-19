@@ -57,7 +57,7 @@ function formatDate(epochMs: number): string {
 
 export default function ProviderQuotesPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const { quotes, isLoading, stats } = useProviderQuotes(statusFilter);
+  const { quotes, isLoading, hasError, stats } = useProviderQuotes(statusFilter);
 
   return (
     <div className="space-y-6" data-testid="provider-quotes-list">
@@ -91,7 +91,21 @@ export default function ProviderQuotesPage() {
 
         {STATUS_TABS.map((tab) => (
           <TabsContent key={tab.value} value={tab.value} className="mt-4">
-            {isLoading ? (
+            {hasError ? (
+              <div
+                className="text-destructive flex min-h-[150px] items-center justify-center rounded-lg border border-dashed"
+                data-testid="provider-quotes-list-error"
+              >
+                <div className="text-center">
+                  <p className="text-sm font-medium">
+                    Không thể tải danh sách báo giá. Vui lòng thử lại.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Unable to load quotes. Please try again.
+                  </p>
+                </div>
+              </div>
+            ) : isLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
                   <Skeleton key={i} className="h-20 w-full rounded-lg" />
