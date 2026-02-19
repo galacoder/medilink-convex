@@ -5,18 +5,17 @@
  * handles status filtering, and calculates dashboard stats (win rate etc.)
  * from the returned quote list.
  */
-import { describe, expect, it, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { describe, expect, it, vi } from "vitest";
 
-import { useProviderQuotes } from "../use-provider-quotes";
 import type { ProviderQuote } from "../../types";
+import { useProviderQuotes } from "../use-provider-quotes";
 
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
-
-import { useQuery } from "convex/react";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -127,7 +126,9 @@ describe("useProviderQuotes", () => {
 
   it("test_useProviderQuotes_returnsErrorOnQueryFailure - hasError=true when Convex returns null", () => {
     // Convex returns null when the query handler throws a ConvexError
-    mockUseQuery.mockReturnValue(null as unknown as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      null as unknown as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useProviderQuotes());
 

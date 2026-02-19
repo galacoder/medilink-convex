@@ -7,10 +7,10 @@
  * typed callbacks and real loading state. Components call these hooks instead
  * of calling useMutation() directly, keeping mutation logic out of UI components.
  */
-import { useState } from "react";
-import { useMutation } from "convex/react";
-import { api } from "convex/_generated/api";
 import type { Id } from "convex/_generated/dataModel";
+import { useState } from "react";
+import { api } from "convex/_generated/api";
+import { useMutation } from "convex/react";
 
 export interface SubmitQuoteArgs {
   serviceRequestId: Id<"serviceRequests">;
@@ -54,7 +54,7 @@ export function useQuoteMutations(): UseQuoteMutationsResult {
   async function submitQuote(args: SubmitQuoteArgs): Promise<Id<"quotes">> {
     setIsSubmitting(true);
     try {
-      return await submitQuoteMutation(args) as Id<"quotes">;
+      return (await submitQuoteMutation(args)) as Id<"quotes">;
     } finally {
       setIsSubmitting(false);
     }
@@ -65,7 +65,7 @@ export function useQuoteMutations(): UseQuoteMutationsResult {
   ): Promise<{ success: boolean }> {
     setIsDeclining(true);
     try {
-      return await declineRequestMutation(args) as { success: boolean };
+      return (await declineRequestMutation(args)) as { success: boolean };
     } finally {
       setIsDeclining(false);
     }

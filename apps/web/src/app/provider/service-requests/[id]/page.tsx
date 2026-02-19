@@ -17,19 +17,14 @@ import { useParams, useRouter } from "next/navigation";
 
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@medilink/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 import { Separator } from "@medilink/ui/separator";
 import { Skeleton } from "@medilink/ui/skeleton";
 
-import { useServiceRequestDetail } from "~/features/service-requests/hooks/use-service-request-detail";
 import { QuoteForm } from "~/features/quotes/components/quote-form";
 import { QuoteStatusBadge } from "~/features/quotes/components/quote-status-badge";
 import { quoteLabels } from "~/features/quotes/labels";
+import { useServiceRequestDetail } from "~/features/service-requests/hooks/use-service-request-detail";
 
 /** Formats epoch ms as Vietnamese date */
 function formatDate(epochMs: number): string {
@@ -83,16 +78,14 @@ export default function ProviderServiceRequestDetailPage() {
   }
 
   const equipmentName =
-    detail.equipment?.nameVi ??
-    detail.equipment?.nameEn ??
-    "—";
+    detail.equipment?.nameVi ?? detail.equipment?.nameEn ?? "—";
 
-  const priorityLabel = quoteLabels.priority[
-    detail.priority as keyof typeof quoteLabels.priority
-  ];
-  const typeLabel = quoteLabels.requestType[
-    detail.type as keyof typeof quoteLabels.requestType
-  ];
+  const priorityLabel =
+    quoteLabels.priority[detail.priority as keyof typeof quoteLabels.priority];
+  const typeLabel =
+    quoteLabels.requestType[
+      detail.type as keyof typeof quoteLabels.requestType
+    ];
 
   const canQuote = detail.status === "pending" || detail.status === "quoted";
 
@@ -100,11 +93,7 @@ export default function ProviderServiceRequestDetailPage() {
     <div className="space-y-6" data-testid="provider-request-detail">
       {/* Back navigation + header */}
       <div className="flex items-start gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.back()}
-        >
+        <Button variant="ghost" size="sm" onClick={() => router.back()}>
           ← {quoteLabels.actions.back.vi}
         </Button>
       </div>
@@ -172,7 +161,7 @@ export default function ProviderServiceRequestDetailPage() {
 
             {/* Description */}
             <div className="space-y-1">
-              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+              <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                 {quoteLabels.info.description.vi}
               </p>
               <p className="text-sm">{detail.descriptionVi}</p>
@@ -206,9 +195,11 @@ export default function ProviderServiceRequestDetailPage() {
               <CardContent className="pt-6">
                 <p className="text-muted-foreground text-sm">
                   Yêu cầu này không còn nhận báo giá (trạng thái:{" "}
-                  {quoteLabels.requestStatus[
-                    detail.status as keyof typeof quoteLabels.requestStatus
-                  ].vi}
+                  {
+                    quoteLabels.requestStatus[
+                      detail.status as keyof typeof quoteLabels.requestStatus
+                    ].vi
+                  }
                   )
                 </p>
               </CardContent>
@@ -237,7 +228,11 @@ export default function ProviderServiceRequestDetailPage() {
                     </div>
                     <QuoteStatusBadge
                       status={
-                        quote.status as "pending" | "accepted" | "rejected" | "expired"
+                        quote.status as
+                          | "pending"
+                          | "accepted"
+                          | "rejected"
+                          | "expired"
                       }
                     />
                   </div>

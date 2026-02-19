@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { declineRequestSchema, submitQuoteFormSchema } from "./quotes";
 
 // ---------------------------------------------------------------------------
@@ -33,7 +34,9 @@ describe("submitQuoteFormSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toContain("Số tiền phải lớn hơn 0");
+      expect(result.error.issues[0]?.message).toContain(
+        "Số tiền phải lớn hơn 0",
+      );
     }
   });
 
@@ -44,7 +47,9 @@ describe("submitQuoteFormSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toContain("Số tiền phải lớn hơn 0");
+      expect(result.error.issues[0]?.message).toContain(
+        "Số tiền phải lớn hơn 0",
+      );
     }
   });
 
@@ -68,7 +73,9 @@ describe("submitQuoteFormSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toContain("Số ngày phải lớn hơn 0");
+      expect(result.error.issues[0]?.message).toContain(
+        "Số ngày phải lớn hơn 0",
+      );
     }
   });
 
@@ -132,7 +139,9 @@ describe("declineRequestSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toContain("Lý do từ chối phải có ít nhất 10 ký tự");
+      expect(result.error.issues[0]?.message).toContain(
+        "Lý do từ chối phải có ít nhất 10 ký tự",
+      );
     }
   });
 
@@ -143,7 +152,9 @@ describe("declineRequestSchema", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.message).toContain("Lý do từ chối phải có ít nhất 10 ký tự");
+      expect(result.error.issues[0]?.message).toContain(
+        "Lý do từ chối phải có ít nhất 10 ký tự",
+      );
     }
   });
 

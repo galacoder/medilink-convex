@@ -5,8 +5,9 @@
  * quote submission and decline request actions with proper typing and
  * real useState-based loading state tracking.
  */
+import { act, renderHook } from "@testing-library/react";
+import { useMutation } from "convex/react";
 import { describe, expect, it, vi } from "vitest";
-import { renderHook, act } from "@testing-library/react";
 
 import { useQuoteMutations } from "../use-quote-mutations";
 
@@ -14,8 +15,6 @@ vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
-
-import { useMutation } from "convex/react";
 
 const mockUseMutation = vi.mocked(useMutation);
 
@@ -32,9 +31,7 @@ describe("useQuoteMutations", () => {
   });
 
   it("test_useQuoteMutations_declineRequest - returns declineRequest function", () => {
-    const mockDeclineFn = vi
-      .fn()
-      .mockResolvedValue({ success: true });
+    const mockDeclineFn = vi.fn().mockResolvedValue({ success: true });
     mockUseMutation.mockReturnValue(
       mockDeclineFn as unknown as ReturnType<typeof useMutation>,
     );
@@ -53,7 +50,9 @@ describe("useQuoteMutations", () => {
     const { result } = renderHook(() => useQuoteMutations());
 
     await result.current.submitQuote({
-      serviceRequestId: "sr_test_001" as Parameters<typeof result.current.submitQuote>[0]["serviceRequestId"],
+      serviceRequestId: "sr_test_001" as Parameters<
+        typeof result.current.submitQuote
+      >[0]["serviceRequestId"],
       amount: 500000,
       currency: "VND",
     });
@@ -93,7 +92,9 @@ describe("useQuoteMutations", () => {
     let submitPromise: Promise<string>;
     act(() => {
       submitPromise = result.current.submitQuote({
-        serviceRequestId: "sr_test_001" as Parameters<typeof result.current.submitQuote>[0]["serviceRequestId"],
+        serviceRequestId: "sr_test_001" as Parameters<
+          typeof result.current.submitQuote
+        >[0]["serviceRequestId"],
         amount: 500000,
       });
     });
@@ -122,7 +123,9 @@ describe("useQuoteMutations", () => {
     let declinePromise: Promise<{ success: boolean }>;
     act(() => {
       declinePromise = result.current.declineRequest({
-        serviceRequestId: "sr_test_001" as Parameters<typeof result.current.declineRequest>[0]["serviceRequestId"],
+        serviceRequestId: "sr_test_001" as Parameters<
+          typeof result.current.declineRequest
+        >[0]["serviceRequestId"],
         reason: "Không phù hợp với lịch làm việc hiện tại",
       });
     });
@@ -145,7 +148,9 @@ describe("useQuoteMutations", () => {
 
     await act(async () => {
       await result.current.submitQuote({
-        serviceRequestId: "sr_test_001" as Parameters<typeof result.current.submitQuote>[0]["serviceRequestId"],
+        serviceRequestId: "sr_test_001" as Parameters<
+          typeof result.current.submitQuote
+        >[0]["serviceRequestId"],
         amount: 1000000,
         currency: "VND",
         estimatedDurationDays: 5,

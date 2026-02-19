@@ -27,13 +27,31 @@ export const api = {
     declineRequest: makeFunctionReference<"mutation">(
       "serviceRequests:declineRequest",
     ),
+    // M3-3: Service execution mutations and queries
+    listActiveServices: makeFunctionReference<"query">(
+      "serviceRequests:listActiveServices",
+    ),
+    startService: makeFunctionReference<"mutation">(
+      "serviceRequests:startService",
+    ),
+    updateProgress: makeFunctionReference<"mutation">(
+      "serviceRequests:updateProgress",
+    ),
+    completeService: makeFunctionReference<"mutation">(
+      "serviceRequests:completeService",
+    ),
+    submitCompletionReport: makeFunctionReference<"mutation">(
+      "serviceRequests:submitCompletionReport",
+    ),
   },
   quotes: {
     accept: makeFunctionReference<"mutation">("quotes:accept"),
     reject: makeFunctionReference<"mutation">("quotes:reject"),
     submit: makeFunctionReference<"mutation">("quotes:submit"),
     listByProvider: makeFunctionReference<"query">("quotes:listByProvider"),
-    listByServiceRequest: makeFunctionReference<"query">("quotes:listByServiceRequest"),
+    listByServiceRequest: makeFunctionReference<"query">(
+      "quotes:listByServiceRequest",
+    ),
   },
   serviceRatings: {
     create: makeFunctionReference<"mutation">("serviceRatings:create"),

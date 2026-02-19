@@ -5,9 +5,9 @@
  * which are financial commitments. Tests verify: rendering, VND formatting,
  * submit button presence, and form structure.
  */
-import { describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { QuoteForm } from "../quote-form";

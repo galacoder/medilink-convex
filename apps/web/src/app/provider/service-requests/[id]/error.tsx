@@ -22,16 +22,16 @@ export default function RequestDetailError({ error, reset }: ErrorProps) {
       className="flex flex-col items-center justify-center p-8 text-center"
       data-testid="provider-request-detail-error"
     >
-      <h2 className="text-lg font-semibold text-destructive mb-2">
+      <h2 className="text-destructive mb-2 text-lg font-semibold">
         Không thể tải chi tiết yêu cầu (Unable to load request details)
       </h2>
-      <p className="text-sm text-muted-foreground mb-4">
+      <p className="text-muted-foreground mb-4 text-sm">
         {error.message ||
           "Đã xảy ra lỗi không mong đợi. (An unexpected error occurred.)"}
       </p>
       <button
         onClick={reset}
-        className="text-sm underline text-primary hover:text-primary/80"
+        className="text-primary hover:text-primary/80 text-sm underline"
         data-testid="provider-request-detail-error-retry"
       >
         Thử lại (Try again)

@@ -799,6 +799,50 @@ export default defineSchema({
     .index("by_author", ["authorId"]),
 
   // ===========================================================================
+  // SERVICE EXECUTION DOMAIN (1 table)
+  // vi: "Lĩnh vực thực hiện dịch vụ" / en: "Service execution domain"
+  // Added for M3-3: Provider service execution and completion reports
+  // ===========================================================================
+
+  /**
+   * Structured completion reports submitted by providers after service execution.
+   * vi: "Báo cáo hoàn thành dịch vụ" / en: "Service completion reports"
+   *
+   * WHY: Stored as structured data (not free text) for M3-4 analytics:
+   *   - Parts replaced → inventory forecasting
+   *   - Actual hours → labor cost tracking
+   *   - Next maintenance → schedule planning
+   *   - Photo URLs → evidence for dispute resolution
+   *
+   * Retention: 5 years per Vietnamese medical device regulations (Decree 36/2016).
+   */
+  completionReports: defineTable({
+    serviceRequestId: v.id("serviceRequests"),
+    // vi: "ID nhà cung cấp thực hiện" / en: "Provider who performed the service"
+    providerId: v.optional(v.id("providers")),
+    // vi: "Mô tả công việc đã thực hiện (tiếng Việt)" / en: "Work done (Vietnamese)"
+    workDescriptionVi: v.string(),
+    // vi: "Mô tả công việc đã thực hiện (tiếng Anh)" / en: "Work done (English)"
+    workDescriptionEn: v.optional(v.string()),
+    // vi: "Danh sách linh kiện đã thay thế" / en: "Parts replaced list"
+    partsReplaced: v.optional(v.array(v.string())),
+    // vi: "Khuyến nghị bảo trì tiếp theo" / en: "Next maintenance recommendation"
+    nextMaintenanceRecommendation: v.optional(v.string()),
+    // vi: "Số giờ thực tế" / en: "Actual hours spent"
+    actualHours: v.optional(v.number()),
+    // vi: "URL ảnh tài liệu" / en: "Photo documentation URLs"
+    photoUrls: v.optional(v.array(v.string())),
+    // vi: "Thời gian hoàn thành thực tế" / en: "Actual completion time" (epoch ms)
+    actualCompletionTime: v.optional(v.number()),
+    // vi: "Được gửi bởi" / en: "Submitted by"
+    submittedBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_service_request", ["serviceRequestId"])
+    .index("by_provider", ["providerId"]),
+
+  // ===========================================================================
   // AUDIT LOG DOMAIN (1 table)
   // vi: "Lĩnh vực nhật ký kiểm tra" / en: "Audit log domain"
   // ===========================================================================

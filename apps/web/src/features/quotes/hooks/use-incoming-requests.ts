@@ -8,8 +8,8 @@
  * reactivity — the UI updates automatically when hospital creates a new request
  * or a request status changes.
  */
-import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { useQuery } from "convex/react";
 
 import type { IncomingServiceRequest, ServiceRequestStatus } from "../types";
 
@@ -35,8 +35,7 @@ export function useIncomingRequests(
   status?: ServiceRequestStatus | "all",
 ): UseIncomingRequestsResult {
   // Convert "all" sentinel to undefined (Convex query uses undefined for no filter)
-  const convexStatus =
-    status && status !== "all" ? status : undefined;
+  const convexStatus = status && status !== "all" ? status : undefined;
 
   // Convex useQuery returns:
   //   undefined = loading (not yet received response)

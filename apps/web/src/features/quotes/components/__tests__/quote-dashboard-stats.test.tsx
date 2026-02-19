@@ -5,12 +5,12 @@
  * the N/A case when no decided quotes exist. These are key KPIs for
  * providers to track their quoting competitiveness.
  */
-import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
+import type { QuoteDashboardStats as StatsType } from "../../types";
 import { renderWithProviders } from "~/test-utils";
 import { QuoteDashboardStats } from "../quote-dashboard-stats";
-import type { QuoteDashboardStats as StatsType } from "../../types";
 
 function createStats(overrides?: Partial<StatsType>): StatsType {
   return {

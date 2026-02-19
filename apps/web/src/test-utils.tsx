@@ -11,15 +11,15 @@ import type { ReactNode } from "react";
 import { render } from "@testing-library/react";
 
 import type {
+  IncomingServiceRequest,
+  ProviderQuote,
+} from "./features/quotes/types";
+import type {
   CreateServiceRequestInput,
   Quote,
   ServiceRating,
   ServiceRequest,
 } from "./features/service-requests/types";
-import type {
-  IncomingServiceRequest,
-  ProviderQuote,
-} from "./features/quotes/types";
 
 // ---------------------------------------------------------------------------
 // Provider wrapper

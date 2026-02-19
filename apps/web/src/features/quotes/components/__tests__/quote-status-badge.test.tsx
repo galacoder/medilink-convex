@@ -5,8 +5,8 @@
  * bilingual label. Consistent visual treatment is critical for providers
  * to quickly parse quote status across the quotes list page.
  */
-import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
 import { QuoteStatusBadge } from "../quote-status-badge";
