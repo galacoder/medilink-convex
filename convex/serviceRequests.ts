@@ -356,6 +356,73 @@ export const updateStatus = mutation({
   },
 });
 
+/**
+ * Provider explicitly declines a service request (passes on quoting it).
+ *
+ * WHY: Providers may need to signal they cannot service a particular request.
+ * Recording the decline with a reason provides audit trail and helps hospitals
+ * understand provider availability. The request remains "pending" so other
+ * providers can still quote on it.
+ *
+ * Only provider org members can decline requests.
+ * Request must be in "pending" or "quoted" status.
+ */
+export const declineRequest = mutation({
+  args: {
+    serviceRequestId: v.id("serviceRequests"),
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate
+    const auth = await requireOrgAuth(ctx);
+
+    // 2. Verify caller's org is a provider
+    await assertProviderOrg(ctx, auth.organizationId as Id<"organizations">);
+
+    // 3. Load the service request
+    const request = await ctx.db.get(args.serviceRequestId);
+    if (!request) {
+      throw new ConvexError({
+        message:
+          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        code: "SERVICE_REQUEST_NOT_FOUND",
+      });
+    }
+
+    // 4. Only allow declining pending or quoted requests
+    if (request.status !== "pending" && request.status !== "quoted") {
+      throw new ConvexError({
+        message:
+          "Không thể từ chối yêu cầu dịch vụ này. (Cannot decline this service request.)",
+        code: "INVALID_SERVICE_REQUEST_STATUS",
+        currentStatus: request.status,
+      });
+    }
+
+    // 5. Validate reason length
+    if (!args.reason || args.reason.trim().length < 10) {
+      throw new ConvexError({
+        message:
+          "Lý do từ chối phải có ít nhất 10 ký tự. (Decline reason must be at least 10 characters.)",
+        code: "INVALID_REASON",
+      });
+    }
+
+    // 6. Create audit log entry — we don't change request status, just record the decline
+    await createAuditEntry(ctx, {
+      organizationId: request.organizationId,
+      actorId: auth.userId as Id<"users">,
+      action: "serviceRequest.declined",
+      resourceType: "serviceRequests",
+      resourceId: args.serviceRequestId,
+      previousValues: { status: request.status },
+      newValues: { declineReason: args.reason },
+    });
+
+    return { success: true };
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
