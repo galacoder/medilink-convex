@@ -19,7 +19,9 @@ import { Label } from "@medilink/ui/label";
 import type { ProviderProfile } from "../types";
 import { providerLabels } from "../labels";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Convex codegen does not include providers namespace locally -- cast is safe,
+// all argument shapes are validated by the Convex schema.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
 const providersApi = api.providers as any;
 
 interface ProviderProfileFormProps {
@@ -74,6 +76,7 @@ export function ProviderProfileForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const updateProfile = useMutation(providersApi.updateProfile);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -93,7 +96,7 @@ export function ProviderProfileForm({
       });
 
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setError(
         locale === "vi"
           ? providerLabels.errors.generic.vi

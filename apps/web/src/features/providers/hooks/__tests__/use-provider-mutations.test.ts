@@ -31,6 +31,7 @@ describe("useProviderMutations", () => {
   it("test_useProviderMutations_addServiceOfferingIsCallable", async () => {
     const { result } = renderHook(() => useProviderMutations());
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const returnValue = await result.current.addServiceOffering({
       organizationId: "org_001",
       specialty: "calibration",
@@ -42,6 +43,7 @@ describe("useProviderMutations", () => {
   it("test_useProviderMutations_updateProfileIsCallable", async () => {
     const { result } = renderHook(() => useProviderMutations());
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const returnValue = await result.current.updateProfile({
       organizationId: "org_001",
       companyName: "New Company Name",
@@ -53,6 +55,7 @@ describe("useProviderMutations", () => {
   it("test_useProviderMutations_setCoverageAreaIsCallable", async () => {
     const { result } = renderHook(() => useProviderMutations());
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const returnValue = await result.current.setCoverageArea({
       organizationId: "org_001",
       areas: [{ region: "TP. Hồ Chí Minh" }],

@@ -119,10 +119,15 @@ describe("OfferingCard", () => {
     // "3 ngày" is rendered as two sibling spans: "3" and " ngày"
     // Use a regex that matches the combined text in the parent span
     expect(screen.getByText((_, element) => {
-      return element?.tagName === "SPAN" &&
-        element.className.includes("font-medium") &&
-        element.textContent?.includes("3") === true &&
-        element.textContent?.includes("ngày") === true;
+      const isSpan = element?.tagName === "SPAN";
+      const hasFontMedium = element?.className.includes("font-medium") === true;
+      // textContent optional chain needed because element may be null in the
+      // getByText callback context -- suppress unnecessary-condition false positives
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const hasThree = element?.textContent?.includes("3") === true;
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      const hasNgay = element?.textContent?.includes("ngày") === true;
+      return isSpan && hasFontMedium && hasThree && hasNgay;
     })).toBeInTheDocument();
   });
 });

@@ -26,14 +26,16 @@ export interface UseProviderProfileResult {
 export function useProviderProfile(
   organizationId: string,
 ): UseProviderProfileResult {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Convex codegen does not include providers namespace locally -- cast is safe,
+  // all argument shapes are validated by the Convex schema.
   const profile = useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     api.providers.getProfile as any,
     organizationId ? { organizationId } : "skip",
   ) as ProviderProfile | null | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const certifications = useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     api.providers.getCertifications as any,
     organizationId ? { organizationId } : "skip",
   ) as Certification[] | undefined;

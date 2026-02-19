@@ -54,7 +54,8 @@ describe("CoverageAreaSelector", () => {
     );
 
     const removeButtons = screen.getAllByTestId("remove-region-btn");
-    // Remove first region
+    // Remove first region (getAllByTestId guarantees at least one result)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await user.click(removeButtons[0]!);
 
     expect(onChange).toHaveBeenCalledWith([

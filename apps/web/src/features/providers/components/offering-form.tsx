@@ -27,7 +27,9 @@ import type { ServiceOffering, Specialty } from "../types";
 import { SPECIALTY_OPTIONS } from "../types";
 import { providerLabels } from "../labels";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// Convex codegen does not include providers namespace locally -- cast is safe,
+// all argument shapes are validated by the Convex schema.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
 const providersApi = api.providers as any;
 
 interface OfferingFormProps {
@@ -88,7 +90,9 @@ export function OfferingForm({
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const addOffering = useMutation(providersApi.addServiceOffering);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const updateOffering = useMutation(providersApi.updateServiceOffering);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -110,7 +114,7 @@ export function OfferingForm({
       if (mode === "create") {
         await addOffering({
           organizationId,
-          specialty: form.specialty as Specialty,
+          specialty: form.specialty,
           descriptionVi: form.descriptionVi || undefined,
           descriptionEn: form.descriptionEn || undefined,
           priceEstimate: form.priceEstimate
@@ -124,7 +128,7 @@ export function OfferingForm({
         await updateOffering({
           organizationId,
           offeringId: offering._id,
-          specialty: form.specialty as Specialty,
+          specialty: form.specialty,
           descriptionVi: form.descriptionVi || undefined,
           descriptionEn: form.descriptionEn || undefined,
           priceEstimate: form.priceEstimate
@@ -137,7 +141,7 @@ export function OfferingForm({
       }
 
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setError(
         locale === "vi"
           ? providerLabels.errors.generic.vi

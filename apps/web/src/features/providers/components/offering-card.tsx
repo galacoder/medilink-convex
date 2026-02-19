@@ -61,8 +61,9 @@ export function OfferingCard({
   onDelete,
   locale = "vi",
 }: OfferingCardProps) {
-  const specialtyLabel =
-    SPECIALTY_LABELS[offering.specialty]?.[locale] ?? offering.specialty;
+  // SPECIALTY_LABELS is Record<Specialty, {vi: string, en: string}> -- lookup
+  // is always defined since offering.specialty is typed as Specialty.
+  const specialtyLabel = SPECIALTY_LABELS[offering.specialty][locale];
 
   const description =
     locale === "vi" ? offering.descriptionVi : offering.descriptionEn;

@@ -29,8 +29,10 @@ export interface UseProviderOfferingsResult {
 export function useProviderOfferings(
   organizationId: string,
 ): UseProviderOfferingsResult {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // Convex codegen does not include providers namespace locally -- cast is safe,
+  // all argument shapes are validated by the Convex schema.
   const offerings = useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     api.providers.listServiceOfferings as any,
     organizationId ? { organizationId } : "skip",
   ) as ServiceOffering[] | undefined;
