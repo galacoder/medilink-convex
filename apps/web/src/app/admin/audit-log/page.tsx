@@ -1,6 +1,5 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
 import { useCallback, useState } from "react";
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
@@ -11,6 +10,7 @@ import { Button } from "@medilink/ui/button";
 import type {
   AuditLogEntryWithDetails,
   AuditLogFilters,
+  AuditLogPage,
 } from "~/features/admin-audit-log/types";
 import { AuditLogFilterPanel } from "~/features/admin-audit-log/components/audit-log-filter-panel";
 import { AuditLogTable } from "~/features/admin-audit-log/components/audit-log-table";
@@ -36,13 +36,12 @@ export default function AuditLogPage() {
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [allEntries, setAllEntries] = useState<AuditLogEntryWithDetails[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   // Build query args from filter state
   const queryArgs = {
     resourceType: filters.resourceType,
-    organizationId: filters.organizationId as Id<"organizations"> | undefined,
-    actorId: filters.actorId as Id<"users"> | undefined,
+    organizationId: filters.organizationId,
+    actorId: filters.actorId,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     search: filters.search,
@@ -50,7 +49,11 @@ export default function AuditLogPage() {
     limit: 50,
   };
 
-  const result = useQuery(api.admin.auditLog.list, queryArgs);
+  // WHY: Cast result to AuditLogPage because api.d.ts uses AnyApi, which
+  // causes useQuery to infer `any`. Explicit cast restores type safety.
+  const result = useQuery(api.admin.auditLog.list, queryArgs) as
+    | AuditLogPage
+    | undefined;
 
   const isLoading = result === undefined;
 
@@ -64,11 +67,8 @@ export default function AuditLogPage() {
   // Merge new page results into accumulated entries
   const currentEntries: AuditLogEntryWithDetails[] =
     cursor === undefined
-      ? ((result?.entries as AuditLogEntryWithDetails[]) ?? [])
-      : [
-          ...allEntries,
-          ...((result?.entries as AuditLogEntryWithDetails[]) ?? []),
-        ];
+      ? (result?.entries ?? [])
+      : [...allEntries, ...(result?.entries ?? [])];
 
   function handleLoadMore() {
     if (!result?.cursor) return;
@@ -81,7 +81,6 @@ export default function AuditLogPage() {
   function handleRefresh() {
     setCursor(undefined);
     setAllEntries([]);
-    setRefreshKey((k) => k + 1);
   }
 
   // CSV export: trigger a fresh query with no pagination, then download
@@ -171,7 +170,7 @@ export default function AuditLogPage() {
       <AuditLogTable
         entries={currentEntries}
         isLoading={isLoading}
-        canLoadMore={!result?.isDone && currentEntries.length > 0}
+        canLoadMore={result?.isDone === false && currentEntries.length > 0}
         isLoadingMore={isLoadingMore}
         onLoadMore={handleLoadMore}
       />
