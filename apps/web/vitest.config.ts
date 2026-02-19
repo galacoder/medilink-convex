@@ -1,4 +1,5 @@
 import path from "path";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -13,6 +14,7 @@ import { defineConfig } from "vitest/config";
  * are mocked via vi.mock("convex/react") in individual test files.
  */
 export default defineConfig({
+  plugins: [react()],
   test: {
     environment: "jsdom",
     globals: true,
