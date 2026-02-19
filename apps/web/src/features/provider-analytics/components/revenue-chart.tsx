@@ -63,7 +63,7 @@ function RevenueTooltip({
   label,
 }: {
   active?: boolean;
-  payload?: Array<{ value: number }>;
+  payload?: { value: number }[];
   label?: string;
 }) {
   if (!active || !payload?.length) return null;

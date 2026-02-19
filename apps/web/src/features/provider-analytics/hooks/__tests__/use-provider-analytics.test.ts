@@ -46,7 +46,7 @@ const mockSummary = {
 
 describe("useProviderAnalytics", () => {
   it("test_useProviderAnalytics_returnsDataWhenLoaded", () => {
-    mockUseQuery.mockReturnValue(mockSummary as any);
+    mockUseQuery.mockReturnValue(mockSummary as unknown);
 
     const { result } = renderHook(() =>
       useProviderAnalytics({
@@ -60,7 +60,7 @@ describe("useProviderAnalytics", () => {
   });
 
   it("test_useProviderAnalytics_handlesLoadingState", () => {
-    mockUseQuery.mockReturnValue(undefined as any);
+    mockUseQuery.mockReturnValue(undefined);
 
     const { result } = renderHook(() =>
       useProviderAnalytics({
@@ -74,7 +74,7 @@ describe("useProviderAnalytics", () => {
   });
 
   it("test_useProviderAnalytics_skipsQueryWhenNoProviderId", () => {
-    mockUseQuery.mockReturnValue(undefined as any);
+    mockUseQuery.mockReturnValue(undefined);
 
     renderHook(() =>
       useProviderAnalytics({
@@ -88,7 +88,7 @@ describe("useProviderAnalytics", () => {
   });
 
   it("test_useProviderAnalytics_supportsAllDateRanges", () => {
-    mockUseQuery.mockReturnValue(mockSummary as any);
+    mockUseQuery.mockReturnValue(mockSummary as unknown);
 
     for (const dateRange of ["7d", "30d", "90d"] as const) {
       const { result } = renderHook(() =>

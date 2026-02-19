@@ -22,7 +22,7 @@ Object.defineProperty(global.URL, "revokeObjectURL", {
 });
 
 describe("useAnalyticsExport", () => {
-  it("test_useAnalyticsExport_generatesCSVWithHeaders", async () => {
+  it("test_useAnalyticsExport_generatesCSVWithHeaders", () => {
     const mockData = [
       {
         serviceRequestId: "sr_001",
@@ -38,10 +38,10 @@ describe("useAnalyticsExport", () => {
 
     const { result } = renderHook(() => useAnalyticsExport());
 
-    let csvContent = "";
+    let _csvContent = "";
     const createObjectURL = vi.fn((blob: Blob) => {
       void blob.text().then((text) => {
-        csvContent = text;
+        _csvContent = text;
       });
       return "blob:mock-url";
     });
@@ -52,7 +52,7 @@ describe("useAnalyticsExport", () => {
       revokeObjectURL: vi.fn(),
     });
 
-    await act(async () => {
+    act(() => {
       result.current.exportToCSV(mockData, "test-export");
     });
 
