@@ -3,180 +3,136 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import { Badge } from "@medilink/ui/badge";
-import { Button } from "@medilink/ui/button";
+import type {Id} from "convex/_generated/dataModel";
 
-import { QRCodeDisplay } from "~/features/qr-scan";
+import { Button } from "@medilink/ui/button";
+import { Skeleton } from "@medilink/ui/skeleton";
+
+import { EquipmentDetail } from "~/features/equipment/components/equipment-detail";
+import { EquipmentQR } from "~/features/equipment/components/equipment-qr";
+import { HistoryTimeline } from "~/features/equipment/components/history-timeline";
+import { useEquipmentDetail } from "~/features/equipment/hooks/use-equipment-detail";
+import { equipmentLabels } from "~/features/equipment/labels";
 
 /**
- * Equipment detail page at /hospital/equipment/[id].
+ * Equipment detail page.
  *
- * WHY: After scanning a QR code (or clicking from the equipment list),
- * staff need to see full equipment details and have access to the QR code
- * for downloading/printing additional labels.
- *
- * This page displays:
- *   - Equipment name (bilingual), status badge, condition, location
- *   - QRCodeDisplay component for viewing/downloading the QR code
- *   - Back navigation to equipment list
- *
- * NOTE: This scaffold renders with static content while Convex integration
- * (api.equipment.getById + api.qrCodes.getByEquipmentId) is added in M3
- * once convex dev generates types.
- *
- * vi: "Chi tiết thiết bị y tế" / en: "Medical Equipment Detail"
+ * WHY: After finding equipment in the list, staff need to see all details,
+ * status history, and maintenance schedule to make informed decisions about
+ * borrowing, maintenance scheduling, or status updates.
  */
+export default function EquipmentDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-// Status badge color mapping
-const STATUS_COLORS: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  available: "default",
-  in_use: "secondary",
-  maintenance: "outline",
-  damaged: "destructive",
-  retired: "outline",
-};
+  const { equipment, isLoading, history, historyLoading, loadMoreHistory } =
+    useEquipmentDetail(id ? (id as Id<"equipment">) : undefined);
 
-// Bilingual status labels
-const STATUS_LABELS: Record<string, { vi: string; en: string }> = {
-  available: { vi: "Sẵn sàng", en: "Available" },
-  in_use: { vi: "Đang sử dụng", en: "In Use" },
-  maintenance: { vi: "Bảo trì", en: "Maintenance" },
-  damaged: { vi: "Hỏng", en: "Damaged" },
-  retired: { vi: "Đã nghỉ hưu", en: "Retired" },
-};
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {/* Breadcrumb skeleton */}
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-4 w-24" />
+          <span className="text-muted-foreground">/</span>
+          <Skeleton className="h-4 w-40" />
+        </div>
 
-// Bilingual condition labels
-const CONDITION_LABELS: Record<string, { vi: string; en: string }> = {
-  excellent: { vi: "Xuất sắc", en: "Excellent" },
-  good: { vi: "Tốt", en: "Good" },
-  fair: { vi: "Trung bình", en: "Fair" },
-  poor: { vi: "Kém", en: "Poor" },
-};
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-9 w-28" />
+        </div>
 
-export default function HospitalEquipmentDetailPage() {
-  const params = useParams<{ id: string }>();
-  const equipmentId = params.id;
+        {/* Content skeleton */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-4 lg:col-span-2">
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+          <Skeleton className="h-80 w-full" />
+        </div>
+      </div>
+    );
+  }
 
-  // TODO (M3): Replace with Convex query once convex dev generates types:
-  // const equipment = useQuery(api.equipment.getById, { id: equipmentId as Id<"equipment"> });
-  // const qrCode = useQuery(api.qrCodes.getByEquipmentId, { equipmentId: equipmentId as Id<"equipment"> });
-
-  // Scaffold: show equipment ID-based placeholder content
-  // Full equipment data will come from Convex queries in M3 integration
-  const mockStatus = "available";
-  const mockCondition = "good";
+  if (!equipment) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <p className="text-muted-foreground text-lg font-medium">
+          {equipmentLabels.notFound.vi}{" "}
+          <span className="text-muted-foreground text-base font-normal">
+            ({equipmentLabels.notFound.en})
+          </span>
+        </p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {equipmentLabels.notFoundDesc.vi}
+        </p>
+        <Button asChild className="mt-4" variant="outline">
+          <Link href="/hospital/equipment">
+            {equipmentLabels.backToList.vi}
+          </Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6" data-testid="equipment-detail">
-      {/* Back navigation */}
-      <div>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/hospital/equipment" data-testid="equipment-detail-back">
-            {/* vi: "Quay lại danh sách" / en: "Back to list" */}← Quay lại danh
-            sách {/* ← Back to list */}
+    <div className="space-y-6">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 text-sm">
+        <Link
+          href="/hospital/equipment"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {equipmentLabels.title.vi}
+        </Link>
+        <span className="text-muted-foreground">/</span>
+        <span className="font-medium">{equipment.nameVi}</span>
+      </nav>
+
+      {/* Page header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold">{equipment.nameVi}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{equipment.nameEn}</p>
+        </div>
+        <Button asChild variant="outline">
+          <Link href={`/hospital/equipment/${equipment._id}/edit`}>
+            {equipmentLabels.edit.vi}
           </Link>
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Equipment info — left 2/3 */}
+      {/* Main content */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Equipment detail (left/main column) */}
         <div className="space-y-6 lg:col-span-2">
-          {/* Equipment header */}
-          <div className="rounded-lg border p-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <h1
-                  className="text-2xl font-semibold"
-                  data-testid="equipment-name-vi"
-                >
-                  {/* vi: "Tên thiết bị" / en: "Equipment name" */}
-                  Thiết bị #{equipmentId.slice(-8)}{" "}
-                  {/* Equipment #[short ID] */}
-                </h1>
-                <p
-                  className="text-muted-foreground mt-1"
-                  data-testid="equipment-name-en"
-                >
-                  Equipment #{equipmentId.slice(-8)}
-                </p>
-              </div>
-
-              <Badge
-                variant={STATUS_COLORS[mockStatus] ?? "default"}
-                data-testid="equipment-status-badge"
-              >
-                {STATUS_LABELS[mockStatus]?.vi ?? mockStatus}{" "}
-                {/* Vietnamese status label */}
-              </Badge>
-            </div>
-
-            {/* Equipment metadata */}
-            <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-muted-foreground">
-                  {/* vi: "Tình trạng" / en: "Condition" */}
-                  Tình trạng {/* Condition */}
-                </p>
-                <p
-                  className="mt-1 font-medium"
-                  data-testid="equipment-condition"
-                >
-                  {CONDITION_LABELS[mockCondition]?.vi ?? mockCondition}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground">
-                  {/* vi: "Vị trí" / en: "Location" */}
-                  Vị trí {/* Location */}
-                </p>
-                <p
-                  className="mt-1 font-medium"
-                  data-testid="equipment-location"
-                >
-                  {/* Placeholder — will be filled from Convex data */}
-                  Chưa cập nhật {/* Not yet updated */}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground">
-                  {/* vi: "Số sê-ri" / en: "Serial Number" */}
-                  Số sê-ri {/* Serial Number */}
-                </p>
-                <p className="mt-1 font-medium" data-testid="equipment-serial">
-                  Chưa cập nhật {/* Not yet updated */}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-muted-foreground">
-                  {/* vi: "ID thiết bị" / en: "Equipment ID" */}
-                  ID thiết bị {/* Equipment ID */}
-                </p>
-                <p
-                  className="mt-1 font-mono text-xs"
-                  data-testid="equipment-id"
-                >
-                  {equipmentId}
-                </p>
-              </div>
-            </div>
-          </div>
+          <EquipmentDetail equipment={equipment} />
         </div>
 
-        {/* QR Code panel — right 1/3 */}
-        <div className="lg:col-span-1">
-          {/* QRCodeDisplay renders the QR code with download button */}
-          {/* Will use qrCode.code from Convex query in M3 */}
-          <QRCodeDisplay
-            equipmentId={equipmentId}
-            equipmentName={`Thiết bị #${equipmentId.slice(-8)}`}
-            qrCode={null}
+        {/* Right column: QR code + History timeline */}
+        <div className="space-y-6">
+          {/* QR Code */}
+          <EquipmentQR
+            equipmentId={equipment._id}
+            equipmentName={equipment.nameVi}
           />
+
+          {/* History timeline */}
+          <div className="space-y-4">
+            <h2 className="text-base font-semibold">
+              {equipmentLabels.history.vi}{" "}
+              <span className="text-muted-foreground font-normal">
+                ({equipmentLabels.history.en})
+              </span>
+            </h2>
+            <HistoryTimeline
+              history={history}
+              isLoading={historyLoading}
+              onLoadMore={loadMoreHistory}
+            />
+          </div>
         </div>
       </div>
     </div>

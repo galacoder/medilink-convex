@@ -54,8 +54,6 @@ dist/
 # tanstack
 .tanstack
 
-# convex
-convex/_generated/
 
 # playwright
 test-results/
