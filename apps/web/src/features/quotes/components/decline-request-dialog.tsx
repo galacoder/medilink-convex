@@ -9,6 +9,7 @@
  *
  * Zod validation (min 10 chars) is enforced client-side before submission.
  */
+import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
 
 import {
@@ -22,10 +23,9 @@ import {
 } from "@medilink/ui/alert-dialog";
 import { Button } from "@medilink/ui/button";
 import { Label } from "@medilink/ui/label";
-import type { Id } from "convex/_generated/dataModel";
 
-import { quoteLabels } from "../labels";
 import { useQuoteMutations } from "../hooks/use-quote-mutations";
+import { quoteLabels } from "../labels";
 
 interface DeclineRequestDialogProps {
   open: boolean;
@@ -100,7 +100,7 @@ export function DeclineRequestDialog({
           </Label>
           <textarea
             id="decline-reason"
-            className="border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             placeholder={quoteLabels.form.declineReasonPlaceholder.vi}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
@@ -109,8 +109,8 @@ export function DeclineRequestDialog({
           />
           {!isValid && reason.length > 0 && (
             <p className="text-destructive text-xs">
-              Lý do phải có ít nhất {MIN_REASON_LENGTH} ký tự (Reason must be
-              at least {MIN_REASON_LENGTH} characters)
+              Lý do phải có ít nhất {MIN_REASON_LENGTH} ký tự (Reason must be at
+              least {MIN_REASON_LENGTH} characters)
             </p>
           )}
           {error && <p className="text-destructive text-xs">{error}</p>}
