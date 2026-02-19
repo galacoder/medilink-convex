@@ -13,15 +13,19 @@
 export const api = {
   serviceRequests: {
     listByHospital: "serviceRequests:listByHospital",
+    listByProvider: "serviceRequests:listByProvider",
     getById: "serviceRequests:getById",
     create: "serviceRequests:create",
     cancel: "serviceRequests:cancel",
     updateStatus: "serviceRequests:updateStatus",
+    declineRequest: "serviceRequests:declineRequest",
   },
   quotes: {
     accept: "quotes:accept",
     reject: "quotes:reject",
     submit: "quotes:submit",
+    listByProvider: "quotes:listByProvider",
+    listByServiceRequest: "quotes:listByServiceRequest",
   },
   serviceRatings: {
     create: "serviceRatings:create",
