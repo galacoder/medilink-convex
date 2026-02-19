@@ -1,27 +1,46 @@
 "use client";
 
-import { useActiveOrganization } from "~/auth/client";
-
 /**
- * Provider service requests page — scaffold with data-testid attributes for E2E tests.
+ * Provider service requests page — incoming requests from hospitals.
  *
- * WHY: E2E tests (Wave 5) need a visible list container at /provider/service-requests
- * with `data-testid="provider-request-list"` for assertions. Full Convex integration
- * (via api.serviceRequests.listByProvider) will be added in M2.
+ * WHY: Providers need to see all pending/quoted service requests from
+ * hospitals in their coverage area so they can decide which to quote on
+ * and which to decline. This replaces the scaffold with real Convex data.
  *
- * Providers see service requests assigned to them or available for quoting.
+ * Preserves data-testid="provider-request-list" for E2E test compatibility.
  *
  * vi: "Yêu cầu dịch vụ từ bệnh viện" / en: "Hospital Service Requests"
  */
+import { useState } from "react";
+
+import { Skeleton } from "@medilink/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@medilink/ui/tabs";
+
+import { useIncomingRequests } from "~/features/quotes/hooks/use-incoming-requests";
+import { IncomingRequestCard } from "~/features/quotes/components/incoming-request-card";
+import { quoteLabels } from "~/features/quotes/labels";
+import type { ServiceRequestStatus } from "~/features/quotes/types";
+
+type StatusFilter = ServiceRequestStatus | "all";
+
+const STATUS_TABS: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "Tất cả" },
+  { value: "pending", label: quoteLabels.requestStatus.pending.vi },
+  { value: "quoted", label: quoteLabels.requestStatus.quoted.vi },
+  { value: "accepted", label: quoteLabels.requestStatus.accepted.vi },
+];
+
 export default function ProviderServiceRequestsPage() {
-  const { data: _activeOrg, isPending } = useActiveOrganization();
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const { requests, isLoading, hasError } = useIncomingRequests(statusFilter);
 
   return (
     <div className="space-y-6">
-      {/* Page heading — vi: "Yêu cầu dịch vụ" / en: "Service Requests" */}
+      {/* Page heading */}
       <div>
         <h1 className="text-2xl font-semibold">
-          Yêu cầu dịch vụ {/* Service Requests */}
+          {quoteLabels.page.incomingRequests.vi}{" "}
+          {/* {quoteLabels.page.incomingRequests.en} */}
         </h1>
         <p className="text-muted-foreground mt-1">
           Yêu cầu dịch vụ từ các bệnh viện{" "}
@@ -29,54 +48,71 @@ export default function ProviderServiceRequestsPage() {
         </p>
       </div>
 
-      {isPending ? (
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-muted h-12 animate-pulse rounded" />
+      {/* Status filter tabs */}
+      <Tabs
+        value={statusFilter}
+        onValueChange={(v) => setStatusFilter(v as StatusFilter)}
+      >
+        <TabsList>
+          {STATUS_TABS.map((tab) => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
           ))}
-        </div>
-      ) : (
-        // WHY: The table is always rendered (even empty) so E2E tests can
-        // assert data-testid="provider-request-list" is visible without waiting for data.
-        <div className="overflow-hidden rounded-lg border">
-          <table
-            className="w-full text-sm"
-            data-testid="provider-request-list"
-            aria-label="Danh sách yêu cầu dịch vụ từ bệnh viện"
-          >
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium">
-                  Loại yêu cầu {/* Request Type */}
-                </th>
-                <th className="px-4 py-3 text-left font-medium">
-                  Trạng thái {/* Status */}
-                </th>
-                <th className="px-4 py-3 text-left font-medium">
-                  Tên bệnh viện {/* Hospital Name */}
-                </th>
-                <th className="px-4 py-3 text-left font-medium">
-                  Mức độ ưu tiên {/* Priority */}
-                </th>
-                <th className="px-4 py-3 text-left font-medium">
-                  Ngày tạo {/* Created Date */}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {/* Provider request rows rendered by Convex query (M2 integration) */}
-              <tr>
-                <td
-                  colSpan={5}
-                  className="text-muted-foreground px-4 py-8 text-center text-sm"
-                >
-                  Chưa có yêu cầu dịch vụ nào {/* No service requests yet */}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      )}
+        </TabsList>
+
+        {STATUS_TABS.map((tab) => (
+          <TabsContent key={tab.value} value={tab.value}>
+            {hasError ? (
+              <div
+                className="text-destructive flex min-h-[200px] items-center justify-center rounded-lg border border-dashed"
+                data-testid="provider-request-list-error"
+              >
+                <div className="text-center">
+                  <p className="text-sm font-medium">
+                    Không thể tải danh sách yêu cầu. Vui lòng thử lại.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Unable to load service requests. Please try again.
+                  </p>
+                </div>
+              </div>
+            ) : isLoading ? (
+              <div
+                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                data-testid="provider-request-list"
+              >
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Skeleton key={i} className="h-52 w-full rounded-lg" />
+                ))}
+              </div>
+            ) : requests.length === 0 ? (
+              <div
+                className="text-muted-foreground flex min-h-[200px] items-center justify-center rounded-lg border border-dashed"
+                data-testid="provider-request-list"
+              >
+                <div className="text-center">
+                  <p className="text-sm font-medium">
+                    {quoteLabels.emptyState.noIncomingRequests.vi}
+                  </p>
+                  <p className="text-xs">
+                    {quoteLabels.emptyState.noIncomingRequestsDescription.vi}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                data-testid="provider-request-list"
+              >
+                {requests.map((request) => (
+                  <IncomingRequestCard key={request._id} request={request} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }

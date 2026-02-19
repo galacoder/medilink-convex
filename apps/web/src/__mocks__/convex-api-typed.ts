@@ -15,17 +15,25 @@ export const api = {
     listByHospital: makeFunctionReference<"query">(
       "serviceRequests:listByHospital",
     ),
+    listByProvider: makeFunctionReference<"query">(
+      "serviceRequests:listByProvider",
+    ),
     getById: makeFunctionReference<"query">("serviceRequests:getById"),
     create: makeFunctionReference<"mutation">("serviceRequests:create"),
     cancel: makeFunctionReference<"mutation">("serviceRequests:cancel"),
     updateStatus: makeFunctionReference<"mutation">(
       "serviceRequests:updateStatus",
     ),
+    declineRequest: makeFunctionReference<"mutation">(
+      "serviceRequests:declineRequest",
+    ),
   },
   quotes: {
     accept: makeFunctionReference<"mutation">("quotes:accept"),
     reject: makeFunctionReference<"mutation">("quotes:reject"),
     submit: makeFunctionReference<"mutation">("quotes:submit"),
+    listByProvider: makeFunctionReference<"query">("quotes:listByProvider"),
+    listByServiceRequest: makeFunctionReference<"query">("quotes:listByServiceRequest"),
   },
   serviceRatings: {
     create: makeFunctionReference<"mutation">("serviceRatings:create"),

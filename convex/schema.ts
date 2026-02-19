@@ -572,6 +572,10 @@ export default defineSchema({
     currency: v.string(),
     validUntil: v.optional(v.number()),
     notes: v.optional(v.string()),
+    // vi: "Số ngày ước tính để hoàn thành" / en: "Estimated days to complete"
+    estimatedDurationDays: v.optional(v.number()),
+    // vi: "Ngày bắt đầu sớm nhất có thể" / en: "Earliest available start date (epoch ms)"
+    availableStartDate: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

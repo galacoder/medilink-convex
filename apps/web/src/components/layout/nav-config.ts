@@ -93,6 +93,11 @@ export const providerNavItems: NavItem[] = [
     label: { vi: "Tổng quan", en: "Dashboard" },
   },
   {
+    href: "/provider/service-requests",
+    icon: ClipboardList,
+    label: { vi: "Yêu cầu dịch vụ", en: "Service Requests" },
+  },
+  {
     href: "/provider/offerings",
     icon: Briefcase,
     label: { vi: "Dịch vụ", en: "Offerings" },
