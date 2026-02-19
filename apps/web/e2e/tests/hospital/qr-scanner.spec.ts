@@ -1,4 +1,4 @@
-import { expect, test } from "../../fixtures/auth";
+import { expect, test } from "../../fixtures/hospital";
 import { QRScannerPage } from "../../pages/hospital/qr-scanner.page";
 
 /**

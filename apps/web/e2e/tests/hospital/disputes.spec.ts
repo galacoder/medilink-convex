@@ -1,4 +1,4 @@
-import { expect, test } from "../../fixtures/auth";
+import { expect, test } from "../../fixtures/hospital";
 
 /**
  * Hospital dispute workflow E2E tests (M2-6 AC-7).
