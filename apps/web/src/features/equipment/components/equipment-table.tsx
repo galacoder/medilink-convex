@@ -305,10 +305,11 @@ export function EquipmentTable({
                     key={status}
                     onClick={() => handleBulkUpdateStatus(status)}
                   >
-                    {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                    {equipmentLabels.statusValues[
-                      status as keyof typeof equipmentLabels.statusValues
-                    ]?.vi ?? status}
+                    {
+                      equipmentLabels.statusValues[
+                        status as keyof typeof equipmentLabels.statusValues
+                      ].vi
+                    }
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>

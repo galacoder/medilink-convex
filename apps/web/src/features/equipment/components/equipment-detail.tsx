@@ -107,17 +107,11 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const conditionLabel =
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    equipmentLabels.conditionValues[equipment.condition]?.vi ??
-    equipment.condition;
+    equipmentLabels.conditionValues[equipment.condition].vi;
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   const criticalityLabel =
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    equipmentLabels.criticalityValues[equipment.criticality]?.vi ??
-    equipment.criticality;
+    equipmentLabels.criticalityValues[equipment.criticality].vi;
 
   return (
     <div className="space-y-6">
@@ -240,9 +234,10 @@ export function EquipmentDetail({ equipment }: EquipmentDetailProps) {
                 <SelectContent>
                   {validTransitions.map((status) => (
                     <SelectItem key={status} value={status}>
-                      {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
-                      {equipmentLabels.statusValues[status as EquipmentStatus]
-                        ?.vi ?? status}
+                      {
+                        equipmentLabels.statusValues[status as EquipmentStatus]
+                          .vi
+                      }
                     </SelectItem>
                   ))}
                 </SelectContent>

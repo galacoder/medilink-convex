@@ -128,7 +128,6 @@ export function HistoryTimeline({
                   "bg-gray-100 text-gray-600"
                 }`}
               >
-                {/* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */}
                 {actionIconMap[entry.actionType] ?? (
                   <AlertCircleIcon className="h-4 w-4" />
                 )}
