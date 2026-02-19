@@ -17,7 +17,7 @@ export type {
   ProviderQuote,
   QuoteFormInput,
   DeclineInput,
-  QuoteDashboardStats,
+  QuoteDashboardStats as QuoteDashboardStatsData,
 } from "./types";
 
 // Labels
@@ -38,3 +38,10 @@ export {
   useQuoteMutations,
   type UseQuoteMutationsResult,
 } from "./hooks/use-quote-mutations";
+
+// Components
+export { IncomingRequestCard } from "./components/incoming-request-card";
+export { QuoteForm } from "./components/quote-form";
+export { QuoteStatusBadge } from "./components/quote-status-badge";
+export { QuoteDashboardStats } from "./components/quote-dashboard-stats";
+export { DeclineRequestDialog } from "./components/decline-request-dialog";
