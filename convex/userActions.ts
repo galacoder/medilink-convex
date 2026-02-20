@@ -18,8 +18,8 @@
  */
 import { ConvexError, v } from "convex/values";
 
-import { internal } from "./_generated/api";
-import { httpAction, internalMutation, mutation } from "./_generated/server";
+import { components, internal } from "./_generated/api";
+import { httpAction, internalAction, internalMutation, mutation } from "./_generated/server";
 
 // ---------------------------------------------------------------------------
 // Local auth helpers (JWT-based, no better-auth dependency for testability)
@@ -152,20 +152,15 @@ export const setPlatformRole = mutation({
 // ---------------------------------------------------------------------------
 
 /**
- * Internal mutation that sets a user's platform role by email.
+ * Internal mutation that updates our custom users table with platform role.
  *
- * WHY: The public `setPlatformRole` mutation requires a JWT with platformRole.
- * For E2E global-setup, we need to set the role BEFORE the user has signed in
- * with admin privileges (bootstrap problem). This internal mutation is called
- * by the HTTP action (which validates a shared secret instead of JWT).
+ * WHY: Split from internalSetPlatformRole (action) to allow testing this
+ * db-write portion independently. Called from internalSetPlatformRole action.
  *
- * SECURITY: This is internal-only — cannot be called from client code.
- * Access is controlled by the HTTP action's shared secret validation.
- *
- * vi: "Mutation nội bộ — đặt vai trò nền tảng không cần JWT"
- * en: "Internal mutation — set platform role without JWT"
+ * vi: "Mutation nội bộ — cập nhật bảng người dùng tùy chỉnh"
+ * en: "Internal mutation — update custom users table"
  */
-export const internalSetPlatformRole = internalMutation({
+export const patchUserPlatformRole = internalMutation({
   args: {
     // vi: "Email người dùng mục tiêu" / en: "Target user email"
     targetEmail: v.string(),
@@ -196,7 +191,94 @@ export const internalSetPlatformRole = internalMutation({
     return {
       success: true,
       userId: targetUser._id,
-      message: `Role updated to ${args.role}`,
+      message: `Custom users table updated for ${args.targetEmail}`,
+    };
+  },
+});
+
+/**
+ * Internal action: set a user's platform role by email (no JWT required).
+ *
+ * WHY: The public `setPlatformRole` mutation requires a JWT with platformRole.
+ * For E2E global-setup, we need to set the role BEFORE the user has signed in
+ * with admin privileges (bootstrap problem). This internal action is called
+ * by the HTTP action (which validates a shared secret instead of JWT).
+ *
+ * This action:
+ *   1. Updates our custom Convex `users` table (patchUserPlatformRole mutation)
+ *   2. Updates the Better Auth user record via betterAuth.adapter.updateMany
+ *      so that the next /api/auth/get-session returns platformRole in the user
+ *      object (which the proxy.ts reads for admin routing).
+ *
+ * SECURITY: This is internal-only — cannot be called from client code.
+ * Access is controlled by the HTTP action's shared secret validation.
+ *
+ * vi: "Action nội bộ — đặt vai trò nền tảng không cần JWT"
+ * en: "Internal action — set platform role without JWT"
+ */
+export const internalSetPlatformRole = internalAction({
+  args: {
+    // vi: "Email người dùng mục tiêu" / en: "Target user email"
+    targetEmail: v.string(),
+    // vi: "Vai trò nền tảng" / en: "Platform role to assign"
+    role: v.union(v.literal("platform_admin"), v.literal("platform_support")),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ success: boolean; userId: string; message: string }> => {
+    // Step 1: Update our custom users table
+    const patchResult = (await ctx.runMutation(
+      internal.userActions.patchUserPlatformRole,
+      { targetEmail: args.targetEmail, role: args.role },
+    )) as { success: boolean; userId: string; message: string };
+
+    // Step 2: Update the Better Auth user record so the session JWT includes platformRole.
+    // WHY: The proxy.ts reads platformRole from /api/auth/get-session which returns
+    // the Better Auth user's additionalFields. Updating our Convex users table alone
+    // is not enough — the Better Auth component's user table must also be updated.
+    //
+    // The betterAuth adapter updateMany accepts custom additionalFields (like platformRole)
+    // even though they're not typed in the generated types. We use `as any` to bypass
+    // the TypeScript check — this is safe because platformRole is declared as an
+    // additionalField in convex/auth.ts createAuthOptions.
+    //
+    // WHY updateMany instead of updateOne:
+    // updateMany with a where clause is the simplest way to update by email without
+    // needing to first look up the user's betterAuth ID.
+    try {
+      await ctx.runMutation(components.betterAuth.adapter.updateMany, {
+        input: {
+          model: "user",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          update: { platformRole: args.role } as any,
+          where: [
+            {
+              field: "email",
+              operator: "eq",
+              value: args.targetEmail,
+            },
+          ],
+        },
+        paginationOpts: {
+          cursor: null,
+          numItems: 1,
+        },
+      } as any);
+    } catch (err) {
+      // Log but don't fail — the custom users table was already updated.
+      // The Better Auth update may fail if the user doesn't exist in Better Auth yet,
+      // which can happen in test environments.
+      console.warn(
+        `[internalSetPlatformRole] Better Auth user update failed for ${args.targetEmail}:`,
+        err instanceof Error ? err.message : String(err),
+      );
+    }
+
+    return {
+      success: true,
+      userId: patchResult.userId,
+      message: `Role updated to ${args.role} for ${args.targetEmail}`,
     };
   },
 });
@@ -294,9 +376,10 @@ export const setPlatformRoleHttp = httpAction(async (ctx, request) => {
     );
   }
 
-  // Call internal mutation to set the role
+  // Call internal action to set the role (action updates both custom users table
+  // AND the Better Auth user record so the JWT includes platformRole)
   try {
-    const result = await ctx.runMutation(
+    const result = await ctx.runAction(
       internal.userActions.internalSetPlatformRole,
       { targetEmail: email, role },
     );

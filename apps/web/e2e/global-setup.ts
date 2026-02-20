@@ -10,8 +10,22 @@ import type { FullConfig } from "@playwright/test";
  * Storage state files saved to:
  *   ./e2e/.auth/hospital.json  — hospital user session
  *   ./e2e/.auth/provider.json  — provider user session
+ *   ./e2e/.auth/admin.json     — platform admin session (created here, set via HTTP endpoint)
  *
  * These files are consumed by auth fixtures in e2e/fixtures/auth.ts.
+ *
+ * Admin flow (special — no orgType selection):
+ *   1. Sign up with any orgType (form requires it)
+ *   2. Call Convex HTTP endpoint POST /api/admin/set-platform-role with shared secret
+ *      to grant platform_admin role in both Better Auth user table and custom users table
+ *   3. Sign out (clears session with no platformRole)
+ *   4. Sign in again to get fresh session/JWT with platformRole
+ *   5. Wait for proxy Branch 2 redirect to /admin/dashboard
+ *   6. Save storageState
+ *
+ * Environment variables required for admin setup:
+ *   NEXT_PUBLIC_CONVEX_SITE_URL — Convex HTTP site URL (e.g. https://<deploy>.convex.site)
+ *   ADMIN_SETUP_SECRET — shared secret for the set-platform-role HTTP endpoint
  */
 async function globalSetup(_config: FullConfig): Promise<void> {
   const { chromium } = await import("@playwright/test");
@@ -37,6 +51,16 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     password: "TestPassword@123",
     orgType: "provider" as const,
     orgName: `Medical Equipment Provider ${timestamp}`,
+  };
+
+  const ADMIN_USER = {
+    name: "Platform Admin Test",
+    email: `admin-${timestamp}@test.medilink.vn`,
+    password: "TestPassword@123!",
+    // Admin needs to fill the sign-up form which requires orgType + orgName.
+    // We use hospital as a placeholder — the platformRole will override portal routing.
+    orgType: "hospital" as const,
+    orgName: `Admin Setup Org ${timestamp}`,
   };
 
   const browser = await chromium.launch();
@@ -69,6 +93,101 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     await providerPage.waitForURL("**/provider/dashboard", { timeout: 20000 });
     await providerContext.storageState({ path: "./e2e/.auth/provider.json" });
     await providerContext.close();
+
+    // --- Sign up admin user and grant platform_admin role ---
+    // WHY: The admin flow requires:
+    //   1. Create a Better Auth account via sign-up form (with placeholder org)
+    //   2. Set platformRole via HTTP endpoint (requires ADMIN_SETUP_SECRET + CONVEX_SITE_URL)
+    //   3. Re-authenticate to get fresh session with platformRole in the JWT
+    //   4. Proxy Branch 2 routes admin to /admin/dashboard
+
+    // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+    const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL ?? process.env.CONVEX_SITE_URL;
+    // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+    const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
+
+    if (!convexSiteUrl || !adminSetupSecret) {
+      console.warn(
+        "[global-setup] Skipping admin user setup: NEXT_PUBLIC_CONVEX_SITE_URL and ADMIN_SETUP_SECRET must be set.\n" +
+        "  Set these in .env.local to enable admin E2E tests.",
+      );
+      // Create empty placeholder so admin fixture doesn't crash
+      fs.writeFileSync(
+        "./e2e/.auth/admin.json",
+        JSON.stringify({ cookies: [], origins: [] }),
+      );
+    } else {
+      const adminContext = await browser.newContext();
+      const adminPage = await adminContext.newPage();
+
+      // Step 1: Sign up admin user via the standard form
+      // The form requires orgType + orgName — we use hospital as placeholder
+      await adminPage.goto(`${baseURL}/sign-up`);
+      await adminPage.fill("#name", ADMIN_USER.name);
+      await adminPage.fill("#email", ADMIN_USER.email);
+      await adminPage.fill("#password", ADMIN_USER.password);
+      await adminPage.click(`#${ADMIN_USER.orgType}`);
+      await adminPage.fill("#orgName", ADMIN_USER.orgName);
+      await adminPage.click('button[type="submit"]');
+      // After signup, the proxy routes based on orgType (hospital) -> hospital/dashboard
+      // Then we sign out immediately — we just needed the Better Auth account created
+      await adminPage.waitForURL("**/hospital/dashboard", { timeout: 20000 });
+
+      // Step 2: Sign out to clear the hospital session cookie
+      // WHY: We need a clean session before re-signing in with the admin role set
+      await adminPage.goto(`${baseURL}/sign-out`);
+      // Better Auth sign-out — use the API route
+      await adminPage.request.post(`${baseURL}/api/auth/sign-out`, {
+        headers: { "Content-Type": "application/json" },
+      });
+      // Navigate to sign-in to verify we're logged out
+      await adminPage.goto(`${baseURL}/sign-in`);
+      await adminPage.waitForURL(`${baseURL}/sign-in`, { timeout: 10000 }).catch(() => {
+        // Some proxies might redirect — just continue
+      });
+
+      // Step 3: Call the Convex HTTP endpoint to set platformRole
+      // WHY: The Better Auth session for this user currently has no platformRole.
+      // Calling this endpoint updates BOTH our custom users table AND the
+      // Better Auth user record (via betterAuth.adapter.updateMany), so that
+      // the next sign-in will return platformRole in the session.
+      const setPlatformRoleUrl = `${convexSiteUrl}/api/admin/set-platform-role`;
+      const setPlatformRoleResponse = await adminPage.request.post(setPlatformRoleUrl, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-setup-secret": adminSetupSecret,
+        },
+        data: JSON.stringify({
+          email: ADMIN_USER.email,
+          role: "platform_admin",
+        }),
+      });
+
+      if (!setPlatformRoleResponse.ok()) {
+        const errorText = await setPlatformRoleResponse.text();
+        throw new Error(
+          `[global-setup] Failed to set platform role for admin user: ${errorText}`,
+        );
+      }
+
+      // Step 4: Sign in again to get a fresh session with platformRole
+      // WHY: The old session doesn't include platformRole. A fresh sign-in
+      // will trigger a new JWT with the updated platformRole field,
+      // which the proxy reads to route to /admin/dashboard.
+      await adminPage.goto(`${baseURL}/sign-in`);
+      await adminPage.fill("#email", ADMIN_USER.email);
+      await adminPage.fill("#password", ADMIN_USER.password);
+      await adminPage.click('button[type="submit"]');
+
+      // Step 5: Wait for proxy to route admin to /admin/dashboard (Branch 2)
+      // WHY: The proxy reads platformRole from Better Auth session and redirects
+      // platform_admin users to /admin/dashboard.
+      await adminPage.waitForURL("**/admin/dashboard", { timeout: 20000 });
+
+      // Step 6: Save storageState for use by admin test fixtures
+      await adminContext.storageState({ path: "./e2e/.auth/admin.json" });
+      await adminContext.close();
+    }
   } finally {
     await browser.close();
   }
@@ -78,6 +197,8 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   process.env.HOSPITAL_USER_EMAIL = HOSPITAL_USER.email;
   // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
   process.env.PROVIDER_USER_EMAIL = PROVIDER_USER.email;
+  // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+  process.env.ADMIN_USER_EMAIL = ADMIN_USER.email;
 }
 
 export default globalSetup;
