@@ -46,6 +46,8 @@ export class AdminHospitalsPage {
    * WHY: Verifies the CTA button for admin action is visible.
    */
   get onboardButton() {
-    return this.page.locator("button").filter({ hasText: /Thêm bệnh viện|Onboard|Đăng ký/ });
+    return this.page
+      .locator("button")
+      .filter({ hasText: /Thêm bệnh viện|Onboard|Đăng ký/ });
   }
 }

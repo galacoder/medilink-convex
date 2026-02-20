@@ -28,6 +28,9 @@ const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./e2e/vrt",
+  // Exclude portal VRT tests — those require auth fixtures and a live Convex backend.
+  // Run portal VRT separately: pnpm exec playwright test --config=playwright.config.portal-vrt.ts
+  testIgnore: ["**/portal-visual.spec.ts"],
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
