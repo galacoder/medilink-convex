@@ -42,6 +42,27 @@ export default defineConfig({
       testDir: "./e2e/provider",
       use: { ...devices["Desktop Chrome"] },
     },
+    /**
+     * Admin portal test project.
+     *
+     * WHY: Separating the admin portal tests into its own named project
+     * allows CI to run admin E2E tests independently from hospital and
+     * provider tests. Admin tests have a different auth fixture (adminPage)
+     * with storageState from e2e/.auth/admin.json created in global-setup.
+     *
+     * These tests require NEXT_PUBLIC_CONVEX_SITE_URL and ADMIN_SETUP_SECRET
+     * env vars to be set for the admin global-setup flow to work.
+     * If those env vars are missing, admin tests will fail gracefully
+     * (redirected to sign-in) rather than crashing.
+     *
+     * Runs all spec files under e2e/tests/admin/ using Chromium.
+     * Uses the same global-setup as other projects (admin session created there).
+     */
+    {
+      name: "admin-portal",
+      testDir: "./e2e/tests/admin",
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
   webServer: {
     command: "pnpm dev",
