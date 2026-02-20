@@ -188,7 +188,8 @@ export default function HomePage() {
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
             Đăng ký tài khoản để truy cập hệ thống quản lý thiết bị của trường
-            SPMET. {/* Sign up to access SPMET school equipment management system. */}
+            SPMET.{" "}
+            {/* Sign up to access SPMET school equipment management system. */}
           </p>
           <Button size="lg" asChild>
             <Link href="/sign-up">{hero.cta_signup.vi}</Link>

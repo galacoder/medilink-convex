@@ -107,14 +107,15 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     //   4. Proxy Branch 2 routes admin to /admin/dashboard
 
     // eslint-disable-next-line no-restricted-properties
-    const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL ?? process.env.CONVEX_SITE_URL;
+    const convexSiteUrl =
+      process.env.NEXT_PUBLIC_CONVEX_SITE_URL ?? process.env.CONVEX_SITE_URL;
     // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
     const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
 
     if (!convexSiteUrl || !adminSetupSecret) {
       console.warn(
         "[global-setup] Skipping admin user setup: NEXT_PUBLIC_CONVEX_SITE_URL and ADMIN_SETUP_SECRET must be set.\n" +
-        "  Set these in .env.local to enable admin E2E tests.",
+          "  Set these in .env.local to enable admin E2E tests.",
       );
       // Create empty placeholder so admin fixture doesn't crash
       fs.writeFileSync(
@@ -147,9 +148,11 @@ async function globalSetup(_config: FullConfig): Promise<void> {
       });
       // Navigate to sign-in to verify we're logged out
       await adminPage.goto(`${baseURL}/sign-in`);
-      await adminPage.waitForURL(`${baseURL}/sign-in`, { timeout: 10000 }).catch(() => {
-        // Some proxies might redirect — just continue
-      });
+      await adminPage
+        .waitForURL(`${baseURL}/sign-in`, { timeout: 10000 })
+        .catch(() => {
+          // Some proxies might redirect — just continue
+        });
 
       // Step 3: Call the Convex HTTP endpoint to set platformRole
       // WHY: The Better Auth session for this user currently has no platformRole.
@@ -157,16 +160,19 @@ async function globalSetup(_config: FullConfig): Promise<void> {
       // Better Auth user record (via betterAuth.adapter.updateMany), so that
       // the next sign-in will return platformRole in the session.
       const setPlatformRoleUrl = `${convexSiteUrl}/api/admin/set-platform-role`;
-      const setPlatformRoleResponse = await adminPage.request.post(setPlatformRoleUrl, {
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-setup-secret": adminSetupSecret,
+      const setPlatformRoleResponse = await adminPage.request.post(
+        setPlatformRoleUrl,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-setup-secret": adminSetupSecret,
+          },
+          data: JSON.stringify({
+            email: ADMIN_USER.email,
+            role: "platform_admin",
+          }),
         },
-        data: JSON.stringify({
-          email: ADMIN_USER.email,
-          role: "platform_admin",
-        }),
-      });
+      );
 
       if (!setPlatformRoleResponse.ok()) {
         const errorText = await setPlatformRoleResponse.text();

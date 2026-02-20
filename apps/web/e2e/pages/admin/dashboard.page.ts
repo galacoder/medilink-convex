@@ -58,6 +58,6 @@ export class AdminDashboardPage {
    * WHY: Verifies the platform overview section renders even before real data.
    */
   get statsCards() {
-    return this.page.locator(".grid.gap-4 [class*=\"Card\"]");
+    return this.page.locator('.grid.gap-4 [class*="Card"]');
   }
 }

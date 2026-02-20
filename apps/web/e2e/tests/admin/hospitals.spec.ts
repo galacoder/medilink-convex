@@ -72,6 +72,8 @@ test.describe("Admin hospital management", () => {
     });
 
     // The hospital list card must be visible (rendered even when loading/empty)
-    await expect(hospitalsPage.hospitalListCard).toBeVisible({ timeout: 10000 });
+    await expect(hospitalsPage.hospitalListCard).toBeVisible({
+      timeout: 10000,
+    });
   });
 });

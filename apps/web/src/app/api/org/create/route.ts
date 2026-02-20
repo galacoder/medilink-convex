@@ -22,11 +22,11 @@
  *
  * vi: "API tạo tổ chức" / en: "Organization creation API"
  */
-import { ConvexHttpClient } from "convex/browser";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-
 import { api } from "convex/_generated/api";
+import { ConvexHttpClient } from "convex/browser";
+
 import { env } from "~/env";
 
 export const runtime = "nodejs";
@@ -53,8 +53,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Verify authentication by forwarding cookies to get-session
     const cookieHeader = request.headers.get("cookie") ?? "";
-    const origin =
-      request.headers.get("origin") ?? new URL(request.url).origin;
+    const origin = request.headers.get("origin") ?? new URL(request.url).origin;
 
     const sessionRes = await fetch(
       new URL("/api/auth/get-session", request.url).toString(),
@@ -124,21 +123,27 @@ export async function POST(request: NextRequest) {
     //    handles authorization server-side.
     //    Format: "orgType:orgId" (simple, no JSON, no signing needed for routing)
     const response = NextResponse.json(orgResult, { status: 201 });
-    response.cookies.set("medilink-org-context", `${orgType}:${orgResult.orgId}`, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      // 7-day expiry matches session token lifetime
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    response.cookies.set(
+      "medilink-org-context",
+      `${orgType}:${orgResult.orgId}`,
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        // 7-day expiry matches session token lifetime
+        maxAge: 60 * 60 * 24 * 7,
+      },
+    );
 
     return response;
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Unknown error";
+    const message = err instanceof Error ? err.message : "Unknown error";
 
     // Handle Convex validation errors (e.g., slug already taken)
-    if (message.includes("Slug already taken") || message.includes("đã được sử dụng")) {
+    if (
+      message.includes("Slug already taken") ||
+      message.includes("đã được sử dụng")
+    ) {
       return NextResponse.json(
         { error: "Slug đã được sử dụng (Slug already taken)" },
         { status: 409 },

@@ -46,7 +46,7 @@ export class AdminAuditLogPage {
    * WHY: Confirms the AuditLogTable component rendered (even when empty).
    */
   get logTable() {
-    return this.page.locator("table, [data-testid=\"audit-log-table\"]").first();
+    return this.page.locator('table, [data-testid="audit-log-table"]').first();
   }
 
   /**
@@ -54,6 +54,8 @@ export class AdminAuditLogPage {
    * WHY: Verifies the AuditLogFilterPanel component is present.
    */
   get filterPanel() {
-    return this.page.locator('[class*="filter"], form, [data-testid="audit-log-filters"]').first();
+    return this.page
+      .locator('[class*="filter"], form, [data-testid="audit-log-filters"]')
+      .first();
   }
 }
