@@ -11,12 +11,15 @@ import {
 } from "~/lib/portal-routing";
 
 /**
- * Next.js middleware for portal-based route protection.
+ * Next.js proxy for portal-based route protection.
  *
  * WHY: Routes users to the correct portal based on their role and organization type.
  * Without this, authenticated users would land on the generic homepage instead
  * of their role-specific dashboard. This is the security boundary that gates
  * all portal access.
+ *
+ * NOTE: Next.js 16 renamed "middleware" to "proxy". The file must be named
+ * proxy.ts and export a function named "proxy" (previously "middleware").
  *
  * Routing state machine:
  * 1. Static/API/public paths → pass through
@@ -27,9 +30,10 @@ import {
  *    c. Has org → allow current portal access
  */
 
-/** Paths that bypass middleware entirely (static files, Next.js internals, API routes). */
+/** Paths that bypass proxy entirely (static files, Next.js internals, API routes). */
 const BYPASS_PREFIXES = [
   "/api/auth",
+  "/api/org",
   "/api/trpc",
   "/api/health",
   "/_next",
@@ -48,14 +52,40 @@ function getSessionCookie(request: NextRequest): string | undefined {
 }
 
 /**
+ * Read org routing context from the medilink-org-context cookie.
+ *
+ * WHY: The Convex component's user table schema is fixed and doesn't support
+ * custom additional fields. Instead of reading org context from Better Auth
+ * user fields (which can't be stored), we use a routing cookie set by
+ * /api/org/create. This cookie is used for portal routing ONLY — not for
+ * authorization (Convex JWT handles that server-side).
+ *
+ * Cookie format: "orgType:orgId" (e.g., "hospital:ks78pdmg...")
+ */
+function getOrgContextCookie(request: NextRequest): {
+  orgType: string;
+  orgId: string;
+} | null {
+  const raw =
+    request.cookies.get("medilink-org-context")?.value ??
+    request.cookies.get("__Secure-medilink-org-context")?.value;
+  if (!raw) return null;
+  const colonIdx = raw.indexOf(":");
+  if (colonIdx < 1) return null;
+  const orgType = raw.slice(0, colonIdx);
+  const orgId = raw.slice(colonIdx + 1);
+  if (!orgType || !orgId) return null;
+  return { orgType, orgId };
+}
+
+/**
  * Fetch session data from the Better Auth API.
  *
- * WHY: Edge middleware cannot query Convex directly. We fetch the session
- * from the Better Auth API route, which has access to the database.
- * This gives us platformRole, activeOrganizationId, and orgType for routing decisions.
- *
- * When there's an active organization, we fetch the full organization to get
- * org_type from its metadata. This enables portal-aware routing at the root path.
+ * WHY: Edge proxy cannot query Convex directly. We fetch the session
+ * from the Better Auth API route to validate the session and get platformRole.
+ * Org context (orgType, orgId) comes from the medilink-org-context cookie,
+ * not from the session, because the Convex component schema can't store
+ * custom user fields.
  */
 async function getSessionData(
   request: NextRequest,
@@ -72,56 +102,33 @@ async function getSessionData(
 
     if (!response.ok) return null;
 
+    // NOTE: activeOrganizationId and activeOrgType come from the
+    // medilink-org-context cookie (set by /api/org/create), NOT from
+    // Better Auth's session or user fields. The Convex component's user table
+    // schema is fixed and cannot store these custom fields.
     const data = (await response.json()) as {
       user?: {
         id?: string;
         platformRole?: string | null;
+        activeOrganizationId?: string | null;
+        activeOrgType?: string | null;
       } | null;
       session?: {
         id?: string;
-        activeOrganizationId?: string | null;
-        activeOrganization?: {
-          metadata?: { org_type?: string } | null;
-        } | null;
       } | null;
     } | null;
 
     if (!data) return null;
 
-    const platformRole = data.user?.platformRole ?? null;
-    const activeOrganizationId = data.session?.activeOrganizationId ?? null;
-
-    // If user has an active org, fetch org details to get org_type for portal routing
-    // WHY: org_type is stored in organization metadata and needed for root path redirect
-    let orgType: string | null = null;
-    if (activeOrganizationId) {
-      try {
-        const orgUrl = new URL(
-          "/api/auth/organization/get-full-organization",
-          request.url,
-        );
-        const orgResponse = await fetch(orgUrl.toString(), {
-          headers: {
-            cookie: cookieHeader,
-          },
-        });
-
-        if (orgResponse.ok) {
-          const orgData = (await orgResponse.json()) as {
-            metadata?: { org_type?: string | null } | null;
-          } | null;
-          orgType = orgData?.metadata?.org_type ?? null;
-        }
-      } catch {
-        // Graceful fallback: if org fetch fails, orgType stays null
-        // Middleware will route to hospital portal (safe default)
-      }
-    }
+    // Get org context from the routing cookie (preferred)
+    // Fall back to user fields in case they're somehow populated
+    const orgCookie = getOrgContextCookie(request);
 
     return {
-      platformRole,
-      activeOrganizationId,
-      orgType,
+      platformRole: data.user?.platformRole ?? null,
+      activeOrganizationId:
+        orgCookie?.orgId ?? data.user?.activeOrganizationId ?? null,
+      orgType: orgCookie?.orgType ?? data.user?.activeOrgType ?? null,
     };
   } catch {
     // If session fetch fails, treat as no session
@@ -129,7 +136,7 @@ async function getSessionData(
   }
 }
 
-export async function middleware(request: NextRequest): Promise<NextResponse> {
+export async function proxy(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
   // Bypass: API routes, static files, Next.js internals
@@ -180,6 +187,21 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
+  // Branch 2.5: Non-admin user attempting to access /admin routes
+  // WHY: getExpectedOrgTypeForPortal returns null for platform-admin (uses platformRole,
+  // not orgType), so Branch 4 doesn't catch hospital/provider users on /admin paths.
+  // Explicitly redirect them to their correct portal dashboard.
+  if (
+    currentPortal === "platform-admin" &&
+    sessionData.platformRole !== "platform_admin" &&
+    sessionData.platformRole !== "platform_support"
+  ) {
+    const correctPortal =
+      sessionData.orgType === "provider" ? "provider" : "hospital";
+    const correctDashboard = getDefaultRedirectForPortal(correctPortal);
+    return NextResponse.redirect(new URL(correctDashboard, request.url));
+  }
+
   // Branch 3: No active organization → redirect to sign-up
   // WHY: Users without an org haven't completed the onboarding flow.
   // They need to select their org type (hospital/provider) and create an org.
@@ -226,10 +248,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 /**
- * Middleware matcher configuration.
+ * Proxy matcher configuration.
  *
  * WHY: We exclude static files, _next internals, and favicon to avoid
- * unnecessary middleware overhead on non-page requests.
+ * unnecessary proxy overhead on non-page requests.
  */
 export const config = {
   matcher: [

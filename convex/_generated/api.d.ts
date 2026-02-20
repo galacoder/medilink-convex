@@ -27,6 +27,7 @@ import type * as lib_providerSearch from "../lib/providerSearch.js";
 import type * as lib_statusMachine from "../lib/statusMachine.js";
 import type * as lib_workflowStateMachine from "../lib/workflowStateMachine.js";
 import type * as memberships from "../memberships.js";
+import type * as orgActions from "../orgActions.js";
 import type * as organizations from "../organizations.js";
 import type * as providers from "../providers.js";
 import type * as qrCodes from "../qrCodes.js";
@@ -66,6 +67,7 @@ declare const fullApi: ApiFromModules<{
   "lib/statusMachine": typeof lib_statusMachine;
   "lib/workflowStateMachine": typeof lib_workflowStateMachine;
   memberships: typeof memberships;
+  orgActions: typeof orgActions;
   organizations: typeof organizations;
   providers: typeof providers;
   qrCodes: typeof qrCodes;

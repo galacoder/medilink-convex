@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { adminNavItems } from "~/components/layout/nav-config";

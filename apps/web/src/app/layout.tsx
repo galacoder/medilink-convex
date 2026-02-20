@@ -15,21 +15,20 @@ import "~/app/styles.css";
 export const metadata: Metadata = {
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
-      ? "https://turbo.t3.gg"
-      : "http://localhost:3000",
+      ? `https://${env.VERCEL_URL ?? "medilink.app"}`
+      : "http://localhost:3002",
   ),
-  title: "Create T3 Turbo",
-  description: "Simple monorepo with shared backend for web & mobile apps",
+  title: "MediLink — Quản lý Thiết bị Y tế",
+  description:
+    "Hệ thống quản lý thiết bị y tế dành cho trường SPMET — Medical equipment management system for SPMET Healthcare School",
   openGraph: {
-    title: "Create T3 Turbo",
-    description: "Simple monorepo with shared backend for web & mobile apps",
-    url: "https://create-t3-turbo.vercel.app",
-    siteName: "Create T3 Turbo",
+    title: "MediLink — Quản lý Thiết bị Y tế",
+    description:
+      "Hệ thống quản lý thiết bị y tế dành cho trường SPMET — Medical equipment management system for SPMET Healthcare School",
+    siteName: "MediLink",
   },
   twitter: {
     card: "summary_large_image",
-    site: "@jullerino",
-    creator: "@jullerino",
   },
 };
 
