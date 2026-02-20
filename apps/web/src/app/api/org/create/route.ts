@@ -23,7 +23,8 @@
  * vi: "API tạo tổ chức" / en: "Organization creation API"
  */
 import { ConvexHttpClient } from "convex/browser";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { api } from "convex/_generated/api";
 import { env } from "~/env";
@@ -40,7 +41,7 @@ interface CreateOrgBody {
 export async function POST(request: NextRequest) {
   try {
     // 1. Parse and validate body
-    const body = (await request.json()) as CreateOrgBody;
+    const body = (await request.json()) as Partial<CreateOrgBody>;
     const { name, slug, orgType } = body;
 
     if (!name || !slug || !orgType) {
@@ -50,18 +51,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (orgType !== "hospital" && orgType !== "provider") {
-      return NextResponse.json(
-        { error: "Loại tổ chức không hợp lệ (Invalid org type)" },
-        { status: 400 },
-      );
-    }
-
     // 2. Verify authentication by forwarding cookies to get-session
     const cookieHeader = request.headers.get("cookie") ?? "";
     const origin =
-      request.headers.get("origin") ??
-      `http://localhost:${process.env.PORT ?? "3002"}`;
+      request.headers.get("origin") ?? new URL(request.url).origin;
 
     const sessionRes = await fetch(
       new URL("/api/auth/get-session", request.url).toString(),
@@ -92,8 +85,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const sessionToken = sessionData.session?.token;
-
     // 3. Call Convex mutation to create org + membership in our custom tables
     //    WHY: Using fetchAuthMutation (server-side) ensures the mutation runs
     //    with the authenticated user's JWT, satisfying authComponent.getAuthUser().
@@ -119,10 +110,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const orgResult = await convexClient.mutation(
+    const orgResult = (await convexClient.mutation(
       api.orgActions.createOrganization,
       { name, slug, orgType },
-    );
+    )) as { orgId: string; slug: string };
 
     // 4. Set routing cookie for org context.
     //    WHY: The Convex component's user table schema is fixed and doesn't support

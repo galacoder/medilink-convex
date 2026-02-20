@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@medilink/ui/button";
 import {
@@ -37,7 +36,6 @@ type OrgType = "hospital" | "provider";
  *   3. The proxy.ts reads this cookie for portal routing
  */
 export default function SignUpPage() {
-  const router = useRouter();
   const labels = authLabels.signUp;
 
   const [name, setName] = useState("");
