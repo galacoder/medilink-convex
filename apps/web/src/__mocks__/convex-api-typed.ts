@@ -59,6 +59,21 @@ export const api = {
   equipment: {
     list: makeFunctionReference<"query">("equipment:list"),
     getById: makeFunctionReference<"query">("equipment:getById"),
+    getByCategory: makeFunctionReference<"query">("equipment:getByCategory"),
+    getHistory: makeFunctionReference<"query">("equipment:getHistory"),
+    getMaintenanceSchedule: makeFunctionReference<"query">(
+      "equipment:getMaintenanceSchedule",
+    ),
+    create: makeFunctionReference<"mutation">("equipment:create"),
+    update: makeFunctionReference<"mutation">("equipment:update"),
+    updateStatus: makeFunctionReference<"mutation">("equipment:updateStatus"),
+    addHistoryEntry: makeFunctionReference<"mutation">(
+      "equipment:addHistoryEntry",
+    ),
+    scheduleMaintenance: makeFunctionReference<"mutation">(
+      "equipment:scheduleMaintenance",
+    ),
+    reportFailure: makeFunctionReference<"mutation">("equipment:reportFailure"),
   },
   disputes: {
     listByHospital: makeFunctionReference<"query">("disputes:listByHospital"),
@@ -118,5 +133,90 @@ export const api = {
       getById: makeFunctionReference<"query">("admin/auditLog:getById"),
       exportCSV: makeFunctionReference<"query">("admin/auditLog:exportCSV"),
     },
+    hospitals: {
+      listHospitals: makeFunctionReference<"query">(
+        "admin/hospitals:listHospitals",
+      ),
+      getHospitalDetail: makeFunctionReference<"query">(
+        "admin/hospitals:getHospitalDetail",
+      ),
+      getHospitalUsage: makeFunctionReference<"query">(
+        "admin/hospitals:getHospitalUsage",
+      ),
+      onboardHospital: makeFunctionReference<"mutation">(
+        "admin/hospitals:onboardHospital",
+      ),
+      suspendHospital: makeFunctionReference<"mutation">(
+        "admin/hospitals:suspendHospital",
+      ),
+      reactivateHospital: makeFunctionReference<"mutation">(
+        "admin/hospitals:reactivateHospital",
+      ),
+    },
+    providers: {
+      listProviders: makeFunctionReference<"query">(
+        "admin/providers:listProviders",
+      ),
+      getProviderDetail: makeFunctionReference<"query">(
+        "admin/providers:getProviderDetail",
+      ),
+      getProviderPerformance: makeFunctionReference<"query">(
+        "admin/providers:getProviderPerformance",
+      ),
+      approveProvider: makeFunctionReference<"mutation">(
+        "admin/providers:approveProvider",
+      ),
+      rejectProvider: makeFunctionReference<"mutation">(
+        "admin/providers:rejectProvider",
+      ),
+      suspendProvider: makeFunctionReference<"mutation">(
+        "admin/providers:suspendProvider",
+      ),
+      verifyCertification: makeFunctionReference<"mutation">(
+        "admin/providers:verifyCertification",
+      ),
+    },
+    analytics: {
+      getOverviewStats: makeFunctionReference<"query">(
+        "admin/analytics:getOverviewStats",
+      ),
+      getGrowthMetrics: makeFunctionReference<"query">(
+        "admin/analytics:getGrowthMetrics",
+      ),
+      getServiceMetrics: makeFunctionReference<"query">(
+        "admin/analytics:getServiceMetrics",
+      ),
+      getRevenueMetrics: makeFunctionReference<"query">(
+        "admin/analytics:getRevenueMetrics",
+      ),
+      getTopPerformers: makeFunctionReference<"query">(
+        "admin/analytics:getTopPerformers",
+      ),
+      getPlatformHealth: makeFunctionReference<"query">(
+        "admin/analytics:getPlatformHealth",
+      ),
+    },
+    serviceRequests: {
+      listAllServiceRequests: makeFunctionReference<"query">(
+        "admin/serviceRequests:listAllServiceRequests",
+      ),
+      listEscalatedDisputes: makeFunctionReference<"query">(
+        "admin/serviceRequests:listEscalatedDisputes",
+      ),
+      getDisputeDetail: makeFunctionReference<"query">(
+        "admin/serviceRequests:getDisputeDetail",
+      ),
+      resolveDispute: makeFunctionReference<"mutation">(
+        "admin/serviceRequests:resolveDispute",
+      ),
+      reassignProvider: makeFunctionReference<"mutation">(
+        "admin/serviceRequests:reassignProvider",
+      ),
+    },
+  },
+  orgActions: {
+    createOrganization: makeFunctionReference<"mutation">(
+      "orgActions:createOrganization",
+    ),
   },
 } as const;

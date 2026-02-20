@@ -1,0 +1,7 @@
+
+.env.local
+# Stray Convex generated files (created when running convex dev from wrong directory)
+convex/
+# Temporary audit/test scripts
+audit-routes.cjs
+audit-routes.js

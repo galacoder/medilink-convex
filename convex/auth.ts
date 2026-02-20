@@ -3,7 +3,6 @@ import type { BetterAuthOptions } from "better-auth/minimal";
 import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth/minimal";
-import { organization } from "better-auth/plugins";
 
 import { components } from "./_generated/api";
 import { type DataModel } from "./_generated/dataModel";
@@ -11,6 +10,29 @@ import { query } from "./_generated/server";
 import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
+
+/**
+ * Trusted origins for Better Auth CORS validation.
+ *
+ * WHY: Dev server port varies by environment (3000 default, but homelab uses 3002,
+ * and port conflicts may cause Next.js to auto-increment). Explicitly trusting all
+ * localhost ports prevents MISSING_OR_NULL_ORIGIN errors when SITE_URL env var
+ * doesn't match the actual running port.
+ *
+ * Production: SITE_URL is set to the production domain so only that domain is trusted.
+ */
+const trustedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [siteUrl]
+    : [
+        siteUrl,
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:3003",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3002",
+      ];
 
 /**
  * The Better Auth component client.
@@ -25,11 +47,18 @@ export const authComponent = createClient<DataModel>(components.betterAuth as an
  *
  * WHY: The auth instance is created per-request so each request gets the correct
  * Convex context for database operations. This is the Convex component model pattern.
+ *
+ * NOTE: We do NOT use Better Auth's `organization()` plugin because
+ * @convex-dev/better-auth v0.10.10 does not support the "member"/"organization"
+ * models required by that plugin (ArgumentValidationError on org creation).
+ * Instead, org management lives entirely in our custom Convex tables
+ * (organizations, organizationMemberships) and org context is stored as
+ * user-level additionalFields (activeOrganizationId, activeOrgType).
  */
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) =>
   ({
     baseURL: siteUrl,
-    trustedOrigins: [siteUrl],
+    trustedOrigins,
     database: authComponent.adapter(ctx),
 
     // Email/password provider (AC-9)
@@ -39,17 +68,34 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) =>
       requireEmailVerification: false,
     },
 
-    // Organization plugin with org_type metadata (AC-2, AC-3, AC-4, AC-6)
-    // Built-in roles: owner, admin, member match our schema
-    plugins: [
-      organization({
-        // Allow creating organizations with org_type metadata
-        allowUserToCreateOrganization: true,
-        // Custom fields on organization (org_type for hospital/provider)
-        organizationCreation: {
-          disabled: false,
+    // Custom user fields for org context (replaces Better Auth org plugin).
+    // WHY: The JWT definePayload below reads these to enrich Convex tokens
+    // so queries can scope data to the user's active org without extra lookups.
+    // Note: Better Auth's DBFieldAttribute uses `required: false` + `defaultValue: null`
+    // for nullable strings (the `nullable` property doesn't exist in this version).
+    user: {
+      additionalFields: {
+        activeOrganizationId: {
+          type: "string" as const,
+          required: false,
+          // No defaultValue — prevents null insertion on user creation
+          // (Convex component schema rejects unknown fields)
+          // Routing handled via medilink-org-context cookie instead
         },
-      }),
+        activeOrgType: {
+          // "hospital" | "provider" — drives proxy.ts portal routing
+          type: "string" as const,
+          required: false,
+        },
+        platformRole: {
+          // "platform_admin" | "platform_support" — for SangLeTech staff
+          type: "string" as const,
+          required: false,
+        },
+      },
+    },
+
+    plugins: [
       // Convex plugin (required for Convex compatibility) - generates JWTs for Convex
       // Custom JWT payload includes session enrichment fields (AC-7)
       convex({
@@ -60,17 +106,19 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) =>
           // Include organization context in the JWT payload.
           // WHY: This allows Convex queries to access organizationId, orgRole,
           // and platformRole without additional database lookups per request.
+          // These come from user.additionalFields (set at org-creation time).
           definePayload: ({
             user,
-            session,
           }: {
             user: Record<string, unknown>;
             session: Record<string, unknown>;
           }) => ({
             // Active organization ID for org-scoped Convex queries
-            organizationId: session.activeOrganizationId ?? null,
+            organizationId: (user.activeOrganizationId as string) ?? null,
+            // Organization type for portal routing validation
+            orgType: (user.activeOrgType as string) ?? null,
             // Platform-level role for platform admin access
-            platformRole: user.platformRole ?? null,
+            platformRole: (user.platformRole as string) ?? null,
           }),
         },
       }),

@@ -25,6 +25,9 @@ const securityHeaders = [
 
 /** @type {import("next").NextConfig} */
 const config = {
+  /** Allow cross-origin /_next/* requests from homelab network IP */
+  allowedDevOrigins: ["192.168.2.18"],
+
   /** Enables hot reloading for local packages without a build step */
   transpilePackages: [
     "@medilink/api",

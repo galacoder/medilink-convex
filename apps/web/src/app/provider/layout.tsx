@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { providerNavItems } from "~/components/layout/nav-config";

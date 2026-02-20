@@ -17,7 +17,7 @@ import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
 import { RadioGroup, RadioGroupItem } from "@medilink/ui/radio-group";
 
-import { organization, signUp } from "~/auth/client";
+import { signUp } from "~/auth/client";
 import { authLabels } from "~/lib/i18n/auth-labels";
 
 type OrgType = "hospital" | "provider";
@@ -28,6 +28,13 @@ type OrgType = "hospital" | "provider";
  * WHY: New users must be associated with an organization at sign-up time
  * to determine their portal (hospital vs provider). Capturing org_type
  * here drives all subsequent portal routing decisions.
+ *
+ * NOTE: We bypass Better Auth's organization plugin because
+ * @convex-dev/better-auth v0.10.10 doesn't support the "member" model.
+ * Instead, we call our custom /api/org/create route which:
+ *   1. Creates the org in our custom Convex tables
+ *   2. Sets a medilink-org-context routing cookie (orgType:orgId)
+ *   3. The proxy.ts reads this cookie for portal routing
  */
 export default function SignUpPage() {
   const router = useRouter();
@@ -54,7 +61,7 @@ export default function SignUpPage() {
     setIsLoading(true);
     setError(null);
 
-    // Step 1: Create user account
+    // Step 1: Create user account via Better Auth
     const signUpResult = await signUp.email({
       email,
       password,
@@ -69,38 +76,40 @@ export default function SignUpPage() {
       return;
     }
 
-    // Step 2: Create organization with org_type metadata
+    // Step 2: Create organization via custom API route.
+    //
+    // WHY custom route instead of organization.create():
+    // @convex-dev/better-auth v0.10.10 rejects the "member" model needed by
+    // Better Auth's org plugin (ArgumentValidationError). Our custom route
+    // writes directly to our Convex organizations + organizationMemberships tables
+    // and sets a medilink-org-context cookie for portal routing.
     const orgSlug = slugify(orgName) || `org-${Date.now()}`;
-    const orgResult = await organization.create({
-      name: orgName,
-      slug: orgSlug,
-      metadata: { org_type: orgType },
+    const orgRes = await fetch("/api/org/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: orgName,
+        slug: orgSlug,
+        orgType,
+      }),
+      credentials: "include",
     });
 
-    if (orgResult.error) {
-      setError(labels.errorGeneric.vi);
+    if (!orgRes.ok) {
+      const errBody = (await orgRes.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      setError(errBody.error ?? labels.errorGeneric.vi);
       setIsLoading(false);
       return;
     }
 
-    // Step 3: Activate the new organization in the session
-    // WHY: Without setActive(), activeOrganizationId stays null. Middleware Branch 3
-    // would redirect back to /sign-up causing an infinite redirect loop.
-    const setActiveResult = await organization.setActive({
-      // orgResult.error was checked above, so data is present
-      organizationId: orgResult.data.id,
-    });
-
-    if (setActiveResult.error) {
-      setError(labels.errorGeneric.vi);
-      setIsLoading(false);
-      return;
-    }
-
-    // Redirect to the correct portal dashboard
-    router.push(
-      orgType === "hospital" ? "/hospital/dashboard" : "/provider/dashboard",
-    );
+    // Step 3: Redirect to the correct portal.
+    // The proxy.ts will allow access once the medilink-org-context cookie is set
+    // (done by /api/org/create above). A hard navigation is used to ensure the
+    // cookie is sent with the next request.
+    window.location.href =
+      orgType === "hospital" ? "/hospital/dashboard" : "/provider/dashboard";
   }
 
   return (
