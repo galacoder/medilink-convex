@@ -34,7 +34,12 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   // Create .auth directory for storageState files
   fs.mkdirSync("./e2e/.auth", { recursive: true });
 
-  const baseURL = "http://localhost:3000";
+  // WHY: Respect PORT env var so local homelab runs (where port 3000 is
+  // occupied by Dokploy) can point to the MediLink dev server on port 3002.
+  // Set PORT=3002 when running: PORT=3002 pnpm e2e
+  // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+  const port = process.env.PORT ?? "3000";
+  const baseURL = `http://localhost:${port}`;
   const timestamp = Date.now();
 
   const HOSPITAL_USER = {
