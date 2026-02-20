@@ -106,9 +106,11 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     //   3. Re-authenticate to get fresh session with platformRole in the JWT
     //   4. Proxy Branch 2 routes admin to /admin/dashboard
 
-    // eslint-disable-next-line no-restricted-properties
+    /* eslint-disable no-restricted-properties, turbo/no-undeclared-env-vars */
+    const nextPublicConvexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
     const convexSiteUrl =
-      process.env.NEXT_PUBLIC_CONVEX_SITE_URL ?? process.env.CONVEX_SITE_URL;
+      nextPublicConvexSiteUrl ?? process.env.CONVEX_SITE_URL;
+    /* eslint-enable no-restricted-properties, turbo/no-undeclared-env-vars */
     // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
     const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
 
