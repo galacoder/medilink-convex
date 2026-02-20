@@ -40,6 +40,7 @@ import type * as seedData_users from "../seedData/users.js";
 import type * as seedHelpers from "../seedHelpers.js";
 import type * as serviceRatings from "../serviceRatings.js";
 import type * as serviceRequests from "../serviceRequests.js";
+import type * as userActions from "../userActions.js";
 
 import type {
   ApiFromModules,
@@ -80,6 +81,7 @@ declare const fullApi: ApiFromModules<{
   seedHelpers: typeof seedHelpers;
   serviceRatings: typeof serviceRatings;
   serviceRequests: typeof serviceRequests;
+  userActions: typeof userActions;
 }>;
 
 /**
