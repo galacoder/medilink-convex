@@ -27,6 +27,14 @@ import { anyApi } from "convex/server";
 
 import { env } from "~/env";
 
+type UserContext = {
+  orgId: string | null;
+  orgType: string | null;
+  orgName: string | null;
+  role: string | null;
+  platformRole: string | null;
+} | null;
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -80,12 +88,13 @@ export async function GET(request: NextRequest) {
   // WHY anyApi: The tsconfig paths alias resolves convex/_generated/api to a mock
   // that only has specific entries. anyApi is a Proxy that works for any function
   // path and is equivalent to the real api object at runtime.
-  const context = await convexClient.query(
-    anyApi.organizations.getUserContext as Parameters<
+  const context = (await convexClient.query(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    anyApi.organizations!.getUserContext as Parameters<
       typeof convexClient.query
     >[0],
     {},
-  );
+  )) as UserContext;
 
   if (!context) {
     // User has no org — they need to complete sign-up

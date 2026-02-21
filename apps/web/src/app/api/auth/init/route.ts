@@ -26,6 +26,14 @@ import { anyApi } from "convex/server";
 
 import { env } from "~/env";
 
+type UserContext = {
+  orgId: string | null;
+  orgType: string | null;
+  orgName: string | null;
+  role: string | null;
+  platformRole: string | null;
+} | null;
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -53,20 +61,16 @@ export async function GET(request: NextRequest) {
   const convexClient = new ConvexHttpClient(env.NEXT_PUBLIC_CONVEX_URL);
   convexClient.setAuth(convexJwt);
 
-  let context: {
-    orgType?: string | null;
-    orgId?: string | null;
-    orgName?: string | null;
-    platformRole?: string | null;
-  } | null = null;
+  let context: UserContext = null;
 
   try {
-    context = await convexClient.query(
-      anyApi.organizations.getUserContext as Parameters<
+    context = (await convexClient.query(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      anyApi.organizations!.getUserContext as Parameters<
         typeof convexClient.query
       >[0],
       {},
-    );
+    )) as UserContext;
   } catch {
     // Convex query failed (expired JWT, network error) → force re-authentication
     return NextResponse.redirect(new URL("/sign-in", request.url));

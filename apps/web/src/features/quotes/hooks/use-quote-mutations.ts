@@ -10,8 +10,8 @@
 import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
 import { api } from "convex/_generated/api";
-import { anyApi } from "convex/server";
 import { useMutation } from "convex/react";
+import { anyApi } from "convex/server";
 
 export interface SubmitQuoteArgs {
   serviceRequestId: Id<"serviceRequests">;
@@ -61,8 +61,10 @@ export function useQuoteMutations(): UseQuoteMutationsResult {
   // because the generated types are created by `npx convex dev` at runtime.
   // Using anyApi avoids type errors in CI while still providing runtime safety
   // through Convex's schema validation. The mutation name matches convex/quotes.ts `update` export.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const updateQuoteMutation = useMutation(anyApi.quotes!.update as Parameters<typeof useMutation>[0]);
+  const updateQuoteMutation = useMutation(
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    anyApi.quotes!.update as Parameters<typeof useMutation>[0],
+  );
   const declineRequestMutation = useMutation(
     api.serviceRequests.declineRequest,
   );
