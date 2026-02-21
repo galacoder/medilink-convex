@@ -219,6 +219,19 @@ export const api = {
       "orgActions:createOrganization",
     ),
   },
+  // M5-1: Notifications — Convex Real-Time Notifications
+  notifications: {
+    create: makeFunctionReference<"mutation">("notifications:create"),
+    listForUser: makeFunctionReference<"query">("notifications:listForUser"),
+    markRead: makeFunctionReference<"mutation">("notifications:markRead"),
+    markAllRead: makeFunctionReference<"mutation">("notifications:markAllRead"),
+    updatePreferences: makeFunctionReference<"mutation">(
+      "notifications:updatePreferences",
+    ),
+    getPreferences: makeFunctionReference<"query">(
+      "notifications:getPreferences",
+    ),
+  },
   // M5-2: Automation — Workflow Rules with Convex Scheduled Functions
   automation: {
     automationLog: {
