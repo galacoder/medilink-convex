@@ -24,6 +24,9 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.10.10",
+    "@copilotkit/react-core": "^1.51.4",
+    "@copilotkit/react-ui": "^1.51.4",
+    "@copilotkit/runtime": "^1.51.4",
     "@medilink/api": "workspace:*",
     "@medilink/auth": "workspace:*",
     "@medilink/db": "workspace:*",
@@ -41,6 +44,7 @@
     "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.574.0",
     "next": "^16.0.9",
+    "openai": "^6.22.0",
     "qrcode": "^1.5.4",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
