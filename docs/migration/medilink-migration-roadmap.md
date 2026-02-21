@@ -2,18 +2,47 @@
 
 ## Execution Progress
 
+### Milestone Status (as of 2026-02-21)
+
+> **All milestones M0-M4 are substantially complete.**
+> M5 (Polish and Launch) is partially complete.
+> This roadmap was created before execution and reflects the PLANNING state.
+> Actual implementation is in the `medilink-convex` repository on GitHub.
+
+| Milestone | Title | GitHub Status | Completion |
+|-----------|-------|---------------|------------|
+| M0 | Infrastructure Setup | 12/12 issues closed | Substantially complete |
+| M1 | Core Schema and Auth | 17/17 issues closed | Substantially complete |
+| M2 | Hospital Portal Features | 16/16 issues closed* | Partially complete (M2-2 reopened) |
+| M3 | Provider Portal Features | 12/12 issues closed | Substantially complete |
+| M4 | Platform Admin | 11/11 issues closed | Substantially complete |
+| M5 | Polish and Launch | 10 closed, 4+ open | Partially complete |
+
+*M2-2 reopened by 2026-02-21 audit: missing photo upload, date range filter, equipment filter
+
 ### Completed Steps
 
 - [x] Plugin architecture audit completed (15 plugins, 35+ tables, complexity 3,365)
 - [x] Classification complete: 8 MIGRATE, 4 REBUILD, 3 DISCARD
 - [x] Migration roadmap created (M0-M5, 48 issues)
+- [x] M0: T3 Turbo scaffold, Convex schema, Better Auth, Woodpecker CI, Turborepo, base UI shells
+- [x] M1: Full 23-table schema, Better Auth with org plugin, all Convex functions, seed data
+- [x] M2: Hospital portal (equipment, service requests, QR scan, consumables, disputes, E2E)
+- [x] M3: Provider portal (offerings, quotes, service execution, analytics, E2E)
+- [x] M4: Platform admin (hospital/provider management, cross-tenant SR, analytics, audit log)
+- [x] M5 (partial): E2E suite, VRT baselines (5 of 50-80), production deployment
+- [x] Milestone audit (2026-02-21): 6-wave audit of all closed issues, fixes applied
 
-### Next Steps
+### Remaining Work
 
-- [ ] M0-1: Scaffold medilink-convex from create-t3-turbo
-- [ ] M0-2: Configure Convex with core schema (users, organizations, roles)
-- [ ] M0-3: Configure Better Auth (replace current auth)
-- [ ] Continue through M0-M5...
+- [ ] M2-2: Service Request UI -- photo upload, date range filter, equipment filter (#61)
+- [ ] M5-5: VRT Baselines -- generate 50-80 baselines across all portal pages (#80)
+- [ ] M4-2: Provider list service area column (enhancement)
+- [ ] M3-4: Provider analytics -- service volume chart, top services table
+- [ ] M3-3: Completion report -- photo upload UI, completed service history view
+
+### Next Steps (original planning content below)
+
 
 ---
 
