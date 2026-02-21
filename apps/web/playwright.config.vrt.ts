@@ -1,15 +1,18 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * VRT (Visual Regression Testing) Playwright config.
+ * VRT (Visual Regression Testing) Playwright config — public pages.
  *
  * WHY: Captures screenshots of public pages and compares them against
  * committed baselines to detect unintended visual regressions.
  *
- * Only tests pages that render without a live Convex backend:
- * - Landing/marketing page (/)
- * - Sign-in page (/sign-in)
- * - Sign-up page (/sign-up)
+ * Only tests pages that render without a live Convex backend (no auth required):
+ * - Landing/marketing page (/) — visual.spec.ts
+ * - Sign-in page (/sign-in) — visual.spec.ts + auth/auth-vrt.spec.ts
+ * - Sign-up page (/sign-up) — visual.spec.ts + auth/auth-vrt.spec.ts
+ * - Auth variants: invite, dark mode, mobile — auth/auth-vrt.spec.ts (M5-5 #80)
+ *
+ * Portal VRT (authenticated pages) runs via playwright.config.portal-vrt.ts.
  *
  * Baselines stored in: e2e/vrt/__snapshots__/
  * Update baselines: pnpm vrt:update
@@ -28,9 +31,9 @@ const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "./e2e/vrt",
-  // Exclude portal VRT tests — those require auth fixtures and a live Convex backend.
-  // Run portal VRT separately: pnpm exec playwright test --config=playwright.config.portal-vrt.ts
-  testIgnore: ["**/portal-visual.spec.ts"],
+  // Only run public VRT specs (no auth required, no Convex backend needed).
+  // Portal VRT (hospital/provider/admin) runs separately: playwright.config.portal-vrt.ts
+  testMatch: ["**/visual.spec.ts", "**/auth/auth-vrt.spec.ts"],
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
