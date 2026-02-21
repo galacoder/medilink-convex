@@ -937,4 +937,82 @@ export default defineSchema({
     .index("by_rule_name", ["ruleName"])
     .index("by_run_at", ["runAt"])
     .index("by_rule_and_status", ["ruleName", "status"]),
+
+  // ===========================================================================
+  // NOTIFICATIONS DOMAIN (2 tables)
+  // vi: "Lĩnh vực thông báo" / en: "Notifications domain"
+  // Added for M5-1: Convex real-time notifications
+  // ===========================================================================
+
+  /**
+   * In-app notifications for users across all portals.
+   * vi: "Thông báo" / en: "Notifications"
+   *
+   * Notification types cover:
+   *   service_request_new_quote      - vi: "Báo giá mới nhận được"          / en: "New quote received"
+   *   service_request_quote_approved - vi: "Báo giá đã được chấp thuận"      / en: "Quote approved"
+   *   service_request_quote_rejected - vi: "Báo giá đã bị từ chối"           / en: "Quote rejected"
+   *   service_request_started        - vi: "Dịch vụ đã bắt đầu"              / en: "Service started"
+   *   service_request_completed      - vi: "Dịch vụ đã hoàn thành"           / en: "Service completed"
+   *   equipment_maintenance_due      - vi: "Bảo trì thiết bị đến hạn"        / en: "Equipment maintenance due"
+   *   equipment_status_broken        - vi: "Thiết bị bị hỏng"                / en: "Equipment broken"
+   *   consumable_stock_low           - vi: "Vật tư dưới mức tối thiểu"        / en: "Consumable stock low"
+   *   dispute_new_message            - vi: "Tin nhắn tranh chấp mới"          / en: "New dispute message"
+   *   dispute_resolved               - vi: "Tranh chấp đã được giải quyết"    / en: "Dispute resolved"
+   */
+  notifications: defineTable({
+    userId: v.id("users"),
+    // vi: "Loại thông báo" / en: "Notification type"
+    type: v.union(
+      v.literal("service_request_new_quote"),
+      v.literal("service_request_quote_approved"),
+      v.literal("service_request_quote_rejected"),
+      v.literal("service_request_started"),
+      v.literal("service_request_completed"),
+      v.literal("equipment_maintenance_due"),
+      v.literal("equipment_status_broken"),
+      v.literal("consumable_stock_low"),
+      v.literal("dispute_new_message"),
+      v.literal("dispute_resolved"),
+    ),
+    // Bilingual title
+    titleVi: v.string(),
+    titleEn: v.string(),
+    // Bilingual body
+    bodyVi: v.string(),
+    bodyEn: v.string(),
+    // vi: "Đã đọc" / en: "Read status"
+    read: v.boolean(),
+    // vi: "Siêu dữ liệu tùy chọn" / en: "Optional metadata (deep-link context)"
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_read", ["userId", "read"]),
+
+  /**
+   * Per-user notification preferences (per-type enable/disable toggle).
+   * vi: "Tùy chọn thông báo" / en: "Notification preferences"
+   *
+   * WHY: One record per user. Each boolean field corresponds to a notification
+   * type. `true` = enabled, `false` = disabled. If a field is undefined, the
+   * notification type defaults to enabled.
+   */
+  notificationPreferences: defineTable({
+    userId: v.id("users"),
+    // Per-type toggles (all optional — undefined = enabled by default)
+    service_request_new_quote: v.optional(v.boolean()),
+    service_request_quote_approved: v.optional(v.boolean()),
+    service_request_quote_rejected: v.optional(v.boolean()),
+    service_request_started: v.optional(v.boolean()),
+    service_request_completed: v.optional(v.boolean()),
+    equipment_maintenance_due: v.optional(v.boolean()),
+    equipment_status_broken: v.optional(v.boolean()),
+    consumable_stock_low: v.optional(v.boolean()),
+    dispute_new_message: v.optional(v.boolean()),
+    dispute_resolved: v.optional(v.boolean()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"]),
 });

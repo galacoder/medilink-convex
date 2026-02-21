@@ -55,4 +55,12 @@ export const api = {
     setCoverageArea: "providers:setCoverageArea",
     updateProfile: "providers:updateProfile",
   },
+  notifications: {
+    create: "notifications:create",
+    listForUser: "notifications:listForUser",
+    markRead: "notifications:markRead",
+    markAllRead: "notifications:markAllRead",
+    updatePreferences: "notifications:updatePreferences",
+    getPreferences: "notifications:getPreferences",
+  },
 } as const;

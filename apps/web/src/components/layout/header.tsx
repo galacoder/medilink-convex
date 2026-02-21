@@ -16,6 +16,7 @@ import {
 import { ThemeToggle } from "@medilink/ui/theme";
 
 import { signOut, useSession } from "~/auth/client";
+import { NotificationCenter } from "~/components/notification-center";
 import { OrgSwitcher } from "~/components/org-switcher";
 
 interface HeaderProps {
@@ -99,6 +100,10 @@ export function Header({ orgName: _orgName, onMobileMenuOpen }: HeaderProps) {
 
       {/* Theme toggle */}
       <ThemeToggle />
+
+      {/* Notification center — bell icon with unread badge + slide-in panel */}
+      {/* vi: "Trung tâm thông báo" / en: "Notification center" */}
+      <NotificationCenter />
 
       {/* User avatar dropdown */}
       <DropdownMenu>
