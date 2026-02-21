@@ -13,6 +13,8 @@
     "e2e:debug": "PORT=3002 pnpm with-env playwright test --debug",
     "vrt": "playwright test --config=playwright.config.vrt.ts",
     "vrt:update": "playwright test --config=playwright.config.vrt.ts --update-snapshots",
+    "vrt:all": "pnpm vrt && PORT=3002 pnpm with-env playwright test --config=playwright.config.portal-vrt.ts",
+    "vrt:all:update": "pnpm vrt:update && PORT=3002 pnpm with-env playwright test --config=playwright.config.portal-vrt.ts --update-snapshots",
     "vrt:portal": "PORT=3002 pnpm with-env playwright test --config=playwright.config.portal-vrt.ts",
     "vrt:portal:update": "PORT=3002 pnpm with-env playwright test --config=playwright.config.portal-vrt.ts --update-snapshots",
     "format": "prettier --check . --ignore-path ../../.gitignore",

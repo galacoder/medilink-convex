@@ -12,16 +12,17 @@ import { defineConfig, devices } from "@playwright/test";
  * and requires Convex to already be running in a separate terminal:
  *   npx convex dev
  *
- * Tests covered:
- *   - /hospital/dashboard (hospital storageState)
- *   - /provider/dashboard (provider storageState)
- *   - /admin/dashboard   (admin storageState — skipped if ADMIN_SETUP_SECRET unset)
+ * Tests covered (M5-5 #80 — 50-80 total VRT screenshots):
+ *   - e2e/vrt/hospital/hospital-vrt.spec.ts  (15-25 screenshots)
+ *   - e2e/vrt/provider/provider-vrt.spec.ts  (10-15 screenshots)
+ *   - e2e/vrt/platform-admin/platform-admin-vrt.spec.ts (10-15 screenshots)
+ *   - e2e/vrt/portal-visual.spec.ts  (legacy — 3 dashboard screenshots)
  *
  * Update baselines:
- *   PORT=3002 pnpm exec playwright test --config=playwright.config.portal-vrt.ts --update-snapshots
+ *   PORT=3002 pnpm vrt:portal:update
  *
  * Run comparison:
- *   PORT=3002 pnpm exec playwright test --config=playwright.config.portal-vrt.ts
+ *   PORT=3002 pnpm vrt:portal
  *
  * Port configuration:
  *   Default: 3000 (CI)
@@ -33,9 +34,15 @@ const port = process.env.PORT ?? "3000";
 const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
-  // Only run portal VRT spec — public VRT lives in visual.spec.ts (public config)
+  // Run portal VRT specs — includes legacy portal-visual.spec.ts + M5-5 portal directories.
+  // Public VRT (auth pages) lives in playwright.config.vrt.ts (no auth required).
   testDir: "./e2e/vrt",
-  testMatch: "**/portal-visual.spec.ts",
+  testMatch: [
+    "**/portal-visual.spec.ts",
+    "**/hospital/hospital-vrt.spec.ts",
+    "**/provider/provider-vrt.spec.ts",
+    "**/platform-admin/platform-admin-vrt.spec.ts",
+  ],
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
