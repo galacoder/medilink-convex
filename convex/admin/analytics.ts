@@ -24,10 +24,70 @@
  * vi: "Phân tích nền tảng quản trị" / en: "Platform admin analytics"
  */
 
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
+
+// ---------------------------------------------------------------------------
+// Local auth helpers (JWT-based, no better-auth dependency for testability)
+// WHY: Following the same pattern as convex/admin/hospitals.ts to avoid
+// importing the full better-auth stack which causes module resolution issues
+// in the convex-test environment.
+// ---------------------------------------------------------------------------
+
+interface PlatformAuthContext {
+  userId: string;
+  platformRole: string | null;
+}
+
+/**
+ * Extracts and validates platformRole from the JWT identity.
+ * Throws bilingual ConvexError if not authenticated.
+ *
+ * vi: "Xác thực quản trị viên nền tảng" / en: "Authenticate platform admin"
+ */
+async function localRequireAuth(ctx: {
+  auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+}): Promise<PlatformAuthContext> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new ConvexError({
+      message:
+        "Xác thực thất bại. Vui lòng đăng nhập lại. (Authentication required. Please sign in.)",
+      code: "UNAUTHENTICATED",
+    });
+  }
+  return {
+    userId: identity.subject as string,
+    platformRole: (identity.platformRole as string | null) ?? null,
+  };
+}
+
+/**
+ * Asserts the caller has platformRole === "platform_admin".
+ * Throws a bilingual ConvexError if not.
+ *
+ * WHY: All platformAdmin.analytics.* queries share the same authorization guard.
+ * Without this, any authenticated user could query cross-tenant platform data.
+ *
+ * vi: "Yêu cầu quyền quản trị viên nền tảng" / en: "Require platform admin role"
+ */
+async function requirePlatformAdmin(ctx: {
+  auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+}): Promise<PlatformAuthContext> {
+  const auth = await localRequireAuth(ctx);
+  if (auth.platformRole !== "platform_admin") {
+    throw new ConvexError({
+      code: "FORBIDDEN",
+      // vi: "Chỉ quản trị viên nền tảng mới có quyền truy cập"
+      // en: "Only platform admins can access this resource"
+      message:
+        "Chỉ quản trị viên nền tảng mới có quyền truy cập (Only platform admins can access this resource)",
+    });
+  }
+  return auth;
+}
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -88,6 +148,9 @@ function findBucketIndex(
 export const getOverviewStats = query({
   args: {},
   handler: async (ctx) => {
+    // Auth guard: only platform admins can view cross-tenant analytics
+    await requirePlatformAdmin(ctx);
+
     // 1. Count hospitals (org_type = "hospital")
     const hospitalOrgs = await ctx.db
       .query("organizations")
@@ -150,6 +213,9 @@ export const getGrowthMetrics = query({
     months: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Auth guard: only platform admins can view cross-tenant growth metrics
+    await requirePlatformAdmin(ctx);
+
     const numMonths = args.months ?? 6;
     const buckets = buildMonthBuckets(numMonths);
 
@@ -201,6 +267,9 @@ export const getServiceMetrics = query({
     months: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Auth guard: only platform admins can view cross-tenant service metrics
+    await requirePlatformAdmin(ctx);
+
     const numMonths = args.months ?? 6;
     const buckets = buildMonthBuckets(numMonths);
 
@@ -266,6 +335,9 @@ export const getRevenueMetrics = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Auth guard: only platform admins can view cross-tenant revenue data
+    await requirePlatformAdmin(ctx);
+
     const limit = args.limit ?? 10;
 
     // Get all completed service requests
@@ -401,6 +473,9 @@ export const getTopPerformers = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    // Auth guard: only platform admins can view cross-tenant top performer data
+    await requirePlatformAdmin(ctx);
+
     const limit = args.limit ?? 5;
 
     // Top hospitals by service request count
@@ -459,6 +534,9 @@ export const getTopPerformers = query({
 export const getPlatformHealth = query({
   args: {},
   handler: async (ctx) => {
+    // Auth guard: only platform admins can view cross-tenant platform health data
+    await requirePlatformAdmin(ctx);
+
     // Average quote response time
     const allQuotes = await ctx.db.query("quotes").collect();
     let totalResponseTimeMs = 0;
