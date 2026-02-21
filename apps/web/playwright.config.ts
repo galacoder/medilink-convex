@@ -76,6 +76,28 @@ export default defineConfig({
       testDir: "./e2e/tests/admin",
       use: { ...devices["Desktop Chrome"] },
     },
+    /**
+     * Security audit test project (M5-6).
+     *
+     * WHY: Security tests (auth route protection, multi-tenancy isolation) run
+     * in isolation from feature tests to clearly separate security gate failures
+     * from functional failures in CI reporting. A security gate failure blocks
+     * the M5-7 production deployment — it must be surfaced prominently.
+     *
+     * These tests use no pre-loaded storageState — they start with a clean
+     * browser context to verify unauthenticated behavior is correct, and
+     * create fresh organizations to verify cross-tenant isolation.
+     *
+     * Runs all spec files under tests/security/ using Chromium.
+     * Does NOT use globalSetup auth fixtures (intentionally unauthenticated).
+     *
+     * vi: "Dự án kiểm tra bảo mật" / en: "Security audit test project"
+     */
+    {
+      name: "security-audit",
+      testDir: "./tests/security",
+      use: { ...devices["Desktop Chrome"] },
+    },
   ],
   webServer: {
     command: `PORT=${port} pnpm dev`,
