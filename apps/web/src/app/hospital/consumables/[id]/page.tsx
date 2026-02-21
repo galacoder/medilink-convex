@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 
+import { RecordUsageForm } from "~/features/consumables/components/RecordUsageForm";
 import { ReorderForm } from "~/features/consumables/components/ReorderForm";
 import { StockAlertBadge } from "~/features/consumables/components/StockAlertBadge";
 import { UsageLogTable } from "~/features/consumables/components/UsageLogTable";
@@ -50,6 +51,10 @@ const LABELS = {
   signInToReorder: {
     vi: "Đăng nhập để tạo yêu cầu đặt hàng",
     en: "Sign in to create reorder request",
+  },
+  signInToRecordUsage: {
+    vi: "Đăng nhập để ghi nhận sử dụng",
+    en: "Sign in to record usage",
   },
 } as const;
 
@@ -207,13 +212,26 @@ export default function ConsumableDetailPage({
         )}
       </div>
 
-      {/* Usage log and reorder form side by side on desktop */}
+      {/* Usage log and action forms side by side on desktop */}
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <UsageLogTable consumableId={consumableId} locale={locale} />
         </div>
-        <div>
-          {/* FIX 1: Render ReorderForm when the user is authenticated */}
+        <div className="space-y-4">
+          {/* Record Usage form — decrements stock and creates audit log entry */}
+          {currentUserId ? (
+            <RecordUsageForm
+              consumableId={consumableId}
+              usedBy={currentUserId}
+              locale={locale}
+            />
+          ) : (
+            <div className="text-muted-foreground rounded-lg border p-4 text-sm">
+              {LABELS.signInToRecordUsage[locale]}
+            </div>
+          )}
+
+          {/* Reorder form — for requesting more stock */}
           {currentUserId ? (
             <ReorderForm
               consumableId={consumableId}
