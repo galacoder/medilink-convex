@@ -379,6 +379,113 @@ export const reject = mutation({
   },
 });
 
+/**
+ * Provider updates an existing pending quote.
+ *
+ * WHY: Providers sometimes need to revise their quote amount, notes,
+ * or availability after submission — e.g., if they discover additional
+ * parts are needed or if their schedule changes before the hospital accepts.
+ *
+ * Constraints:
+ *   - Only the provider who submitted the quote can update it
+ *   - Only "pending" quotes can be updated (accepted/rejected quotes are final)
+ *   - At least one field must be changed
+ *
+ * vi: "Cập nhật báo giá" / en: "Update quote"
+ */
+export const update = mutation({
+  args: {
+    quoteId: v.id("quotes"),
+    // vi: "Số tiền mới (VND)" / en: "New amount (VND)"
+    amount: v.optional(v.number()),
+    // vi: "Ghi chú mới" / en: "New notes"
+    notes: v.optional(v.string()),
+    // vi: "Số ngày hiệu lực" / en: "Days until expiry"
+    validUntilDays: v.optional(v.number()),
+    // vi: "Số ngày ước tính hoàn thành" / en: "Estimated days to complete"
+    estimatedDurationDays: v.optional(v.number()),
+    // vi: "Ngày bắt đầu sớm nhất (epoch ms)" / en: "Earliest available start date (epoch ms)"
+    availableStartDate: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    // 1. Authenticate
+    const auth = await requireOrgAuth(ctx);
+
+    // 2. Load the quote
+    const quote = await ctx.db.get(args.quoteId);
+    if (!quote) {
+      throw new ConvexError({
+        message: "Không tìm thấy báo giá. (Quote not found.)",
+        code: "QUOTE_NOT_FOUND",
+      });
+    }
+
+    // 3. Verify the quote is still pending (cannot update accepted/rejected quotes)
+    if (quote.status !== "pending") {
+      throw new ConvexError({
+        message: `Chỉ có thể cập nhật báo giá ở trạng thái 'pending'. Trạng thái hiện tại: "${quote.status}". (Only pending quotes can be updated. Current status: "${quote.status}".)`,
+        code: "INVALID_QUOTE_STATUS",
+        currentStatus: quote.status,
+      });
+    }
+
+    // 4. Verify the caller's org is the provider who submitted this quote
+    const providerRecord = await ctx.db
+      .query("providers")
+      .withIndex("by_org", (q) =>
+        q.eq("organizationId", auth.organizationId as Id<"organizations">),
+      )
+      .first();
+
+    if (!providerRecord || providerRecord._id !== quote.providerId) {
+      throw new ConvexError({
+        message:
+          "Bạn không có quyền cập nhật báo giá này. (You do not have permission to update this quote.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    // 5. Build the patch (only update provided fields)
+    const now = Date.now();
+    const patch: Record<string, unknown> = { updatedAt: now };
+
+    if (args.amount !== undefined) patch.amount = args.amount;
+    if (args.notes !== undefined) patch.notes = args.notes;
+    if (args.estimatedDurationDays !== undefined)
+      patch.estimatedDurationDays = args.estimatedDurationDays;
+    if (args.availableStartDate !== undefined)
+      patch.availableStartDate = args.availableStartDate;
+    if (args.validUntilDays !== undefined) {
+      patch.validUntil = now + args.validUntilDays * 24 * 60 * 60 * 1000;
+    }
+
+    // 6. Apply the update
+    await ctx.db.patch(args.quoteId, patch);
+
+    // 7. Audit log
+    const serviceRequest = await ctx.db.get(quote.serviceRequestId);
+    if (serviceRequest) {
+      await createAuditEntry(ctx, {
+        organizationId: serviceRequest.organizationId,
+        actorId: auth.userId as Id<"users">,
+        action: "quote.updated",
+        resourceType: "quotes",
+        resourceId: args.quoteId,
+        previousValues: {
+          amount: quote.amount,
+          notes: quote.notes,
+        },
+        newValues: {
+          amount: args.amount ?? quote.amount,
+          notes: args.notes ?? quote.notes,
+        },
+      });
+    }
+
+    return args.quoteId;
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------

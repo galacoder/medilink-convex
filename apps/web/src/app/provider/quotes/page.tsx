@@ -14,11 +14,13 @@
  */
 import { useState } from "react";
 
+import { Button } from "@medilink/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@medilink/ui/card";
 import { Skeleton } from "@medilink/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@medilink/ui/tabs";
 
 import type { QuoteStatus } from "~/features/quotes/types";
+import { EditQuoteForm } from "~/features/quotes/components/edit-quote-form";
 import { QuoteDashboardStats } from "~/features/quotes/components/quote-dashboard-stats";
 import { QuoteStatusBadge } from "~/features/quotes/components/quote-status-badge";
 import { useProviderQuotes } from "~/features/quotes/hooks/use-provider-quotes";
@@ -52,6 +54,7 @@ function formatDate(epochMs: number): string {
 
 export default function ProviderQuotesPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [editingQuoteId, setEditingQuoteId] = useState<string | null>(null);
   const { quotes, isLoading, hasError, stats } =
     useProviderQuotes(statusFilter);
 
@@ -133,15 +136,35 @@ export default function ProviderQuotesPage() {
                             {quote.serviceRequest?.hospitalOrgName ?? "—"}
                           </p>
                         </div>
-                        <QuoteStatusBadge
-                          status={
-                            quote.status as
-                              | "pending"
-                              | "accepted"
-                              | "rejected"
-                              | "expired"
-                          }
-                        />
+                        <div className="flex items-center gap-2">
+                          {quote.status === "pending" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                setEditingQuoteId(
+                                  editingQuoteId === quote._id
+                                    ? null
+                                    : quote._id,
+                                )
+                              }
+                              data-testid="edit-quote-button"
+                            >
+                              {editingQuoteId === quote._id
+                                ? "Đóng"
+                                : "Sửa"}
+                            </Button>
+                          )}
+                          <QuoteStatusBadge
+                            status={
+                              quote.status as
+                                | "pending"
+                                | "accepted"
+                                | "rejected"
+                                | "expired"
+                            }
+                          />
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -157,6 +180,20 @@ export default function ProviderQuotesPage() {
                         <p className="text-muted-foreground mt-1 line-clamp-1 text-xs">
                           {quote.serviceRequest.descriptionVi}
                         </p>
+                      )}
+
+                      {/* Inline edit form for pending quotes */}
+                      {editingQuoteId === quote._id && (
+                        <div className="mt-3">
+                          <EditQuoteForm
+                            quoteId={quote._id}
+                            initialAmount={quote.amount}
+                            initialNotes={quote.notes}
+                            onSuccess={() => setEditingQuoteId(null)}
+                            onCancel={() => setEditingQuoteId(null)}
+                            locale="vi"
+                          />
+                        </div>
                       )}
                     </CardContent>
                   </Card>
