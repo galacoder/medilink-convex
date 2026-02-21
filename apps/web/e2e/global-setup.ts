@@ -37,7 +37,7 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   // WHY: Respect PORT env var so local homelab runs (where port 3000 is
   // occupied by Dokploy) can point to the MediLink dev server on port 3002.
   // Set PORT=3002 when running: PORT=3002 pnpm e2e
-  // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+  // eslint-disable-next-line no-restricted-properties
   const port = process.env.PORT ?? "3000";
   const baseURL = `http://localhost:${port}`;
   const timestamp = Date.now();
@@ -106,11 +106,11 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     //   3. Re-authenticate to get fresh session with platformRole in the JWT
     //   4. Proxy Branch 2 routes admin to /admin/dashboard
 
-    /* eslint-disable no-restricted-properties, turbo/no-undeclared-env-vars */
+    /* eslint-disable no-restricted-properties */
     const nextPublicConvexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
     const convexSiteUrl =
       nextPublicConvexSiteUrl ?? process.env.CONVEX_SITE_URL;
-    /* eslint-enable no-restricted-properties, turbo/no-undeclared-env-vars */
+    /* eslint-enable no-restricted-properties */
     // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
     const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
 
