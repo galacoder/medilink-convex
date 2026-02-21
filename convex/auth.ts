@@ -32,6 +32,10 @@ const trustedOrigins =
         "http://localhost:3003",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:3002",
+        "http://192.168.2.18:3000", // homelab network access
+        "http://192.168.2.18:3001",
+        "http://192.168.2.18:3002",
+        "http://192.168.2.18:3003",
       ];
 
 /**

@@ -36,6 +36,7 @@ const BYPASS_PREFIXES = [
   "/api/org",
   "/api/trpc",
   "/api/health",
+  "/api/admin",
   "/_next",
   "/favicon.ico",
 ];
@@ -102,10 +103,14 @@ async function getSessionData(
 
     if (!response.ok) return null;
 
-    // NOTE: activeOrganizationId and activeOrgType come from the
-    // medilink-org-context cookie (set by /api/org/create), NOT from
-    // Better Auth's session or user fields. The Convex component's user table
-    // schema is fixed and cannot store these custom fields.
+    // NOTE: activeOrganizationId, activeOrgType, and platformRole come from the
+    // medilink-org-context cookie, NOT from Better Auth's session or user fields.
+    // The Convex component's user table schema is fixed and cannot store custom fields.
+    //
+    // Cookie formats:
+    //   "hospital:ks78..."      → regular hospital user
+    //   "provider:ks79..."      → regular provider user
+    //   "admin:platform_admin"  → platform admin (set by /api/org/context for admins)
     const data = (await response.json()) as {
       user?: {
         id?: string;
@@ -121,8 +126,18 @@ async function getSessionData(
     if (!data) return null;
 
     // Get org context from the routing cookie (preferred)
-    // Fall back to user fields in case they're somehow populated
     const orgCookie = getOrgContextCookie(request);
+
+    // Admin sentinel: orgType "admin" means the user is a platform admin.
+    // WHY: Better Auth component schema can't store platformRole, so we use
+    // a special cookie value to communicate admin status to the proxy.
+    if (orgCookie?.orgType === "admin") {
+      return {
+        platformRole: "platform_admin",
+        activeOrganizationId: null,
+        orgType: null,
+      };
+    }
 
     return {
       platformRole: data.user?.platformRole ?? null,
@@ -159,6 +174,17 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     const signInUrl = new URL("/sign-in", request.url);
     signInUrl.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(signInUrl);
+  }
+
+  // Branch 1.5: Valid session token but NO medilink-org-context cookie
+  // WHY: After sign-in, the routing cookie may be absent (new browser, expired cookie,
+  // or simplified sign-in flow). /api/auth/init restores it server-side and redirects
+  // to the correct portal — avoiding the need for client-side cookie restoration.
+  // NOTE: /api/auth is already in BYPASS_PREFIXES → no infinite redirect loop.
+  if (!getOrgContextCookie(request)) {
+    const initUrl = new URL("/api/auth/init", request.url);
+    initUrl.searchParams.set("returnTo", pathname);
+    return NextResponse.redirect(initUrl);
   }
 
   // Session exists — fetch session data for role-based routing

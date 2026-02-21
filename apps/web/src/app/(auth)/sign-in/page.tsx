@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@medilink/ui/button";
 import {
@@ -16,22 +16,21 @@ import {
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
 
-import { authClient, signIn } from "~/auth/client";
+import { signIn } from "~/auth/client";
 import { authLabels } from "~/lib/i18n/auth-labels";
-import { getPostAuthRedirect } from "~/lib/portal-routing";
 
 /**
  * Inner sign-in form that reads the returnTo search param.
  *
  * WHY: Single sign-in entry point for all users (hospital, provider, platform admin).
- * After sign-in, we fetch the session to determine platformRole and org_type,
- * then redirect to the correct portal dashboard using getPostAuthRedirect().
+ * After sign-in, redirects to "/" — the proxy's Branch 1.5 detects the missing
+ * medilink-org-context cookie and redirects to /api/auth/init, which sets the
+ * cookie server-side and routes to the correct portal dashboard.
  *
  * The returnTo query param is respected to restore deep-link navigation context.
  * useSearchParams() requires a Suspense boundary in Next.js App Router.
  */
 function SignInForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const labels = authLabels.signIn;
 
@@ -65,41 +64,41 @@ function SignInForm() {
     });
 
     if (result.error) {
-      setError(labels.errorGeneric.vi);
+      const msg = result.error.message ?? "";
+      if (
+        msg.toLowerCase().includes("invalid email or password") ||
+        msg.toLowerCase().includes("invalid_email_or_password")
+      ) {
+        setError("Email hoặc mật khẩu không đúng. (Invalid email or password)");
+      } else {
+        setError(`${labels.errorGeneric.vi} (${msg || "unknown error"})`);
+      }
       setIsLoading(false);
       return;
     }
 
-    // Fetch session to determine correct portal based on platformRole and org_type
-    const sessionResult = await authClient.getSession();
-
-    const sessionData = sessionResult.data
-      ? {
-          platformRole:
-            (
-              sessionResult.data.user as {
-                platformRole?: string | null;
-              }
-            ).platformRole ?? null,
-          orgType: null, // org_type is not in the basic session; middleware handles further routing
-          activeOrganizationId:
-            (
-              sessionResult.data.session as {
-                activeOrganizationId?: string | null;
-              }
-            ).activeOrganizationId ?? null,
-        }
-      : null;
-
-    // Honor returnTo param if user was redirected here from a protected route,
-    // otherwise use session-based routing to the correct portal dashboard.
-    const redirect = safeReturnTo ?? getPostAuthRedirect(sessionData);
-
-    router.push(redirect);
+    // Redirect to /api/auth/init to set the routing cookie server-side and land on
+    // the correct portal. WHY: We can't redirect to "/" because the proxy treats it
+    // as a public path (no Branch 1.5 interception). /api/auth/init is in
+    // BYPASS_PREFIXES so the proxy never intercepts it — the route handles
+    // Convex lookup + cookie set + portal redirect atomically.
+    const initUrl = new URL("/api/auth/init", window.location.origin);
+    if (safeReturnTo) initUrl.searchParams.set("returnTo", safeReturnTo);
+    window.location.href = initUrl.toString();
   }
 
   return (
     <Card>
+      {process.env.NODE_ENV === "development" && (
+        <div className="border-b bg-amber-50 px-4 py-1 text-center text-xs text-amber-700">
+          🛠 Dev server:{" "}
+          {typeof window !== "undefined" ? window.location.origin : ""} &middot;{" "}
+          <a href="/api/health" className="underline">
+            health check
+          </a>
+        </div>
+      )}
+
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl">{labels.title.vi}</CardTitle>
         <CardDescription>{labels.subtitle.vi}</CardDescription>

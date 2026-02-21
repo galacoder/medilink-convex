@@ -56,6 +56,74 @@ export const getOrganization = query({
 });
 
 /**
+ * Get the current user's primary org context for routing cookie restoration.
+ *
+ * WHY: The medilink-org-context routing cookie is only set during sign-up.
+ * On subsequent sign-ins the cookie is absent, breaking proxy routing.
+ * This query lets the sign-in flow restore the cookie from the user's
+ * existing membership without requiring re-signup.
+ *
+ * Returns the first org the caller belongs to (owner memberships preferred),
+ * or null if the user has no org membership yet.
+ *
+ * Bilingual: vi: "Lấy ngữ cảnh tổ chức người dùng" / en: "Get user org context"
+ */
+export const getUserContext = query({
+  args: {},
+  handler: async (ctx) => {
+    const authUser = await authComponent.getAuthUser(ctx);
+    if (!authUser) return null;
+
+    // Use .first() instead of .unique() in case of duplicate email records
+    // (e.g., seeded user + provisioned user both with the same email)
+    const user = await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .first();
+    if (!user) return null;
+
+    // For platform admins, return platformRole immediately without needing an org.
+    // WHY: The Better Auth component's schema doesn't support platformRole as a
+    // stored field, so we read it from our custom users table instead.
+    if (
+      user.platformRole === "platform_admin" ||
+      user.platformRole === "platform_support"
+    ) {
+      return {
+        orgId: null as unknown as string,
+        orgType: null as unknown as string,
+        orgName: null as unknown as string,
+        role: null as unknown as string,
+        platformRole: user.platformRole,
+      };
+    }
+
+    // Prefer owner membership, fall back to any membership
+    const memberships = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    if (memberships.length === 0) return null;
+
+    const preferred =
+      memberships.find((m) => m.role === "owner") ?? memberships[0];
+    if (!preferred) return null;
+
+    const org = await ctx.db.get(preferred.orgId);
+    if (!org) return null;
+
+    return {
+      orgId: org._id,
+      orgType: org.org_type,
+      orgName: org.name,
+      role: preferred.role,
+      platformRole: user.platformRole ?? null,
+    };
+  },
+});
+
+/**
  * Get organization by slug.
  * Only accessible to members of the organization.
  *
