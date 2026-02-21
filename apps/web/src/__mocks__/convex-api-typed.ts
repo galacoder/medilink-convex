@@ -119,4 +119,32 @@ export const api = {
       exportCSV: makeFunctionReference<"query">("admin/auditLog:exportCSV"),
     },
   },
+  // M5-2: Automation — Workflow Rules with Convex Scheduled Functions
+  automation: {
+    automationLog: {
+      listAutomationLogs: makeFunctionReference<"query">(
+        "automation/automationLog:listAutomationLogs",
+      ),
+      getAutomationRuleStatus: makeFunctionReference<"query">(
+        "automation/automationLog:getAutomationRuleStatus",
+      ),
+    },
+    rules: {
+      checkOverdueRequests: makeFunctionReference<"mutation">(
+        "automation/rules:checkOverdueRequests",
+      ),
+      checkMaintenanceDue: makeFunctionReference<"mutation">(
+        "automation/rules:checkMaintenanceDue",
+      ),
+      checkStockLevels: makeFunctionReference<"mutation">(
+        "automation/rules:checkStockLevels",
+      ),
+      checkCertificationExpiry: makeFunctionReference<"mutation">(
+        "automation/rules:checkCertificationExpiry",
+      ),
+      suggestProviders: makeFunctionReference<"query">(
+        "automation/rules:suggestProviders",
+      ),
+    },
+  },
 } as const;

@@ -890,4 +890,51 @@ export default defineSchema({
     .index("by_org_and_action", ["organizationId", "action"])
     .index("by_actor", ["actorId"])
     .index("by_resource", ["resourceType", "resourceId"]),
+
+  // ===========================================================================
+  // AUTOMATION LOG DOMAIN (1 table)
+  // vi: "Lĩnh vực nhật ký tự động hóa" / en: "Automation log domain"
+  // Added for M5-2: Workflow automation with Convex scheduled functions
+  // ===========================================================================
+
+  /**
+   * Tracks every cron/automation rule execution for the automation dashboard.
+   * vi: "Nhật ký tự động hóa" / en: "Automation run log"
+   *
+   * ruleName enum (5 values):
+   *   checkOverdueRequests    - vi: "Kiểm tra yêu cầu quá hạn"     / en: "Check overdue requests"
+   *   checkMaintenanceDue     - vi: "Kiểm tra bảo trì sắp đến hạn"  / en: "Check maintenance due"
+   *   checkStockLevels        - vi: "Kiểm tra mức tồn kho"          / en: "Check stock levels"
+   *   checkCertificationExpiry - vi: "Kiểm tra chứng nhận hết hạn"  / en: "Check certification expiry"
+   *   autoAssignProviders     - vi: "Tự động phân công nhà cung cấp" / en: "Auto-assign providers"
+   *
+   * status enum:
+   *   success - vi: "Thành công" / en: "Success"
+   *   error   - vi: "Lỗi"       / en: "Error"
+   */
+  automationLog: defineTable({
+    // vi: "Tên quy tắc tự động" / en: "Automation rule name"
+    ruleName: v.union(
+      v.literal("checkOverdueRequests"),
+      v.literal("checkMaintenanceDue"),
+      v.literal("checkStockLevels"),
+      v.literal("checkCertificationExpiry"),
+      v.literal("autoAssignProviders"),
+    ),
+    // vi: "Trạng thái thực thi" / en: "Execution status"
+    status: v.union(v.literal("success"), v.literal("error")),
+    // vi: "Số lượng bị ảnh hưởng" / en: "Number of affected records"
+    affectedCount: v.number(),
+    // vi: "Thời gian thực thi" / en: "Execution timestamp" (epoch ms)
+    runAt: v.number(),
+    // vi: "Thông báo lỗi" / en: "Error message (if status=error)"
+    errorMessage: v.optional(v.string()),
+    // vi: "Thông tin bổ sung" / en: "Additional metadata"
+    metadata: v.optional(v.any()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_rule_name", ["ruleName"])
+    .index("by_run_at", ["runAt"])
+    .index("by_rule_and_status", ["ruleName", "status"]),
 });
