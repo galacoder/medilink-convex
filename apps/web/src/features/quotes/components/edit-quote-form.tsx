@@ -11,10 +11,9 @@
  *
  * vi: "Form chỉnh sửa báo giá" / en: "Edit quote form"
  */
+import type { Id } from "convex/_generated/dataModel";
 import type { FormEvent } from "react";
 import { useState } from "react";
-
-import type { Id } from "convex/_generated/dataModel";
 
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
@@ -130,7 +129,7 @@ export function EditQuoteForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 rounded-md border bg-muted/30 p-4"
+      className="bg-muted/30 space-y-3 rounded-md border p-4"
       data-testid="edit-quote-form"
     >
       {/* Amount */}

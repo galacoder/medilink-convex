@@ -17,6 +17,7 @@ import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
 
 import { signIn } from "~/auth/client";
+import { env } from "~/env";
 import { authLabels } from "~/lib/i18n/auth-labels";
 
 /**
@@ -89,7 +90,7 @@ function SignInForm() {
 
   return (
     <Card>
-      {process.env.NODE_ENV === "development" && (
+      {env.NODE_ENV === "development" && (
         <div className="border-b bg-amber-50 px-4 py-1 text-center text-xs text-amber-700">
           🛠 Dev server:{" "}
           {typeof window !== "undefined" ? window.location.origin : ""} &middot;{" "}

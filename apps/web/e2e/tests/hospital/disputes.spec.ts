@@ -112,10 +112,9 @@ test.describe("Dispute workflow", () => {
       await disputeLinks.first().click();
 
       // Should navigate to detail page
-      await expect(hospitalPage).toHaveURL(
-        /\/hospital\/disputes\/[^/]+$/,
-        { timeout: 15000 },
-      );
+      await expect(hospitalPage).toHaveURL(/\/hospital\/disputes\/[^/]+$/, {
+        timeout: 15000,
+      });
 
       // The detail page should load without error
       // Check for breadcrumb or dispute content

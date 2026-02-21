@@ -150,9 +150,7 @@ export default function ProviderQuotesPage() {
                               }
                               data-testid="edit-quote-button"
                             >
-                              {editingQuoteId === quote._id
-                                ? "Đóng"
-                                : "Sửa"}
+                              {editingQuoteId === quote._id ? "Đóng" : "Sửa"}
                             </Button>
                           )}
                           <QuoteStatusBadge

@@ -11,10 +11,9 @@
  *
  * vi: "Form ghi nhận sử dụng vật tư" / en: "Record consumable usage form"
  */
+import type { GenericId as Id } from "convex/values";
 import type { FormEvent } from "react";
 import { useState } from "react";
-
-import type { GenericId as Id } from "convex/values";
 
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
@@ -46,7 +45,10 @@ const LABELS = {
     vi: "Ghi nhận thất bại. Vui lòng thử lại.",
     en: "Failed to record usage. Please try again.",
   },
-  quantityRequired: { vi: "Vui lòng nhập số lượng", en: "Please enter quantity" },
+  quantityRequired: {
+    vi: "Vui lòng nhập số lượng",
+    en: "Please enter quantity",
+  },
   quantityPositive: {
     vi: "Số lượng phải lớn hơn 0",
     en: "Quantity must be greater than 0",
@@ -117,8 +119,7 @@ export function RecordUsageForm({
       setNotes("");
       onSuccess?.();
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : LABELS.error[locale];
+      const message = err instanceof Error ? err.message : LABELS.error[locale];
       setErrorMsg(message);
     } finally {
       setIsSubmitting(false);
@@ -127,11 +128,13 @@ export function RecordUsageForm({
 
   return (
     <div className="rounded-lg border p-4">
-      <h3 className="mb-4 text-sm font-semibold">
-        {LABELS.title[locale]}
-      </h3>
+      <h3 className="mb-4 text-sm font-semibold">{LABELS.title[locale]}</h3>
 
-      <form onSubmit={handleSubmit} className="space-y-3" data-testid="record-usage-form">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-3"
+        data-testid="record-usage-form"
+      >
         <div>
           <Label htmlFor="usage-quantity" className="text-xs">
             {LABELS.quantity[locale]}

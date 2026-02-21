@@ -123,10 +123,9 @@ test.describe("Start service and update progress (AC-5)", () => {
     if (count > 0) {
       await serviceLinks.first().click();
 
-      await expect(providerPage).toHaveURL(
-        /\/provider\/services\/[^/]+$/,
-        { timeout: 15000 },
-      );
+      await expect(providerPage).toHaveURL(/\/provider\/services\/[^/]+$/, {
+        timeout: 15000,
+      });
 
       // Service detail page must render
       await expect(
@@ -175,10 +174,9 @@ test.describe("Start service and update progress (AC-5)", () => {
 
     if (count > 0) {
       await serviceLinks.first().click();
-      await expect(providerPage).toHaveURL(
-        /\/provider\/services\/[^/]+$/,
-        { timeout: 15000 },
-      );
+      await expect(providerPage).toHaveURL(/\/provider\/services\/[^/]+$/, {
+        timeout: 15000,
+      });
 
       // Service detail page must render
       await expect(
@@ -217,10 +215,9 @@ test.describe("Completion report (AC-6)", () => {
     if (count > 0) {
       await serviceLinks.first().click();
 
-      await expect(providerPage).toHaveURL(
-        /\/provider\/services\/[^/]+$/,
-        { timeout: 15000 },
-      );
+      await expect(providerPage).toHaveURL(/\/provider\/services\/[^/]+$/, {
+        timeout: 15000,
+      });
 
       await expect(
         providerPage.locator('[data-testid="service-detail-page"]'),
