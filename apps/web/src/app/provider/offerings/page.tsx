@@ -29,6 +29,10 @@ export default function ProviderOfferingsPage() {
     router.push("/provider/offerings/new");
   }
 
+  function handleEdit(offering: ServiceOffering) {
+    router.push(`/provider/offerings/${offering._id}/edit`);
+  }
+
   async function handleDelete(offering: ServiceOffering) {
     if (!organizationId) return;
     await removeServiceOffering({
@@ -62,6 +66,7 @@ export default function ProviderOfferingsPage() {
         offerings={offerings}
         isLoading={isLoading}
         onAdd={handleAdd}
+        onEdit={handleEdit}
         onDelete={handleDelete}
         locale="vi"
       />
