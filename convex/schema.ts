@@ -84,7 +84,12 @@ export default defineSchema({
     ),
     createdAt: v.number(),
     updatedAt: v.number(),
-  }),
+  })
+    // M5-6: Performance indexes — avoid full table scans on auth lookups
+    // by_email: used by Better Auth adapter to look up user by email on sign-in
+    .index("by_email", ["email"])
+    // by_platform_role: used by admin queries to list platform_admin/platform_support users
+    .index("by_platform_role", ["platformRole"]),
 
   // ===========================================================================
   // EQUIPMENT DOMAIN (5 tables)
@@ -223,6 +228,13 @@ export default defineSchema({
    *   quarterly - vi: "Hàng quý"  / en: "Quarterly"
    *   annually  - vi: "Hàng năm"   / en: "Annually"
    */
+  /**
+   * M5-6 index note: by_equipment + by_status + by_scheduled_at exist.
+   * Added by_org_and_status compound index for admin/staff dashboard queries
+   * that filter maintenance records by organization and status without a full scan.
+   * WHY: The staff maintenance dashboard queries all records for their org by status
+   * (e.g., "overdue") — without this index Convex would scan all maintenance records.
+   */
   maintenanceRecords: defineTable({
     equipmentId: v.id("equipment"),
     // vi: "Loại bảo trì" / en: "Maintenance type"
@@ -260,7 +272,12 @@ export default defineSchema({
   })
     .index("by_equipment", ["equipmentId"])
     .index("by_status", ["status"])
-    .index("by_scheduled_at", ["scheduledAt"]),
+    .index("by_scheduled_at", ["scheduledAt"])
+    // M5-6: Compound index for cron job that finds overdue maintenance records
+    // by status+scheduledAt without scanning all records.
+    // WHY: checkMaintenanceDue cron queries all "scheduled" records before a date —
+    // this index eliminates a full table scan on the maintenanceRecords table.
+    .index("by_status_and_scheduled_at", ["status", "scheduledAt"]),
 
   /**
    * Equipment failure/damage reports.
@@ -706,7 +723,11 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_consumable", ["consumableId"])
-    .index("by_used_by", ["usedBy"]),
+    .index("by_used_by", ["usedBy"])
+    // M5-6: Equipment usage index for analytics queries that correlate
+    // consumable usage with specific equipment items.
+    // WHY: Equipment-level consumable reports would full-scan without this index.
+    .index("by_equipment", ["equipmentId"]),
 
   /**
    * Requests to reorder consumable stock.
