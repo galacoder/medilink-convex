@@ -102,6 +102,18 @@ const config = {
   /** We already do linting and typechecking as separate tasks in CI */
   typescript: { ignoreBuildErrors: true },
 
+  /**
+   * Prevent Next.js from bundling server-only packages that include test files
+   * with dev-only dependencies (e.g. pino → thread-stream → test files → 'tap').
+   *
+   * WHY: @copilotkit/runtime depends on pino@9 which depends on thread-stream@3.
+   * thread-stream includes test files that `require('tap')` — a dev dependency
+   * not installed in production. Next.js tries to bundle these transitive files
+   * causing "Module not found: Can't resolve 'tap'" at build time.
+   * Marking pino as external tells Next.js to require() it at runtime instead.
+   */
+  serverExternalPackages: ["pino", "pino-pretty"],
+
   async headers() {
     return [
       {
