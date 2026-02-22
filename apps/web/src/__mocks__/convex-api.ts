@@ -63,4 +63,25 @@ export const api = {
     updatePreferences: "notifications:updatePreferences",
     getPreferences: "notifications:getPreferences",
   },
+  support: {
+    create: "support:create",
+    updateStatus: "support:updateStatus",
+    addMessage: "support:addMessage",
+    listByOrg: "support:listByOrg",
+    getById: "support:getById",
+    listByUser: "support:listByUser",
+  },
+  payment: {
+    create: "payment:create",
+    list: "payment:list",
+    getById: "payment:getById",
+    updateStatus: "payment:updateStatus",
+  },
+  consumablePhotos: {
+    generateUploadUrl: "consumablePhotos:generateUploadUrl",
+    savePhoto: "consumablePhotos:savePhoto",
+    deletePhoto: "consumablePhotos:deletePhoto",
+    listPhotos: "consumablePhotos:listPhotos",
+    getPhotoUrl: "consumablePhotos:getPhotoUrl",
+  },
 } as const;

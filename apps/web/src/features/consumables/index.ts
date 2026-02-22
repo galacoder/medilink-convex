@@ -25,8 +25,13 @@ export type {
 
 export { useStockAlerts } from "./hooks/useStockAlerts";
 
+export { useConsumablePhotos } from "./hooks/useConsumablePhotos";
+export type { ConsumablePhoto } from "./hooks/useConsumablePhotos";
+
 // Components
 export { ConsumablesTable } from "./components/ConsumablesTable";
 export { StockAlertBadge } from "./components/StockAlertBadge";
 export { ReorderForm } from "./components/ReorderForm";
 export { UsageLogTable } from "./components/UsageLogTable";
+export { PhotoUpload } from "./components/PhotoUpload";
+export { PhotoGallery } from "./components/PhotoGallery";
