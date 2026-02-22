@@ -15,9 +15,9 @@
  * en: "Convex actions for AI assistant functionality"
  */
 
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 
-import { action } from "./_generated/server";
+import { action, mutation, query } from "./_generated/server";
 
 // ---------------------------------------------------------------------------
 // Equipment status literals (mirrors validators/equipmentStatusSchema)
@@ -412,5 +412,162 @@ Respond ONLY with valid JSON:
         suggestions: ["Thử lại (Try again)", "Xem bảng phân tích (View analytics)"],
       };
     }
+  },
+});
+
+// ---------------------------------------------------------------------------
+// AI Conversation History (new functions — existing 3 actions above untouched)
+// ---------------------------------------------------------------------------
+
+/**
+ * Local auth helper mirroring disputes.ts localRequireAuth pattern.
+ *
+ * WHY: Consistent auth helper avoids importing the full better-auth stack.
+ * The Better Auth + Convex adapter stores the Convex user ID as `subject`
+ * and the organization ID as `organizationId` in the JWT identity.
+ *
+ * vi: "Xác thực người dùng AI" / en: "AI module auth helper"
+ */
+async function requireAiAuth(ctx: {
+  auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+}): Promise<{
+  userId: string;
+  organizationId: string;
+}> {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    throw new ConvexError({
+      message:
+        "Xác thực thất bại. Vui lòng đăng nhập lại. (Authentication required. Please sign in.)",
+      code: "UNAUTHENTICATED",
+    });
+  }
+  const organizationId = (identity.organizationId as string | null) ?? null;
+  if (!organizationId) {
+    throw new ConvexError({
+      message:
+        "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization before performing this action.)",
+      code: "NO_ACTIVE_ORGANIZATION",
+    });
+  }
+  return {
+    userId: identity.subject as string,
+    organizationId,
+  };
+}
+
+/**
+ * Persists a completed AI conversation to the aiConversation table.
+ *
+ * WHY: Enables users to review past AI interactions and restore context.
+ * Uses the same auth pattern as disputes.ts for consistency.
+ *
+ * vi: "Lưu hội thoại AI" / en: "Save AI conversation"
+ */
+export const saveConversation = mutation({
+  args: {
+    titleVi: v.string(),
+    titleEn: v.string(),
+    messages: v.array(
+      v.object({
+        role: v.union(v.literal("user"), v.literal("assistant")),
+        content: v.string(),
+        timestamp: v.number(),
+      }),
+    ),
+    model: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // The Better Auth Convex adapter stores Convex user ID as `subject`
+    // and organization ID as `organizationId` in the JWT identity token.
+    const auth = await requireAiAuth(ctx);
+
+    const now = Date.now();
+    return await ctx.db.insert("aiConversation", {
+      // Cast: subject IS the Convex user document ID per Better Auth adapter
+      userId: auth.userId as import("./_generated/dataModel").Id<"users">,
+      organizationId:
+        auth.organizationId as import("./_generated/dataModel").Id<"organizations">,
+      titleVi: args.titleVi,
+      titleEn: args.titleEn,
+      messages: args.messages,
+      model: args.model,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});
+
+/**
+ * Lists all AI conversations for the currently authenticated user.
+ *
+ * Returns conversations sorted newest-first (descending by _creationTime).
+ *
+ * vi: "Danh sách hội thoại AI" / en: "List AI conversations"
+ */
+export const listConversations = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+
+    const userId =
+      identity.subject as import("./_generated/dataModel").Id<"users">;
+
+    return await ctx.db
+      .query("aiConversation")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+  },
+});
+
+/**
+ * Retrieves a single AI conversation by ID.
+ *
+ * vi: "Lấy hội thoại AI theo ID" / en: "Get AI conversation by ID"
+ */
+export const getConversation = query({
+  args: { conversationId: v.id("aiConversation") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.conversationId);
+  },
+});
+
+/**
+ * Deletes an AI conversation by ID.
+ *
+ * WHY: Users should be able to remove conversations from their history.
+ * Verifies ownership before deletion to prevent cross-user data access.
+ *
+ * vi: "Xóa hội thoại AI" / en: "Delete AI conversation"
+ */
+export const deleteConversation = mutation({
+  args: { conversationId: v.id("aiConversation") },
+  handler: async (ctx, args) => {
+    const auth = await requireAiAuth(ctx);
+
+    const conversation = await ctx.db.get(args.conversationId);
+    if (!conversation) {
+      throw new ConvexError({
+        message:
+          "Hội thoại không tồn tại. (Conversation not found.)",
+        code: "NOT_FOUND",
+      });
+    }
+
+    // Verify the caller owns this conversation
+    if (
+      conversation.userId !==
+      (auth.userId as import("./_generated/dataModel").Id<"users">)
+    ) {
+      throw new ConvexError({
+        message:
+          "Bạn không có quyền xóa hội thoại này. (You do not have permission to delete this conversation.)",
+        code: "FORBIDDEN",
+      });
+    }
+
+    await ctx.db.delete(args.conversationId);
   },
 });
