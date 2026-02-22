@@ -20,6 +20,8 @@ import {
 } from "@copilotkit/runtime";
 import OpenAI from "openai";
 
+import { env } from "~/env";
+
 export const runtime = "nodejs";
 
 /**
@@ -33,7 +35,7 @@ export const POST = async (req: Request) => {
   // WHY: OPENAI_API_KEY is only read server-side (never in client bundle).
   // If missing, CopilotKit will return an error response that the UI displays.
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY ?? "",
+    apiKey: env.OPENAI_API_KEY ?? "",
   });
 
   const serviceAdapter = new OpenAIAdapter({

@@ -14,7 +14,7 @@ import { NotificationItem } from "./notification-item";
 function groupNotificationsByDate(
   notifications: Doc<"notifications">[],
   locale: "vi" | "en",
-): Array<{ label: string; items: Doc<"notifications">[] }> {
+): { label: string; items: Doc<"notifications">[] }[] {
   const groups = new Map<string, Doc<"notifications">[]>();
   const now = new Date();
   const today = now.toDateString();

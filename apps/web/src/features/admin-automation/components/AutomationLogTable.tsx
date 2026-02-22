@@ -95,10 +95,10 @@ export function AutomationLogTable({
             {/* Rule name */}
             <TableCell className="font-medium">
               <span className="block">
-                {automationLabels.ruleNames[log.ruleName]?.vi ?? log.ruleName}
+                {automationLabels.ruleNames[log.ruleName].vi}
               </span>
               <span className="text-muted-foreground text-xs">
-                {automationLabels.ruleNames[log.ruleName]?.en ?? log.ruleName}
+                {automationLabels.ruleNames[log.ruleName].en}
               </span>
             </TableCell>
 

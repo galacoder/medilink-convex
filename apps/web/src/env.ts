@@ -17,6 +17,8 @@ export const env = createEnv({
    */
   server: {
     // CONVEX_DEPLOYMENT will be added in M0-2 when Convex is configured
+    // Optional: enables the CopilotKit AI assistant (copilotkit/route.ts)
+    OPENAI_API_KEY: z.string().optional(),
   },
 
   /**

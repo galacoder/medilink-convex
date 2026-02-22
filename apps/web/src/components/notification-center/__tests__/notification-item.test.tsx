@@ -12,6 +12,7 @@
  */
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { Doc } from "convex/_generated/dataModel";
 import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";
@@ -22,24 +23,11 @@ import { NotificationItem } from "../notification-item";
 // ---------------------------------------------------------------------------
 
 function createMockNotification(
-  overrides: Partial<{
-    _id: string;
-    userId: string;
-    type: string;
-    titleVi: string;
-    titleEn: string;
-    bodyVi: string;
-    bodyEn: string;
-    read: boolean;
-    createdAt: number;
-    updatedAt: number;
-    _creationTime: number;
-    metadata: Record<string, unknown>;
-  }> = {},
-) {
+  overrides: Partial<Doc<"notifications">> = {},
+): Doc<"notifications"> {
   const now = Date.now();
   return {
-    _id: "notif_123",
+    _id: "notif_123" as Doc<"notifications">["_id"],
     _creationTime: now,
     userId: "user_456",
     type: "service_request_new_quote",
@@ -51,7 +39,7 @@ function createMockNotification(
     createdAt: now,
     updatedAt: now,
     ...overrides,
-  } as any;
+  } as Doc<"notifications">;
 }
 
 // ---------------------------------------------------------------------------
@@ -120,7 +108,7 @@ describe("NotificationItem", () => {
   it("test_NotificationItem_calls_onMarkRead_when_unread_item_clicked", async () => {
     const user = userEvent.setup();
     const notification = createMockNotification({
-      _id: "notif_abc",
+      _id: "notif_abc" as Doc<"notifications">["_id"],
       read: false,
     });
     const onMarkRead = vi.fn();

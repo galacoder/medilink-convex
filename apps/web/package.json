@@ -60,6 +60,7 @@
     "@medilink/prettier-config": "workspace:*",
     "@medilink/tailwind-config": "workspace:*",
     "@medilink/tsconfig": "workspace:*",
+    "@next/bundle-analyzer": "^16.1.6",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
