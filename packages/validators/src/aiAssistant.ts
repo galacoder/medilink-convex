@@ -205,3 +205,65 @@ export const aiAnalyticsAnswerSchema = z.object({
 });
 
 export type AiAnalyticsAnswer = z.infer<typeof aiAnalyticsAnswerSchema>;
+
+// ---------------------------------------------------------------------------
+// AI Conversation History schemas (new — Wave 2)
+// ---------------------------------------------------------------------------
+
+/**
+ * Schema for a single AI conversation message.
+ * vi: "Tin nhắn hội thoại AI" / en: "AI conversation message"
+ */
+export const aiMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().min(1, {
+    message:
+      "Nội dung tin nhắn không được để trống (Message content cannot be empty)",
+  }),
+  timestamp: z.number().positive({
+    message: "Thời gian không hợp lệ (Invalid timestamp)",
+  }),
+});
+
+export type AiMessage = z.infer<typeof aiMessageSchema>;
+
+/**
+ * Schema for creating/saving an AI conversation to persistent history.
+ * vi: "Lưu hội thoại AI" / en: "Save AI conversation"
+ *
+ * WHY: Used by the UI when persisting a completed conversation session
+ * to the aiConversation table via saveConversation mutation.
+ */
+export const createAiConversationSchema = z.object({
+  titleVi: z.string().min(1, {
+    message:
+      "Tiêu đề không được để trống (Title cannot be empty)",
+  }),
+  titleEn: z.string().min(1, {
+    message:
+      "English title cannot be empty (Tiêu đề tiếng Anh không được để trống)",
+  }),
+  messages: z.array(aiMessageSchema).min(1, {
+    message:
+      "Hội thoại phải có ít nhất một tin nhắn (Conversation must have at least one message)",
+  }),
+  model: z.string().min(1, {
+    message:
+      "Tên mô hình không được để trống (Model name cannot be empty)",
+  }),
+});
+
+export type CreateAiConversationInput = z.infer<
+  typeof createAiConversationSchema
+>;
+
+/**
+ * Schema for filtering/querying AI conversation history.
+ * vi: "Lọc lịch sử hội thoại AI" / en: "Filter AI conversation history"
+ */
+export const aiConversationFilterSchema = z.object({
+  limit: z.number().positive().max(100).optional(),
+  cursor: z.string().optional(),
+});
+
+export type AiConversationFilter = z.infer<typeof aiConversationFilterSchema>;

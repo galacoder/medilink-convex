@@ -1036,4 +1036,187 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
+
+  // ===========================================================================
+  // AI ASSISTANT DOMAIN (1 table) — Wave 2
+  // ===========================================================================
+
+  /**
+   * Persisted AI conversation history per user.
+   * vi: "Lịch sử hội thoại AI" / en: "AI conversation history"
+   *
+   * WHY: The AI assistant was stateless (actions only). This table persists
+   * conversation history so users can review past interactions.
+   */
+  aiConversation: defineTable({
+    // vi: "ID người dùng" / en: "User ID"
+    userId: v.id("users"),
+    // vi: "ID tổ chức" / en: "Organization ID"
+    organizationId: v.id("organizations"),
+    // vi: "Tiêu đề hội thoại" / en: "Conversation title"
+    titleVi: v.string(),
+    titleEn: v.string(),
+    // vi: "Danh sách tin nhắn" / en: "Message list"
+    messages: v.array(
+      v.object({
+        role: v.union(v.literal("user"), v.literal("assistant")),
+        content: v.string(),
+        timestamp: v.number(),
+      }),
+    ),
+    // vi: "Mô hình AI" / en: "AI model used"
+    model: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_org", ["organizationId"]),
+
+  // ===========================================================================
+  // SUPPORT DOMAIN (2 tables) — Wave 2
+  // ===========================================================================
+
+  /**
+   * Support tickets for general help requests.
+   * vi: "Phiếu hỗ trợ" / en: "Support ticket"
+   *
+   * WHY: Follows the disputes.ts thread+message architecture for consistency.
+   * Supports staff/admin assignment, priority levels, and category filtering.
+   */
+  supportTicket: defineTable({
+    // vi: "ID tổ chức" / en: "Organization ID"
+    organizationId: v.id("organizations"),
+    // vi: "Người tạo" / en: "Created by"
+    createdBy: v.id("users"),
+    // vi: "Người được phân công" / en: "Assigned to"
+    assignedTo: v.optional(v.id("users")),
+    // vi: "Trạng thái" / en: "Status"
+    status: v.union(
+      v.literal("open"),
+      v.literal("in_progress"),
+      v.literal("resolved"),
+      v.literal("closed"),
+    ),
+    // vi: "Mức độ ưu tiên" / en: "Priority"
+    priority: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+      v.literal("critical"),
+    ),
+    // vi: "Danh mục" / en: "Category"
+    category: v.union(
+      v.literal("general"),
+      v.literal("technical"),
+      v.literal("billing"),
+      v.literal("feature_request"),
+      v.literal("other"),
+    ),
+    // vi: "Tiêu đề" / en: "Subject"
+    subjectVi: v.string(),
+    subjectEn: v.string(),
+    // vi: "Mô tả" / en: "Description"
+    descriptionVi: v.string(),
+    descriptionEn: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_org", ["organizationId"])
+    .index("by_org_and_status", ["organizationId", "status"])
+    .index("by_created_by", ["createdBy"]),
+
+  /**
+   * Messages within a support ticket thread.
+   * vi: "Tin nhắn phiếu hỗ trợ" / en: "Support ticket message"
+   *
+   * WHY: Mirrors disputeMessages table for consistent thread architecture.
+   */
+  supportMessage: defineTable({
+    // vi: "ID phiếu hỗ trợ" / en: "Support ticket ID"
+    ticketId: v.id("supportTicket"),
+    // vi: "ID tác giả" / en: "Author ID"
+    authorId: v.id("users"),
+    // vi: "Nội dung" / en: "Content"
+    contentVi: v.string(),
+    contentEn: v.optional(v.string()),
+    // vi: "URL đính kèm" / en: "Attachment URLs"
+    attachmentUrls: v.optional(v.array(v.string())),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_ticket", ["ticketId"])
+    .index("by_author", ["authorId"]),
+
+  // ===========================================================================
+  // PAYMENT DOMAIN (1 table) — Wave 2
+  // ===========================================================================
+
+  /**
+   * Payment stub for future Stripe/VNPay integration.
+   * vi: "Thanh toán" / en: "Payment"
+   *
+   * WHY: Lightweight payment record stub. No payment processor integration yet.
+   * Provides the schema foundation for Wave 3 backend and Wave 4 UI.
+   */
+  payment: defineTable({
+    // vi: "ID tổ chức" / en: "Organization ID"
+    organizationId: v.id("organizations"),
+    // vi: "ID yêu cầu dịch vụ liên quan" / en: "Related service request ID"
+    serviceRequestId: v.optional(v.id("serviceRequests")),
+    // vi: "Số tiền" / en: "Amount"
+    amount: v.number(),
+    // vi: "Đơn vị tiền tệ" / en: "Currency (VND)"
+    currency: v.string(),
+    // vi: "Trạng thái thanh toán" / en: "Payment status"
+    status: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("failed"),
+      v.literal("refunded"),
+    ),
+    // vi: "Phương thức thanh toán" / en: "Payment method"
+    method: v.optional(v.string()),
+    // vi: "Mô tả" / en: "Description"
+    descriptionVi: v.string(),
+    descriptionEn: v.optional(v.string()),
+    // vi: "Người thanh toán" / en: "Paid by"
+    paidBy: v.id("users"),
+    // vi: "Thời điểm thanh toán" / en: "Paid at timestamp"
+    paidAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_org", ["organizationId"])
+    .index("by_org_and_status", ["organizationId", "status"])
+    .index("by_service_request", ["serviceRequestId"]),
+
+  // ===========================================================================
+  // CONSUMABLE PHOTOS DOMAIN (1 table) — Wave 3
+  // ===========================================================================
+
+  /**
+   * Photo storage records linking Convex file storage to consumable items.
+   * vi: "Ảnh vật tư" / en: "Consumable photo"
+   *
+   * WHY: The consumables table uses append-only convention so photos are tracked
+   * in a separate table. Each photo maps a Convex storage ID to a consumable ID.
+   * This enables photo gallery display and photo deletion without modifying
+   * the existing consumables table schema.
+   */
+  consumablePhotos: defineTable({
+    // vi: "ID vật tư" / en: "Consumable ID"
+    consumableId: v.id("consumables"),
+    // vi: "ID tổ chức" / en: "Organization ID"
+    organizationId: v.id("organizations"),
+    // vi: "ID lưu trữ Convex" / en: "Convex storage ID"
+    storageId: v.id("_storage"),
+    // vi: "Tên file" / en: "File name"
+    fileName: v.string(),
+    // vi: "Người tải lên" / en: "Uploaded by"
+    uploadedBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_consumable", ["consumableId"])
+    .index("by_org", ["organizationId"]),
 });

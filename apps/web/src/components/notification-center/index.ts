@@ -1,12 +1,13 @@
 /**
- * Notification center barrel export.
+ * Notification center barrel export — re-exports from features/notifications/.
  *
- * WHY: Single import point for all notification center components.
- * The NotificationCenter component is shared across hospital, provider,
- * and admin portal layouts via the shared Header component.
+ * WHY: Components have been promoted to the feature module at
+ * src/features/notifications/. This file is kept for backward-compatibility
+ * so existing imports of "~/components/notification-center" continue to work.
+ * New code should import from "~/features/notifications" directly.
  *
  * vi: "Xuất trung tâm thông báo" / en: "Notification center exports"
  */
-export { NotificationCenter } from "./notification-center";
-export { NotificationList } from "./notification-list";
-export { NotificationItem } from "./notification-item";
+export { NotificationCenter } from "~/features/notifications/components/notification-center";
+export { NotificationList } from "~/features/notifications/components/notification-list";
+export { NotificationItem } from "~/features/notifications/components/notification-item";
