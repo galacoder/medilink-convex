@@ -1189,4 +1189,34 @@ export default defineSchema({
     .index("by_org", ["organizationId"])
     .index("by_org_and_status", ["organizationId", "status"])
     .index("by_service_request", ["serviceRequestId"]),
+
+  // ===========================================================================
+  // CONSUMABLE PHOTOS DOMAIN (1 table) — Wave 3
+  // ===========================================================================
+
+  /**
+   * Photo storage records linking Convex file storage to consumable items.
+   * vi: "Ảnh vật tư" / en: "Consumable photo"
+   *
+   * WHY: The consumables table uses append-only convention so photos are tracked
+   * in a separate table. Each photo maps a Convex storage ID to a consumable ID.
+   * This enables photo gallery display and photo deletion without modifying
+   * the existing consumables table schema.
+   */
+  consumablePhotos: defineTable({
+    // vi: "ID vật tư" / en: "Consumable ID"
+    consumableId: v.id("consumables"),
+    // vi: "ID tổ chức" / en: "Organization ID"
+    organizationId: v.id("organizations"),
+    // vi: "ID lưu trữ Convex" / en: "Convex storage ID"
+    storageId: v.id("_storage"),
+    // vi: "Tên file" / en: "File name"
+    fileName: v.string(),
+    // vi: "Người tải lên" / en: "Uploaded by"
+    uploadedBy: v.id("users"),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_consumable", ["consumableId"])
+    .index("by_org", ["organizationId"]),
 });
