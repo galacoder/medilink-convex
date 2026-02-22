@@ -162,7 +162,9 @@ describe("admin/analytics.getOverviewStats", () => {
   it("test_getOverviewStats_returnsAllCountsAsZeroForEmptyDb", async () => {
     const t = convexTest(schema, modules);
 
-    const result = await t.query(
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (api as any).admin.analytics.getOverviewStats,
       {},
@@ -191,7 +193,9 @@ describe("admin/analytics.getOverviewStats", () => {
     await seedProvider(t, providerOrgId);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getOverviewStats, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getOverviewStats, {});
 
     expect(result.totalHospitals).toBe(2);
     expect(result.totalProviders).toBe(1);
@@ -219,7 +223,9 @@ describe("admin/analytics.getOverviewStats", () => {
     await seedQuote(t, pendingSrId, providerId, 1000000, "pending");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getOverviewStats, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getOverviewStats, {});
 
     expect(result.totalRevenue).toBe(2000000);
     expect(result.totalServiceRequests).toBeGreaterThanOrEqual(2);
@@ -237,7 +243,9 @@ describe("admin/analytics.getGrowthMetrics", () => {
     await seedOrganization(t, "Provider Growth Org", "provider");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getGrowthMetrics, { months: 6 });
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getGrowthMetrics, { months: 6 });
 
     expect(Array.isArray(result.hospitalGrowth)).toBe(true);
     expect(Array.isArray(result.providerGrowth)).toBe(true);
@@ -255,7 +263,9 @@ describe("admin/analytics.getGrowthMetrics", () => {
     const t = convexTest(schema, modules);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getGrowthMetrics, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getGrowthMetrics, {});
 
     expect(result.hospitalGrowth.length).toBe(6);
   });
@@ -279,7 +289,9 @@ describe("admin/analytics.getServiceMetrics", () => {
     await seedServiceRequest(t, hospitalOrgId, equipId, userId, providerId, "pending");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getServiceMetrics, { months: 6 });
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getServiceMetrics, { months: 6 });
 
     expect(Array.isArray(result.monthlyVolume)).toBe(true);
     expect(result.monthlyVolume.length).toBe(6);
@@ -309,7 +321,9 @@ describe("admin/analytics.getServiceMetrics", () => {
     await seedServiceRequest(t, hospitalOrgId, equipId, userId, providerId, "cancelled");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getServiceMetrics, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getServiceMetrics, {});
 
     expect(result.overallCompletionRate).toBe(0.5);
   });
@@ -334,7 +348,9 @@ describe("admin/analytics.getRevenueMetrics", () => {
     await seedQuote(t, srId, providerId, 3000000, "accepted");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getRevenueMetrics, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getRevenueMetrics, {});
 
     expect(typeof result.totalRevenue).toBe("number");
     expect(typeof result.averageServiceValue).toBe("number");
@@ -348,7 +364,9 @@ describe("admin/analytics.getRevenueMetrics", () => {
     const t = convexTest(schema, modules);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getRevenueMetrics, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getRevenueMetrics, {});
 
     expect(result.totalRevenue).toBe(0);
     expect(result.averageServiceValue).toBe(0);
@@ -373,7 +391,9 @@ describe("admin/analytics.getRevenueMetrics", () => {
     await seedQuote(t, sr2Id, providerId, 2000000, "accepted");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getRevenueMetrics, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getRevenueMetrics, {});
 
     // Should have revenue entry for the hospital
     expect(result.revenueByHospital.length).toBeGreaterThanOrEqual(1);
@@ -405,7 +425,9 @@ describe("admin/analytics.getTopPerformers", () => {
     await seedServiceRequest(t, hospitalOrgId, equipId, userId, providerId, "completed");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getTopPerformers, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getTopPerformers, {});
 
     expect(Array.isArray(result.topHospitals)).toBe(true);
     expect(Array.isArray(result.topProviders)).toBe(true);
@@ -425,7 +447,9 @@ describe("admin/analytics.getTopPerformers", () => {
     const t = convexTest(schema, modules);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = await t.query((api as any).admin.analytics.getTopPerformers, {});
+    const result = await t
+      .withIdentity({ subject: "admin_user_id", platformRole: "platform_admin" })
+      .query((api as any).admin.analytics.getTopPerformers, {});
 
     expect(result.topHospitals).toHaveLength(0);
     expect(result.topProviders).toHaveLength(0);

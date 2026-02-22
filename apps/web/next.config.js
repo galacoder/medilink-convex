@@ -102,6 +102,31 @@ const config = {
   /** We already do linting and typechecking as separate tasks in CI */
   typescript: { ignoreBuildErrors: true },
 
+  /**
+   * Prevent Next.js from bundling server-only packages that include test files
+   * with dev-only dependencies.
+   *
+   * WHY: @copilotkit/runtime depends on pino@9 → thread-stream@3.
+   * thread-stream includes test files that use fork(join(__dirname, '...'))
+   * causing webpack __dirname substitution to produce unresolvable paths.
+   * Those test files also `require('tap')` which is not installed in prod.
+   *
+   * @copilotkit/runtime is also listed because its dist/index.mjs has pino
+   * import paths inlined, so marking only pino/thread-stream as external is
+   * insufficient — the top-level bundled ESM file still causes webpack to
+   * follow pnpm-resolved paths that bypass serverExternalPackages matching.
+   *
+   * Listing @copilotkit/runtime prevents Next.js from processing the entire
+   * runtime bundle; it is loaded via require() at runtime instead, which
+   * is correct for a server-only API route handler.
+   */
+  serverExternalPackages: [
+    "pino",
+    "pino-pretty",
+    "thread-stream",
+    "@copilotkit/runtime",
+  ],
+
   async headers() {
     return [
       {
