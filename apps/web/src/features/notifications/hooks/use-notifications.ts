@@ -39,9 +39,7 @@ export function useNotifications(): UseNotificationsReturn {
   );
   const notifications = rawNotifications as NotificationItem[] | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const markReadMutation = useMutation(api.notifications.markRead);
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const markAllReadMutation = useMutation(api.notifications.markAllRead);
 
   const isLoading = notifications === undefined;
@@ -49,7 +47,6 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       await (markReadMutation as (args: { notificationId: string }) => Promise<void>)({ notificationId });
     },
     [markReadMutation],
@@ -57,7 +54,6 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markAllRead = useCallback(async () => {
     if (!userId) return;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await (markAllReadMutation as (args: { userId: string }) => Promise<void>)({ userId });
   }, [userId, markAllReadMutation]);
 

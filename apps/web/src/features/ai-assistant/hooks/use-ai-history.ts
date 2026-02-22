@@ -14,7 +14,7 @@
  *
  * vi: "Hook lịch sử hội thoại AI (skeleton)" / en: "AI history hook (skeleton for Wave 2)"
  */
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { AiConversation, UseAiHistoryReturn } from "../types";
 
@@ -26,8 +26,9 @@ import type { AiConversation, UseAiHistoryReturn } from "../types";
  * vi: "Hook lịch sử AI" / en: "AI history hook"
  */
 export function useAiHistory(): UseAiHistoryReturn {
-  // Skeleton: no conversations until Wave 2 adds the aiConversation table
-  const conversations: AiConversation[] = [];
+  // Skeleton: no conversations until Wave 2 adds the aiConversation table.
+  // WHY useMemo: stable reference avoids exhaustive-deps warning in selectConversation.
+  const conversations = useMemo<AiConversation[]>(() => [], []);
   const isLoading = false;
 
   const [selectedConversation, setSelectedConversation] =

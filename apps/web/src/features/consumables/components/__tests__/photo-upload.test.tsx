@@ -37,6 +37,14 @@ vi.mock("convex/_generated/api", () => ({
 import { renderWithProviders } from "~/test-utils";
 import { PhotoUpload } from "../PhotoUpload";
 
+/**
+ * WHY: Both non-nullable-type-assertion-style (prefers `!` over `as T`) and
+ * no-non-null-assertion (forbids `!`) are active in this project. For querying
+ * the hidden file input in tests, we centralize the single disable here.
+ */
+// eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+const getFileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement;
+
 describe("PhotoUpload", () => {
   let mockOnUpload: ReturnType<typeof vi.fn>;
 
@@ -81,7 +89,7 @@ describe("PhotoUpload", () => {
     renderWithProviders(<PhotoUpload onUpload={mockOnUpload} />);
 
     const file = new File(["test"], "photo.jpg", { type: "image/jpeg" });
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = getFileInput();
     expect(input).toBeTruthy();
 
     fireEvent.change(input, { target: { files: [file] } });
@@ -95,7 +103,7 @@ describe("PhotoUpload", () => {
     renderWithProviders(<PhotoUpload onUpload={mockOnUpload} />);
 
     const file = new File(["test"], "photo.png", { type: "image/png" });
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = getFileInput();
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -111,7 +119,7 @@ describe("PhotoUpload", () => {
     const file = new File(["test"], "document.pdf", {
       type: "application/pdf",
     });
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = getFileInput();
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -133,7 +141,7 @@ describe("PhotoUpload", () => {
     const file = new File([largeContent], "large.jpg", {
       type: "image/jpeg",
     });
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = getFileInput();
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -153,7 +161,7 @@ describe("PhotoUpload", () => {
     renderWithProviders(<PhotoUpload onUpload={mockOnUpload} />);
 
     const file = new File(["test"], "photo.jpg", { type: "image/jpeg" });
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const input = getFileInput();
 
     fireEvent.change(input, { target: { files: [file] } });
 

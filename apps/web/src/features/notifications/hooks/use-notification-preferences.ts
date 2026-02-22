@@ -37,7 +37,6 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
   );
   const preferences = rawPreferences as NotificationPreferences | null | undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const updatePreferencesMutation = useMutation(api.notifications.updatePreferences);
 
   const isLoading = rawPreferences === undefined;
@@ -45,8 +44,7 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
   const updatePreferences = useCallback(
     async (prefs: Record<string, boolean>) => {
       if (!userId) return;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await (updatePreferencesMutation as (args: { userId: string; preferences: Record<string, boolean> }) => Promise<void>)({ userId, preferences: prefs });
+      await updatePreferencesMutation({ userId, preferences: prefs });
     },
     [userId, updatePreferencesMutation],
   );

@@ -102,11 +102,9 @@ export function NotificationPreferences({
 
       <div className="space-y-3">
         {PREFERENCE_TYPES.map((type) => {
-          // PREFERENCE_TYPES is a subset of NotificationType, all of which are
-          // keys in notificationLabels.types, so the cast is safe.
           const typeEntry =
             notificationLabels.types[type as keyof typeof notificationLabels.types];
-          const label = typeEntry ? typeEntry[locale] : type;
+          const label = typeEntry[locale];
           const enabled = getPreferenceValue(type);
 
           return (

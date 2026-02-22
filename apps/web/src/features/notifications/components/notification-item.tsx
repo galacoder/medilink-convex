@@ -46,10 +46,9 @@ export function NotificationItem({
   locale = "vi",
 }: NotificationItemProps) {
   const typeLabels = notificationLabels.types;
-  // WHY: notification.type may be a string not in our label map (future types);
-  // fallback to the raw type string in that case.
-  const typeEntry = typeLabels[notification.type as keyof typeof typeLabels];
-  const typeLabel = typeEntry ? typeEntry[locale] : notification.type;
+  // notification.type is typed as a key of typeLabels per the Convex schema.
+  const typeEntry = typeLabels[notification.type];
+  const typeLabel = typeEntry[locale];
   const title = locale === "vi" ? notification.titleVi : notification.titleEn;
   const body = locale === "vi" ? notification.bodyVi : notification.bodyEn;
 

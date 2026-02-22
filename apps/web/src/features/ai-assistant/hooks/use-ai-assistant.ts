@@ -45,7 +45,10 @@ export function useAiAssistant(): UseAiAssistantReturn {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await queryEquipmentAction({ query, organizationId });
+        const result = await queryEquipmentAction({ query, organizationId }) as {
+          equipmentIds: string[];
+          summary: string;
+        };
         return {
           equipmentIds: result.equipmentIds,
           summary: result.summary,
@@ -66,7 +69,10 @@ export function useAiAssistant(): UseAiAssistantReturn {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await draftServiceRequestAction({ description, organizationId });
+        const result = await draftServiceRequestAction({ description, organizationId }) as {
+          descriptionSuggestion?: string;
+          urgency: "high" | "medium" | "low";
+        };
         return {
           descriptionVi: result.descriptionSuggestion ?? description,
           descriptionEn: undefined,
@@ -88,7 +94,10 @@ export function useAiAssistant(): UseAiAssistantReturn {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await answerAnalyticsQuestionAction({ question, organizationId });
+        const result = await answerAnalyticsQuestionAction({ question, organizationId }) as {
+          answer: string;
+          dataPoints?: unknown[];
+        };
         return {
           answer: result.answer,
           data: result.dataPoints,
