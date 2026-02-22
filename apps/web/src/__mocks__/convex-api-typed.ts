@@ -219,6 +219,18 @@ export const api = {
       "orgActions:createOrganization",
     ),
   },
+  // AI Assistant — 3 Convex actions (called via useAction)
+  aiAssistant: {
+    queryEquipment: makeFunctionReference<"action">(
+      "aiAssistant:queryEquipment",
+    ),
+    draftServiceRequest: makeFunctionReference<"action">(
+      "aiAssistant:draftServiceRequest",
+    ),
+    answerAnalyticsQuestion: makeFunctionReference<"action">(
+      "aiAssistant:answerAnalyticsQuestion",
+    ),
+  },
   // M5-1: Notifications — Convex Real-Time Notifications
   notifications: {
     create: makeFunctionReference<"mutation">("notifications:create"),
