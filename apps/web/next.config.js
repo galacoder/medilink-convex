@@ -112,7 +112,7 @@ const config = {
    * causing "Module not found: Can't resolve 'tap'" at build time.
    * Marking pino as external tells Next.js to require() it at runtime instead.
    */
-  serverExternalPackages: ["pino", "pino-pretty"],
+  serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
 
   async headers() {
     return [
