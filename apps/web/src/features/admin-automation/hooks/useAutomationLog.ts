@@ -31,12 +31,11 @@ export function useAutomationLog(
   ruleName?: AutomationRuleName,
   limit = 100,
 ): AutomationLogEntry[] | undefined {
-  const logs = useQuery(api.automation.automationLog.listAutomationLogs, {
+  // useQuery returns undefined while loading; cast to the expected type
+  return useQuery(api.automation.automationLog.listAutomationLogs, {
     ruleName,
     limit,
-  });
-  // useQuery returns undefined while loading
-  return logs as AutomationLogEntry[] | undefined;
+  }) as AutomationLogEntry[] | undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -50,9 +49,8 @@ export function useAutomationLog(
  * vi: "Hook lấy trạng thái quy tắc tự động hóa" / en: "Hook for automation rule status"
  */
 export function useAutomationRuleStatus(): AutomationRuleStatus[] | undefined {
-  const statuses = useQuery(
-    api.automation.automationLog.getAutomationRuleStatus,
-    {},
-  );
-  return statuses as AutomationRuleStatus[] | undefined;
+  // useQuery returns undefined while loading; cast to the expected type
+  return useQuery(api.automation.automationLog.getAutomationRuleStatus, {}) as
+    | AutomationRuleStatus[]
+    | undefined;
 }

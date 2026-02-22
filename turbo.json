@@ -54,6 +54,7 @@
     "AUTH_GOOGLE_SECRET",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",
+    "OPENAI_API_KEY",
     "PORT"
   ],
   "globalPassThroughEnv": [

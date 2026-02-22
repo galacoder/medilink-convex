@@ -23,7 +23,7 @@
 import { v } from "convex/values";
 
 import { internal } from "../_generated/api";
-import { mutation, query } from "../_generated/server";
+import { internalMutation, mutation, query } from "../_generated/server";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -59,7 +59,7 @@ const CERT_EXPIRY_WARNING_MS = 30 * 24 * 60 * 60 * 1000;
  * vi: "Kiểm tra yêu cầu dịch vụ bị tắc nghẽn quá 7 ngày"
  * en: "Check service requests stuck > 7 days and log for escalation"
  */
-export const checkOverdueRequests = mutation({
+export const checkOverdueRequests = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
@@ -130,7 +130,7 @@ export const checkOverdueRequests = mutation({
  * vi: "Kiểm tra lịch bảo trì thiết bị sắp đến hạn"
  * en: "Check equipment maintenance records due within 7 days"
  */
-export const checkMaintenanceDue = mutation({
+export const checkMaintenanceDue = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();
@@ -196,7 +196,7 @@ export const checkMaintenanceDue = mutation({
  * vi: "Kiểm tra vật tư tiêu hao dưới mức tái đặt hàng"
  * en: "Flag consumables where currentStock < reorderPoint per org"
  */
-export const checkStockLevels = mutation({
+export const checkStockLevels = internalMutation({
   args: {},
   handler: async (ctx) => {
     let totalAffected = 0;
@@ -268,7 +268,7 @@ export const checkStockLevels = mutation({
  * vi: "Kiểm tra chứng nhận nhà cung cấp hết hạn trong vòng 30 ngày"
  * en: "Flag provider certifications expiring within 30 days"
  */
-export const checkCertificationExpiry = mutation({
+export const checkCertificationExpiry = internalMutation({
   args: {},
   handler: async (ctx) => {
     const now = Date.now();

@@ -9,6 +9,7 @@
  *
  * vi: "Kiểm tra danh sách thông báo" / en: "Notification list tests"
  */
+import type { Doc } from "convex/_generated/dataModel";
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -16,23 +17,11 @@ import { renderWithProviders } from "~/test-utils";
 import { NotificationList } from "../notification-list";
 
 function createMockNotification(
-  overrides: Partial<{
-    _id: string;
-    userId: string;
-    type: string;
-    titleVi: string;
-    titleEn: string;
-    bodyVi: string;
-    bodyEn: string;
-    read: boolean;
-    createdAt: number;
-    updatedAt: number;
-    _creationTime: number;
-  }> = {},
-) {
+  overrides: Partial<Doc<"notifications">> = {},
+): Doc<"notifications"> {
   const now = Date.now();
   return {
-    _id: `notif_${Math.random()}`,
+    _id: `notif_${Math.random()}` as Doc<"notifications">["_id"],
     _creationTime: now,
     userId: "user_456",
     type: "service_request_new_quote",
@@ -44,7 +33,7 @@ function createMockNotification(
     createdAt: now,
     updatedAt: now,
     ...overrides,
-  } as any;
+  } as Doc<"notifications">;
 }
 
 describe("NotificationList", () => {

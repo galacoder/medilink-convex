@@ -96,9 +96,9 @@ function RuleCard({ ruleStatus }: { ruleStatus: AutomationRuleStatus }) {
           <div className="flex items-center gap-2">
             {icon}
             <CardTitle className="text-base">
-              <span className="block">{nameLabel?.vi}</span>
+              <span className="block">{nameLabel.vi}</span>
               <span className="text-muted-foreground block text-xs font-normal">
-                {nameLabel?.en}
+                {nameLabel.en}
               </span>
             </CardTitle>
           </div>
@@ -120,7 +120,7 @@ function RuleCard({ ruleStatus }: { ruleStatus: AutomationRuleStatus }) {
           )}
         </div>
         <CardDescription className="mt-1 text-xs">
-          {description?.vi}
+          {description.vi}
         </CardDescription>
       </CardHeader>
 
@@ -129,7 +129,7 @@ function RuleCard({ ruleStatus }: { ruleStatus: AutomationRuleStatus }) {
         <div className="text-muted-foreground flex items-center gap-1 text-xs">
           <ClockIcon className="h-3 w-3" />
           <span>
-            {schedule?.vi}
+            {schedule.vi}
             {/* {schedule?.en} */}
           </span>
         </div>

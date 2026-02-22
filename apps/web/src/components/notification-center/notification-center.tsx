@@ -1,5 +1,6 @@
 "use client";
 
+import type { Doc } from "convex/_generated/dataModel";
 import { useCallback, useState } from "react";
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
@@ -57,21 +58,20 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
   // We need the Convex user ID for queries. Better Auth stores the userId
   // in the session — Convex user IDs are the same as Better Auth user IDs
   // via the Convex adapter.
-  const userId = session?.user?.id;
+  const userId = session?.user.id;
 
   // Reactive notification list — updates in real time via Convex subscriptions
   const notifications = useQuery(
     api.notifications.listForUser,
     userId ? { userId } : "skip",
-  );
+  ) as Doc<"notifications">[] | undefined;
 
   // Mutations
   const markReadMutation = useMutation(api.notifications.markRead);
   const markAllReadMutation = useMutation(api.notifications.markAllRead);
 
   // Compute unread count
-  const unreadCount =
-    notifications?.filter((n: { read: boolean }) => !n.read).length ?? 0;
+  const unreadCount = notifications?.filter((n) => !n.read).length ?? 0;
 
   const handleMarkRead = useCallback(
     async (notificationId: string) => {
