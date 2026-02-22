@@ -9,8 +9,8 @@
  *
  * vi: "Kiểm tra danh sách thông báo" / en: "Notification list tests"
  */
-import { screen } from "@testing-library/react";
 import type { Doc } from "convex/_generated/dataModel";
+import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "~/test-utils";

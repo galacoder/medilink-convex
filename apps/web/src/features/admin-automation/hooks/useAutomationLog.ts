@@ -50,8 +50,7 @@ export function useAutomationLog(
  */
 export function useAutomationRuleStatus(): AutomationRuleStatus[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
-  return useQuery(
-    api.automation.automationLog.getAutomationRuleStatus,
-    {},
-  ) as AutomationRuleStatus[] | undefined;
+  return useQuery(api.automation.automationLog.getAutomationRuleStatus, {}) as
+    | AutomationRuleStatus[]
+    | undefined;
 }
