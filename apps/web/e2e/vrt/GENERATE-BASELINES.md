@@ -6,17 +6,17 @@
 |-----------|-------|--------------------|-------------|
 | `visual.spec.ts` | 3 | 3 (complete) | `playwright.config.vrt.ts` |
 | `auth/auth-vrt.spec.ts` | 7 | 7 (complete) | `playwright.config.vrt.ts` |
-| `portal-visual.spec.ts` | 2 | 2 (complete) | `playwright.config.portal-vrt.ts` |
+| `portal-visual.spec.ts` | 3 | 3 (complete) | `playwright.config.portal-vrt.ts` |
 | `hospital/hospital-vrt.spec.ts` | 17 | 17 (complete) | `playwright.config.portal-vrt.ts` |
 | `provider/provider-vrt.spec.ts` | 14 | 14 (complete) | `playwright.config.portal-vrt.ts` |
-| `platform-admin/platform-admin-vrt.spec.ts` | 10 | **0 (skipped — ADMIN_SETUP_SECRET missing)** | `playwright.config.portal-vrt.ts` |
+| `platform-admin/platform-admin-vrt.spec.ts` | 10 | **10 (complete)** | `playwright.config.portal-vrt.ts` |
 
-**Total**: 43 baselines captured, 10 pending admin baselines (53 total when admin is configured)
+**Total**: 54 baselines captured (all complete ✅)
 
 Portal specs are in Scenario B: spec files are written and valid but require running servers to
 generate PNG baselines. Public VRT (auth + landing pages) is fully captured.
 
-## Existing Baselines (12 files)
+## Existing Baselines (54 files)
 
 ```
 __snapshots__/visual.spec.ts/
@@ -31,11 +31,16 @@ __snapshots__/auth/auth-vrt.spec.ts/
   auth-sign-up-provider.png
   auth-invite-acceptance.png
   auth-sign-in-dark.png
-  auth-sign-up-dark.png        (spec has 7 tests; dark sign-up baseline not yet captured)
+  auth-sign-up-dark.png
 
 __snapshots__/portal-visual.spec.ts/
   hospital-dashboard.png
   provider-dashboard.png
+  admin-dashboard.png
+
+__snapshots__/hospital/hospital-vrt.spec.ts/   (17 files)
+__snapshots__/provider/provider-vrt.spec.ts/   (14 files)
+__snapshots__/platform-admin/platform-admin-vrt.spec.ts/   (10 files)
 ```
 
 ## Prerequisites
@@ -178,10 +183,12 @@ These fixtures store browser cookies/localStorage for pre-authenticated sessions
 avoiding the full 3-step sign-up flow for each test.
 
 ### Port Configuration
-The portal VRT config defaults to port 3000 for CI but accepts `PORT` override:
+The root `.env` sets `PORT=3000` (for CI). On homelab, `.env.local` overrides with `PORT=3002`
+(Dokploy occupies port 3000). The `with-env-local` script loads both files with `--override`, so
+`.env.local` takes precedence. **Do not pass `PORT=3002` explicitly** — it's now handled by `.env.local`.
 ```bash
-PORT=3002 pnpm vrt:portal:update   # homelab (Dokploy occupies 3000)
-pnpm vrt:portal:update             # CI (uses port 3000)
+pnpm vrt:portal:update        # homelab: uses PORT=3002 from .env.local
+pnpm vrt:portal:update        # CI: uses PORT=3000 from .env (no .env.local)
 ```
 
 ### Animations

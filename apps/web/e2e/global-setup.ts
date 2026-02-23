@@ -72,13 +72,22 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   // throwaway test accounts on every VRT run.
   const hospitalFixtureValid = hasValidFixture(fs, "./e2e/.auth/hospital.json");
   const providerFixtureValid = hasValidFixture(fs, "./e2e/.auth/provider.json");
+  const adminFixtureValid = hasValidFixture(fs, "./e2e/.auth/admin.json");
 
-  if (hospitalFixtureValid && providerFixtureValid) {
+  if (hospitalFixtureValid && providerFixtureValid && adminFixtureValid) {
     console.log(
-      "[global-setup] Valid auth fixtures found — skipping user creation. " +
+      "[global-setup] Valid auth fixtures found (hospital + provider + admin) — skipping user creation. " +
         "Delete ./e2e/.auth/*.json to force re-creation.",
     );
     return;
+  }
+
+  if (hospitalFixtureValid && providerFixtureValid && !adminFixtureValid) {
+    console.log(
+      "[global-setup] Hospital and provider fixtures valid — skipping hospital/provider sign-up. " +
+        "Running admin setup only.",
+    );
+    // Fall through to admin-only setup below
   }
 
   const HOSPITAL_USER = {
@@ -110,41 +119,53 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   const browser = await chromium.launch();
 
   try {
-    // --- Sign up hospital user ---
-    const hospitalContext = await browser.newContext();
-    const hospitalPage = await hospitalContext.newPage();
-    await hospitalPage.goto(`${baseURL}/sign-up`);
-    await hospitalPage.fill("#name", HOSPITAL_USER.name);
-    await hospitalPage.fill("#email", HOSPITAL_USER.email);
-    await hospitalPage.fill("#password", HOSPITAL_USER.password);
-    await hospitalPage.click(`#${HOSPITAL_USER.orgType}`);
-    await hospitalPage.fill("#orgName", HOSPITAL_USER.orgName);
-    await hospitalPage.click('button[type="submit"]');
-    await hospitalPage.waitForURL("**/hospital/dashboard", { timeout: 20000 });
-    await hospitalContext.storageState({ path: "./e2e/.auth/hospital.json" });
-    await hospitalContext.close();
+    // --- Sign up hospital user (skip if valid fixture exists) ---
+    if (!hospitalFixtureValid) {
+      const hospitalContext = await browser.newContext();
+      const hospitalPage = await hospitalContext.newPage();
+      await hospitalPage.goto(`${baseURL}/sign-up`);
+      await hospitalPage.fill("#name", HOSPITAL_USER.name);
+      await hospitalPage.fill("#email", HOSPITAL_USER.email);
+      await hospitalPage.fill("#password", HOSPITAL_USER.password);
+      await hospitalPage.click(`#${HOSPITAL_USER.orgType}`);
+      await hospitalPage.fill("#orgName", HOSPITAL_USER.orgName);
+      await hospitalPage.click('button[type="submit"]');
+      await hospitalPage.waitForURL("**/hospital/dashboard", {
+        timeout: 20000,
+      });
+      await hospitalContext.storageState({ path: "./e2e/.auth/hospital.json" });
+      await hospitalContext.close();
+    }
 
-    // --- Sign up provider user ---
-    const providerContext = await browser.newContext();
-    const providerPage = await providerContext.newPage();
-    await providerPage.goto(`${baseURL}/sign-up`);
-    await providerPage.fill("#name", PROVIDER_USER.name);
-    await providerPage.fill("#email", PROVIDER_USER.email);
-    await providerPage.fill("#password", PROVIDER_USER.password);
-    await providerPage.click(`#${PROVIDER_USER.orgType}`);
-    await providerPage.fill("#orgName", PROVIDER_USER.orgName);
-    await providerPage.click('button[type="submit"]');
-    await providerPage.waitForURL("**/provider/dashboard", { timeout: 20000 });
-    await providerContext.storageState({ path: "./e2e/.auth/provider.json" });
-    await providerContext.close();
+    // --- Sign up provider user (skip if valid fixture exists) ---
+    if (!providerFixtureValid) {
+      const providerContext = await browser.newContext();
+      const providerPage = await providerContext.newPage();
+      await providerPage.goto(`${baseURL}/sign-up`);
+      await providerPage.fill("#name", PROVIDER_USER.name);
+      await providerPage.fill("#email", PROVIDER_USER.email);
+      await providerPage.fill("#password", PROVIDER_USER.password);
+      await providerPage.click(`#${PROVIDER_USER.orgType}`);
+      await providerPage.fill("#orgName", PROVIDER_USER.orgName);
+      await providerPage.click('button[type="submit"]');
+      await providerPage.waitForURL("**/provider/dashboard", {
+        timeout: 20000,
+      });
+      await providerContext.storageState({ path: "./e2e/.auth/provider.json" });
+      await providerContext.close();
+    }
 
-    // --- Sign up admin user and grant platform_admin role ---
+    // --- Sign up admin user and grant platform_admin role (skip if valid fixture exists) ---
     // WHY: The admin flow requires:
     //   1. Create a Better Auth account via sign-up form (with placeholder org)
     //   2. Set platformRole via HTTP endpoint (requires ADMIN_SETUP_SECRET + CONVEX_SITE_URL)
     //   3. Re-authenticate to get fresh session with platformRole in the JWT
     //   4. Proxy Branch 2 routes admin to /admin/dashboard
-
+    if (adminFixtureValid) {
+      console.log(
+        "[global-setup] Valid admin fixture found — skipping admin user creation.",
+      );
+    } else {
     /* eslint-disable no-restricted-properties */
     const nextPublicConvexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
     const convexSiteUrl =
@@ -170,6 +191,13 @@ async function globalSetup(_config: FullConfig): Promise<void> {
       // Step 1: Sign up admin user via the standard form
       // The form requires orgType + orgName — we use hospital as placeholder
       await adminPage.goto(`${baseURL}/sign-up`);
+      // WHY: Wait for the form to be ready before interacting. The sign-up page
+      // is a Client Component that hydrates after initial page load, so we
+      // wait for the name input to be visible before filling.
+      await adminPage.waitForSelector("#name", {
+        state: "visible",
+        timeout: 60000,
+      });
       await adminPage.fill("#name", ADMIN_USER.name);
       await adminPage.fill("#email", ADMIN_USER.email);
       await adminPage.fill("#password", ADMIN_USER.password);
@@ -240,6 +268,7 @@ async function globalSetup(_config: FullConfig): Promise<void> {
       await adminContext.storageState({ path: "./e2e/.auth/admin.json" });
       await adminContext.close();
     }
+    } // end else (!adminFixtureValid)
   } finally {
     await browser.close();
   }
