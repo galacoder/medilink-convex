@@ -96,7 +96,7 @@ export function useAiAssistant(): UseAiAssistantReturn {
       try {
         const result = await answerAnalyticsQuestionAction({ question, organizationId }) as {
           answer: string;
-          dataPoints?: unknown[];
+          dataPoints?: Record<string, unknown>;
         };
         return {
           answer: result.answer,
