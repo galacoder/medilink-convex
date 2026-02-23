@@ -8,9 +8,9 @@
  * ensures only valid specialties (matching Convex schema) can be submitted.
  */
 import { useState } from "react";
-import { api } from "@medilink/db/api";
 import { useMutation } from "convex/react";
 
+import { api } from "@medilink/db/api";
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";

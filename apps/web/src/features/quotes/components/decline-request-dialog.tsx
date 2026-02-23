@@ -9,9 +9,9 @@
  *
  * Zod validation (min 10 chars) is enforced client-side before submission.
  */
-import type { Id } from "@medilink/db/dataModel";
 import { useState } from "react";
 
+import type { Id } from "@medilink/db/dataModel";
 import {
   AlertDialog,
   AlertDialogCancel,

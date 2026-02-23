@@ -8,8 +8,9 @@
  *
  * vi: "Hook tải dữ liệu đánh giá nhà cung cấp" / en: "Provider ratings data hook"
  */
-import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { ProviderRatings } from "../types";
 

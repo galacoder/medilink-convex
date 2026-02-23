@@ -1,9 +1,10 @@
 "use client";
 
-import type { Id } from "@medilink/db/dataModel";
 import type { FunctionReference } from "convex/server";
-import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
+
+import type { Id } from "@medilink/db/dataModel";
+import { api } from "@medilink/db/api";
 
 import type { DisputeMessageWithAuthor, DisputeWithDetails } from "../types";
 

@@ -1,8 +1,9 @@
 "use client";
 
 import type { PaginatedQueryReference } from "convex/react";
-import { api } from "@medilink/db/api";
 import { usePaginatedQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { Equipment, EquipmentFilters } from "../types";
 

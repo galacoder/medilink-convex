@@ -1,7 +1,6 @@
 "use client";
 
 import type { Doc } from "@medilink/db/dataModel";
-
 import { ScrollArea } from "@medilink/ui/scroll-area";
 import { Skeleton } from "@medilink/ui/skeleton";
 

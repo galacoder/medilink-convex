@@ -14,10 +14,10 @@
  * vi: "Trang chi tiết bệnh viện — Quản trị viên nền tảng"
  * en: "Hospital detail page — Platform Admin"
  */
-import type { Id } from "@medilink/db/dataModel";
 import { use } from "react";
 import Link from "next/link";
 
+import type { Id } from "@medilink/db/dataModel";
 import {
   Card,
   CardContent,

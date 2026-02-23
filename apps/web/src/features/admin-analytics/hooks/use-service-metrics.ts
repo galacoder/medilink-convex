@@ -9,8 +9,9 @@
  *
  * vi: "Hook tải chỉ số dịch vụ" / en: "Service metrics hook"
  */
-import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { ServiceMetrics } from "../types";
 

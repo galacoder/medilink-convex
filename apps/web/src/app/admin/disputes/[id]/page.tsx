@@ -11,7 +11,6 @@
  *
  * vi: "Trang chi tiết tranh chấp và trọng tài" / en: "Dispute detail & arbitration page"
  */
-import type { Id } from "@medilink/db/dataModel";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +24,7 @@ import {
   WrenchIcon,
 } from "lucide-react";
 
+import type { Id } from "@medilink/db/dataModel";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import {

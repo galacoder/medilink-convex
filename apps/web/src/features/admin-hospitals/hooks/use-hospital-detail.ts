@@ -9,10 +9,11 @@
  * vi: "Hook chi tiết bệnh viện — Quản trị viên nền tảng"
  * en: "Hospital detail hook — Platform Admin"
  */
-import type { Id } from "@medilink/db/dataModel";
 import type { FunctionReference } from "convex/server";
-import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
+
+import type { Id } from "@medilink/db/dataModel";
+import { api } from "@medilink/db/api";
 
 import type { HospitalDetail, HospitalUsage } from "../types";
 
