@@ -27,6 +27,30 @@ import type { FullConfig } from "@playwright/test";
  *   NEXT_PUBLIC_CONVEX_SITE_URL — Convex HTTP site URL (e.g. https://<deploy>.convex.site)
  *   ADMIN_SETUP_SECRET — shared secret for the set-platform-role HTTP endpoint
  */
+/**
+ * Returns true if the auth fixture file exists and contains valid (non-empty) cookies.
+ * WHY: Avoids re-running the 3-step sign-up flow when sessions are still active.
+ * Better Auth session tokens have a long TTL (~30 days), so fixtures created in the
+ * same dev session are reusable until they expire.
+ */
+function hasValidFixture(fs: typeof import("fs"), path: string): boolean {
+  try {
+    if (!fs.existsSync(path)) return false;
+    const data = JSON.parse(fs.readFileSync(path, "utf-8")) as {
+      cookies?: { name: string; expires: number }[];
+    };
+    if (!data.cookies || data.cookies.length === 0) return false;
+    // Check session_token expiry (epoch seconds)
+    const sessionCookie = data.cookies.find((c) =>
+      c.name.includes("session_token"),
+    );
+    if (!sessionCookie) return false;
+    return sessionCookie.expires > Date.now() / 1000;
+  } catch {
+    return false;
+  }
+}
+
 async function globalSetup(_config: FullConfig): Promise<void> {
   const { chromium } = await import("@playwright/test");
   const fs = await import("fs");
@@ -41,6 +65,21 @@ async function globalSetup(_config: FullConfig): Promise<void> {
   const port = process.env.PORT ?? "3000";
   const baseURL = `http://localhost:${port}`;
   const timestamp = Date.now();
+
+  // Skip sign-up flows if valid fixtures already exist.
+  // WHY: Re-creating users requires a working Convex dev connection and takes ~30s.
+  // Reusing existing fixtures is faster and avoids cluttering the Convex DB with
+  // throwaway test accounts on every VRT run.
+  const hospitalFixtureValid = hasValidFixture(fs, "./e2e/.auth/hospital.json");
+  const providerFixtureValid = hasValidFixture(fs, "./e2e/.auth/provider.json");
+
+  if (hospitalFixtureValid && providerFixtureValid) {
+    console.log(
+      "[global-setup] Valid auth fixtures found — skipping user creation. " +
+        "Delete ./e2e/.auth/*.json to force re-creation.",
+    );
+    return;
+  }
 
   const HOSPITAL_USER = {
     name: "Hospital Test Staff",

@@ -7,11 +7,11 @@
 | `visual.spec.ts` | 3 | 3 (complete) | `playwright.config.vrt.ts` |
 | `auth/auth-vrt.spec.ts` | 7 | 7 (complete) | `playwright.config.vrt.ts` |
 | `portal-visual.spec.ts` | 2 | 2 (complete) | `playwright.config.portal-vrt.ts` |
-| `hospital/hospital-vrt.spec.ts` | 17 | **0 (missing)** | `playwright.config.portal-vrt.ts` |
-| `provider/provider-vrt.spec.ts` | 14 | **0 (missing)** | `playwright.config.portal-vrt.ts` |
-| `platform-admin/platform-admin-vrt.spec.ts` | 10 | **0 (missing)** | `playwright.config.portal-vrt.ts` |
+| `hospital/hospital-vrt.spec.ts` | 17 | 17 (complete) | `playwright.config.portal-vrt.ts` |
+| `provider/provider-vrt.spec.ts` | 14 | 14 (complete) | `playwright.config.portal-vrt.ts` |
+| `platform-admin/platform-admin-vrt.spec.ts` | 10 | **0 (skipped — ADMIN_SETUP_SECRET missing)** | `playwright.config.portal-vrt.ts` |
 
-**Total**: 12 existing baselines, 41 missing portal baselines (53 total when complete)
+**Total**: 43 baselines captured, 10 pending admin baselines (53 total when admin is configured)
 
 Portal specs are in Scenario B: spec files are written and valid but require running servers to
 generate PNG baselines. Public VRT (auth + landing pages) is fully captured.
