@@ -11,7 +11,7 @@
  *
  * vi: "Form chỉnh sửa báo giá" / en: "Edit quote form"
  */
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import type { FormEvent } from "react";
 import { useState } from "react";
 

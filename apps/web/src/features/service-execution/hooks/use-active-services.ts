@@ -12,7 +12,7 @@
  *
  * vi: "Hook lấy danh sách dịch vụ đang hoạt động" / en: "Active services hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { ActiveService } from "../types";

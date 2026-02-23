@@ -9,7 +9,7 @@
  *
  * vi: "Kiểm tra danh sách thông báo" / en: "Notification list tests"
  */
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "@medilink/db/dataModel";
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 

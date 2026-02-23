@@ -22,7 +22,7 @@
  *
  * vi: "Trang phân tích nền tảng quản trị" / en: "Platform admin analytics dashboard"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { PlatformHealthMetrics } from "~/features/admin-analytics/types";

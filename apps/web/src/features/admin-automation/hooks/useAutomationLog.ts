@@ -8,7 +8,7 @@
  *
  * vi: "Hook dữ liệu tự động hóa" / en: "Automation data hooks"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type {

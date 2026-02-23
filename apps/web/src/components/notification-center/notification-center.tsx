@@ -1,8 +1,8 @@
 "use client";
 
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "@medilink/db/dataModel";
 import { useCallback, useState } from "react";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useMutation, useQuery } from "convex/react";
 import { Bell } from "lucide-react";
 

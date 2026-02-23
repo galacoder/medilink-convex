@@ -1,6 +1,6 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import { useState } from "react";
 import Link from "next/link";
 import { AlertCircleIcon } from "lucide-react";

@@ -13,7 +13,7 @@
  * Validation: client-side using submitQuoteFormSchema from @medilink/validators.
  * Pattern: matches ServiceRequestForm controlled state approach.
  */
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import { useState } from "react";
 
 import {

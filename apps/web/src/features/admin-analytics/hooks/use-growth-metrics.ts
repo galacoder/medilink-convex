@@ -8,7 +8,7 @@
  *
  * vi: "Hook tải chỉ số tăng trưởng" / en: "Growth metrics hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { GrowthMetrics } from "../types";

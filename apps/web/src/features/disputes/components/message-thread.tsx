@@ -1,9 +1,9 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import type { FunctionReference } from "convex/server";
 import { useEffect, useRef, useState } from "react";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useMutation } from "convex/react";
 import { SendIcon } from "lucide-react";
 

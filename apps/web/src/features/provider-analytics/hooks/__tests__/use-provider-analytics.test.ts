@@ -21,7 +21,7 @@ vi.mock("convex/react", () => ({
 // Mock the convex generated API — analytics is a new module, not yet in the
 // generated _generated/api. Using a stub ensures the import works in tests
 // without a running Convex instance.
-vi.mock("convex/_generated/api", () => ({
+vi.mock("@medilink/db/api", () => ({
   api: {
     analytics: {
       getProviderSummary: "analytics:getProviderSummary",

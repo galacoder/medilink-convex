@@ -10,7 +10,7 @@
  *
  * vi: "Kiểm tra mục thông báo" / en: "Notification item tests"
  */
-import type { Doc } from "convex/_generated/dataModel";
+import type { Doc } from "@medilink/db/dataModel";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";

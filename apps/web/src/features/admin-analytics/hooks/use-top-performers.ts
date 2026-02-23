@@ -8,7 +8,7 @@
  *
  * vi: "Hook tải đơn vị hàng đầu" / en: "Top performers hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { TopPerformers } from "../types";

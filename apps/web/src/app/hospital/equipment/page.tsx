@@ -1,10 +1,10 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import type { FunctionReference } from "convex/server";
 import { useState } from "react";
 import Link from "next/link";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useMutation } from "convex/react";
 import { PlusIcon } from "lucide-react";
 

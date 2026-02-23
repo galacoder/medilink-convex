@@ -11,7 +11,7 @@
  *
  * vi: "Trang chi tiết tranh chấp và trọng tài" / en: "Dispute detail & arbitration page"
  */
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

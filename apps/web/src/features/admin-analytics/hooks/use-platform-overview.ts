@@ -8,7 +8,7 @@
  *
  * vi: "Hook tải thống kê tổng quan nền tảng" / en: "Platform overview stats hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { PlatformOverviewStats } from "../types";

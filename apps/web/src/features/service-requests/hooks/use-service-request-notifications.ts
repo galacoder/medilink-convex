@@ -11,7 +11,7 @@
  * (Convex handles auth via the ConvexBetterAuthProvider). Platform admins
  * have no active org so we skip the query to avoid NO_ACTIVE_ORGANIZATION errors.
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { ServiceRequest } from "../types";

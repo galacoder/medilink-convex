@@ -8,7 +8,7 @@
  *
  * vi: "Hook tải quan hệ bệnh viện" / en: "Hospital relationships hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { HospitalRelationship } from "../types";

@@ -8,7 +8,7 @@
  *
  * vi: "Hook tải doanh thu hàng tháng" / en: "Monthly revenue data hook"
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { MonthlyRevenue } from "../types";

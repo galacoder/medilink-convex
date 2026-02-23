@@ -1,7 +1,7 @@
 "use client";
 
 import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useAction, useMutation, useQuery } from "convex/react";
 
 // Cast via (api as any) until `npx convex dev` regenerates types.

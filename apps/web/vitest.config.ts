@@ -25,9 +25,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./src"),
-      // Map convex generated API to stub for tests
+      // Map @medilink/db/api to stub for tests
       // (actual _generated dir is gitignored and created by npx convex dev)
-      "convex/_generated/api": path.resolve(
+      "@medilink/db/api": path.resolve(
         __dirname,
         "./src/__mocks__/convex-api.ts",
       ),

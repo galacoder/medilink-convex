@@ -10,9 +10,9 @@
  *
  * vi: "Hook thực hiện dịch vụ" / en: "Service execution mutations hook"
  */
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import { useState } from "react";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useMutation } from "convex/react";
 
 export interface UseServiceExecutionResult {

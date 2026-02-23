@@ -24,7 +24,7 @@
  */
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { ConvexHttpClient } from "convex/browser";
 
 import { env } from "~/env";

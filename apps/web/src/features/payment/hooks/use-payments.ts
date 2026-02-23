@@ -1,7 +1,7 @@
 "use client";
 
 import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { Payment, PaymentStatus } from "../types";

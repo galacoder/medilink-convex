@@ -1,9 +1,9 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 import type { PaginatedQueryReference } from "convex/react";
 import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { usePaginatedQuery, useQuery } from "convex/react";
 
 import type { Equipment } from "../types";

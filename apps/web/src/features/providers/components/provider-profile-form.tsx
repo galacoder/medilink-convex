@@ -8,7 +8,7 @@
  * profile fields and submits via the updateProfile Convex mutation.
  */
 import { useState } from "react";
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useMutation } from "convex/react";
 
 import { Button } from "@medilink/ui/button";

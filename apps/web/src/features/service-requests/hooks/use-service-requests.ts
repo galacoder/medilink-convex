@@ -8,7 +8,7 @@
  * useQuery gives real-time reactivity — the UI updates automatically when a
  * provider submits a quote or status changes.
  */
-import { api } from "convex/_generated/api";
+import { api } from "@medilink/db/api";
 import { useQuery } from "convex/react";
 
 import type { ServiceRequest, ServiceRequestStatus } from "../types";
