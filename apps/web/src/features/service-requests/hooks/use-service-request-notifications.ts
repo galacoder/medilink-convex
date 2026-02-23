@@ -14,9 +14,8 @@
 import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
 
-import { useActiveOrganization } from "~/auth/client";
-
 import type { ServiceRequest } from "../types";
+import { useActiveOrganization } from "~/auth/client";
 
 export interface UseServiceRequestNotificationsResult {
   /** Number of requests in "quoted" status (need quote review) */

@@ -10,8 +10,12 @@
  *
  * vi: "Kiem tra danh sach phieu ho tro" / en: "Ticket list component tests"
  */
-import { screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { SupportTicket } from "../../types";
+import { renderWithProviders } from "~/test-utils";
+import { TicketList } from "../ticket-list";
 
 // Mock convex/react (needed for sub-components)
 vi.mock("convex/react", () => ({
@@ -32,10 +36,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { renderWithProviders } from "~/test-utils";
-import type { SupportTicket } from "../../types";
-import { TicketList } from "../ticket-list";
 
 function makeMockTicket(overrides: Partial<SupportTicket> = {}): SupportTicket {
   const now = Date.now();
@@ -152,9 +152,7 @@ describe("TicketList", () => {
   });
 
   it("test_TicketList_displays_category_label", () => {
-    const tickets = [
-      makeMockTicket({ _id: "t1", category: "technical" }),
-    ];
+    const tickets = [makeMockTicket({ _id: "t1", category: "technical" })];
 
     renderWithProviders(<TicketList tickets={tickets} />);
 

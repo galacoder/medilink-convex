@@ -6,8 +6,11 @@
  *
  * vi: "Kiem tra hook danh sach thanh toan" / en: "Payments hook tests"
  */
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { usePayments } from "../use-payments";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -26,9 +29,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { useQuery } from "convex/react";
-import { usePayments } from "../use-payments";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -87,10 +87,9 @@ describe("usePayments", () => {
 
     renderHook(() => usePayments("completed"));
 
-    expect(mockUseQuery).toHaveBeenCalledWith(
-      expect.anything(),
-      { status: "completed" },
-    );
+    expect(mockUseQuery).toHaveBeenCalledWith(expect.anything(), {
+      status: "completed",
+    });
   });
 
   it("test_usePayments_passes_empty_object_without_filter", () => {

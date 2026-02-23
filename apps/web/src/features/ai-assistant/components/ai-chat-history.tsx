@@ -9,8 +9,8 @@
  *
  * vi: "Lịch sử trò chuyện AI" / en: "AI chat history"
  */
-import { aiAssistantLabels } from "../labels";
 import type { AiConversation } from "../types";
+import { aiAssistantLabels } from "../labels";
 
 interface AiChatHistoryProps {
   /** Conversation list (empty in Wave 1, populated in Wave 2) */

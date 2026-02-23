@@ -57,10 +57,7 @@ function formatCurrency(amount: number, currency: string): string {
  *
  * vi: "Danh sach thanh toan" / en: "Payment list"
  */
-export function PaymentList({
-  payments,
-  isLoading = false,
-}: PaymentListProps) {
+export function PaymentList({ payments, isLoading = false }: PaymentListProps) {
   const [activeTab, setActiveTab] = useState<PaymentStatus | "all">("all");
 
   // Filter payments by status tab

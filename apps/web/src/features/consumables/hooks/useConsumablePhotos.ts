@@ -77,7 +77,11 @@ export function useConsumablePhotos(consumableId: string | undefined) {
     }
 
     // Validate file type
-    if (!ALLOWED_PHOTO_TYPES.includes(file.type as (typeof ALLOWED_PHOTO_TYPES)[number])) {
+    if (
+      !ALLOWED_PHOTO_TYPES.includes(
+        file.type as (typeof ALLOWED_PHOTO_TYPES)[number],
+      )
+    ) {
       throw new Error(
         "Loai tep khong hop le. Chi chap nhan JPEG, PNG, WebP. (Invalid file type. Only JPEG, PNG, WebP accepted.)",
       );
@@ -85,9 +89,7 @@ export function useConsumablePhotos(consumableId: string | undefined) {
 
     // Validate file size
     if (file.size > MAX_PHOTO_SIZE_BYTES) {
-      throw new Error(
-        "Kich thuoc tep vuot qua 5MB. (File size exceeds 5MB.)",
-      );
+      throw new Error("Kich thuoc tep vuot qua 5MB. (File size exceeds 5MB.)");
     }
 
     // 1. Get pre-signed upload URL
@@ -101,9 +103,7 @@ export function useConsumablePhotos(consumableId: string | undefined) {
     });
 
     if (!uploadResponse.ok) {
-      throw new Error(
-        "Tai anh len that bai. (Upload failed.)",
-      );
+      throw new Error("Tai anh len that bai. (Upload failed.)");
     }
 
     const { storageId } = (await uploadResponse.json()) as {

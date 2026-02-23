@@ -13,8 +13,8 @@ import { useCallback } from "react";
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 
-import { useSession } from "~/auth/client";
 import type { NotificationItem, UseNotificationsReturn } from "../types";
+import { useSession } from "~/auth/client";
 
 /**
  * Hook that returns the current user's notifications and action functions.
@@ -47,14 +47,18 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      await (markReadMutation as (args: { notificationId: string }) => Promise<void>)({ notificationId });
+      await (
+        markReadMutation as (args: { notificationId: string }) => Promise<void>
+      )({ notificationId });
     },
     [markReadMutation],
   );
 
   const markAllRead = useCallback(async () => {
     if (!userId) return;
-    await (markAllReadMutation as (args: { userId: string }) => Promise<void>)({ userId });
+    await (markAllReadMutation as (args: { userId: string }) => Promise<void>)({
+      userId,
+    });
   }, [userId, markAllReadMutation]);
 
   return { notifications, isLoading, unreadCount, markRead, markAllRead };

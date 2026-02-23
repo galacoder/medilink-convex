@@ -9,8 +9,12 @@
  *
  * vi: "Kiem tra form tao phieu ho tro" / en: "Ticket form component tests"
  */
-import { screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, screen } from "@testing-library/react";
+import { useMutation } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderWithProviders } from "~/test-utils";
+import { TicketForm } from "../ticket-form";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -32,16 +36,14 @@ vi.mock("convex/_generated/api", () => ({
   },
 }));
 
-import { useMutation } from "convex/react";
-import { renderWithProviders } from "~/test-utils";
-import { TicketForm } from "../ticket-form";
-
 const mockUseMutation = vi.mocked(useMutation);
 
 describe("TicketForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseMutation.mockReturnValue(vi.fn() as unknown as ReturnType<typeof useMutation>);
+    mockUseMutation.mockReturnValue(
+      vi.fn() as unknown as ReturnType<typeof useMutation>,
+    );
   });
 
   it("test_TicketForm_renders_subject_field", () => {

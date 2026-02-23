@@ -140,7 +140,7 @@ export function TicketDetail({
                 <h4 className="text-muted-foreground mt-3 mb-1 text-sm font-medium">
                   {supportLabels.fields.descriptionEn.vi}
                 </h4>
-                <p className="text-muted-foreground text-sm italic whitespace-pre-wrap">
+                <p className="text-muted-foreground text-sm whitespace-pre-wrap italic">
                   {ticket.descriptionEn}
                 </p>
               </>

@@ -10,8 +10,12 @@
  *
  * vi: "Kiem tra danh sach thanh toan" / en: "Payment list component tests"
  */
-import { screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { Payment } from "../../types";
+import { renderWithProviders } from "~/test-utils";
+import { PaymentList } from "../payment-list";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -30,10 +34,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { renderWithProviders } from "~/test-utils";
-import type { Payment } from "../../types";
-import { PaymentList } from "../payment-list";
 
 function makeMockPayment(overrides: Partial<Payment> = {}): Payment {
   const now = Date.now();
@@ -68,9 +68,7 @@ describe("PaymentList", () => {
     renderWithProviders(<PaymentList payments={[]} isLoading={true} />);
 
     // Should not show empty state when loading
-    expect(
-      screen.queryByText("Chua co thanh toan"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Chua co thanh toan")).not.toBeInTheDocument();
   });
 
   it("test_PaymentList_renders_payment_rows", () => {

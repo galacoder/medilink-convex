@@ -37,15 +37,25 @@ export function useAiAssistant(): UseAiAssistantReturn {
   const [error, setError] = useState<string | null>(null);
 
   const queryEquipmentAction = useAction(api.aiAssistant.queryEquipment);
-  const draftServiceRequestAction = useAction(api.aiAssistant.draftServiceRequest);
-  const answerAnalyticsQuestionAction = useAction(api.aiAssistant.answerAnalyticsQuestion);
+  const draftServiceRequestAction = useAction(
+    api.aiAssistant.draftServiceRequest,
+  );
+  const answerAnalyticsQuestionAction = useAction(
+    api.aiAssistant.answerAnalyticsQuestion,
+  );
 
   const queryEquipment = useCallback(
-    async (query: string, organizationId: string): Promise<EquipmentQueryResult> => {
+    async (
+      query: string,
+      organizationId: string,
+    ): Promise<EquipmentQueryResult> => {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await queryEquipmentAction({ query, organizationId }) as {
+        const result = (await queryEquipmentAction({
+          query,
+          organizationId,
+        })) as {
           equipmentIds: string[];
           summary: string;
         };
@@ -65,11 +75,17 @@ export function useAiAssistant(): UseAiAssistantReturn {
   );
 
   const draftServiceRequest = useCallback(
-    async (description: string, organizationId: string): Promise<ServiceRequestDraft> => {
+    async (
+      description: string,
+      organizationId: string,
+    ): Promise<ServiceRequestDraft> => {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await draftServiceRequestAction({ description, organizationId }) as {
+        const result = (await draftServiceRequestAction({
+          description,
+          organizationId,
+        })) as {
           descriptionSuggestion?: string;
           urgency: "high" | "medium" | "low";
         };
@@ -90,11 +106,17 @@ export function useAiAssistant(): UseAiAssistantReturn {
   );
 
   const answerAnalyticsQuestion = useCallback(
-    async (question: string, organizationId: string): Promise<AnalyticsAnswer> => {
+    async (
+      question: string,
+      organizationId: string,
+    ): Promise<AnalyticsAnswer> => {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await answerAnalyticsQuestionAction({ question, organizationId }) as {
+        const result = (await answerAnalyticsQuestionAction({
+          question,
+          organizationId,
+        })) as {
           answer: string;
           dataPoints?: Record<string, unknown>;
         };

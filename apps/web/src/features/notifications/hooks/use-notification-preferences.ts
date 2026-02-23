@@ -13,8 +13,11 @@ import { useCallback } from "react";
 import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 
+import type {
+  NotificationPreferences,
+  UseNotificationPreferencesReturn,
+} from "../types";
 import { useSession } from "~/auth/client";
-import type { NotificationPreferences, UseNotificationPreferencesReturn } from "../types";
 
 /**
  * Hook that returns the current user's notification preferences.
@@ -35,9 +38,14 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     api.notifications.getPreferences,
     userId ? { userId } : "skip",
   );
-  const preferences = rawPreferences as NotificationPreferences | null | undefined;
+  const preferences = rawPreferences as
+    | NotificationPreferences
+    | null
+    | undefined;
 
-  const updatePreferencesMutation = useMutation(api.notifications.updatePreferences);
+  const updatePreferencesMutation = useMutation(
+    api.notifications.updatePreferences,
+  );
 
   const isLoading = rawPreferences === undefined;
 
@@ -49,5 +57,9 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
     [userId, updatePreferencesMutation],
   );
 
-  return { preferences: preferences ?? undefined, isLoading, updatePreferences };
+  return {
+    preferences: preferences ?? undefined,
+    isLoading,
+    updatePreferences,
+  };
 }
