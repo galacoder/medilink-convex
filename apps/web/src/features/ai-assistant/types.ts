@@ -55,9 +55,18 @@ export interface AnalyticsAnswer {
 
 /** Shape returned by the useAiAssistant hook */
 export interface UseAiAssistantReturn {
-  queryEquipment: (query: string, organizationId: string) => Promise<EquipmentQueryResult>;
-  draftServiceRequest: (description: string, organizationId: string) => Promise<ServiceRequestDraft>;
-  answerAnalyticsQuestion: (question: string, organizationId: string) => Promise<AnalyticsAnswer>;
+  queryEquipment: (
+    query: string,
+    organizationId: string,
+  ) => Promise<EquipmentQueryResult>;
+  draftServiceRequest: (
+    description: string,
+    organizationId: string,
+  ) => Promise<ServiceRequestDraft>;
+  answerAnalyticsQuestion: (
+    question: string,
+    organizationId: string,
+  ) => Promise<AnalyticsAnswer>;
   isLoading: boolean;
   error: string | null;
 }

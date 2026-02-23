@@ -236,8 +236,7 @@ export type AiMessage = z.infer<typeof aiMessageSchema>;
  */
 export const createAiConversationSchema = z.object({
   titleVi: z.string().min(1, {
-    message:
-      "Tiêu đề không được để trống (Title cannot be empty)",
+    message: "Tiêu đề không được để trống (Title cannot be empty)",
   }),
   titleEn: z.string().min(1, {
     message:
@@ -248,8 +247,7 @@ export const createAiConversationSchema = z.object({
       "Hội thoại phải có ít nhất một tin nhắn (Conversation must have at least one message)",
   }),
   model: z.string().min(1, {
-    message:
-      "Tên mô hình không được để trống (Model name cannot be empty)",
+    message: "Tên mô hình không được để trống (Model name cannot be empty)",
   }),
 });
 

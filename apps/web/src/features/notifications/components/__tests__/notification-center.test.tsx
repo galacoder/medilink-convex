@@ -9,8 +9,12 @@
  *
  * vi: "Kiểm tra thành phần NotificationCenter" / en: "NotificationCenter component tests"
  */
-import { screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, screen } from "@testing-library/react";
+import { useMutation, useQuery } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderWithProviders } from "~/test-utils";
+import { NotificationCenter } from "../notification-center";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -38,10 +42,6 @@ vi.mock("~/auth/client", () => ({
   })),
 }));
 
-import { useQuery, useMutation } from "convex/react";
-import { renderWithProviders } from "~/test-utils";
-import { NotificationCenter } from "../notification-center";
-
 const mockUseQuery = vi.mocked(useQuery);
 const mockUseMutation = vi.mocked(useMutation);
 
@@ -65,7 +65,9 @@ describe("NotificationCenter", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // WHY: Double cast via unknown avoids ReactMutation type mismatch in tests
-    mockUseMutation.mockReturnValue(vi.fn() as unknown as ReturnType<typeof useMutation>);
+    mockUseMutation.mockReturnValue(
+      vi.fn() as unknown as ReturnType<typeof useMutation>,
+    );
   });
 
   it("test_NotificationCenter_renders_bell_button", () => {
@@ -129,9 +131,7 @@ describe("NotificationCenter", () => {
     });
     fireEvent.click(button);
 
-    expect(
-      screen.getByText("Đánh dấu tất cả đã đọc"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Đánh dấu tất cả đã đọc")).toBeInTheDocument();
   });
 
   it("test_NotificationCenter_english_locale_shows_english_labels", () => {

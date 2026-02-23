@@ -24,8 +24,7 @@ export const paymentStatusSchema = z.enum([
  */
 export const createPaymentSchema = z.object({
   amount: z.number().positive({
-    message:
-      "Số tiền phải lớn hơn 0 (Amount must be greater than 0)",
+    message: "Số tiền phải lớn hơn 0 (Amount must be greater than 0)",
   }),
   currency: z.string().default("VND"),
   descriptionVi: z.string().min(3, {
@@ -45,8 +44,7 @@ export const createPaymentSchema = z.object({
  */
 export const updatePaymentStatusSchema = z.object({
   paymentId: z.string().min(1, {
-    message:
-      "ID thanh toán không được để trống (Payment ID is required)",
+    message: "ID thanh toán không được để trống (Payment ID is required)",
   }),
   status: paymentStatusSchema,
   paidAt: z.number().optional(),
@@ -55,4 +53,6 @@ export const updatePaymentStatusSchema = z.object({
 // TypeScript type inference exports
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
 export type CreatePaymentInput = z.infer<typeof createPaymentSchema>;
-export type UpdatePaymentStatusInput = z.infer<typeof updatePaymentStatusSchema>;
+export type UpdatePaymentStatusInput = z.infer<
+  typeof updatePaymentStatusSchema
+>;

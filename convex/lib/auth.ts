@@ -49,6 +49,20 @@ export interface AuthContext {
   /** Better Auth user subject (matches users._id in Convex). */
   userId: string;
   /**
+   * User email included in the JWT for DB fallback lookups.
+   * WHY: The Better Auth Convex component cannot store custom additionalFields,
+   * so organizationId / platformRole are often null in the JWT. The email lets
+   * requireOrgAuth / requirePlatformAdmin fall back to the custom `users` table.
+   */
+  email: string | null;
+  /**
+   * Convex-recommended secure token identifier from the auth provider JWT.
+   * WHY: Per Convex docs, tokenIdentifier is cryptographically signed and unique
+   * per user+provider — safer than email for DB lookups. Used as primary key
+   * in the by_token index; email (by_email) is the fallback during transition.
+   */
+  tokenIdentifier: string | null;
+  /**
    * The active organization ID embedded in the JWT by Better Auth's Convex
    * plugin. May be null for users without an active organization session.
    */
@@ -93,6 +107,8 @@ export async function requireAuth(
 
   return {
     userId: identity.subject,
+    email: (identity.email as string | null) ?? null,
+    tokenIdentifier: (identity.tokenIdentifier as string | null) ?? null,
     organizationId: (identity.organizationId as string | null) ?? null,
     platformRole: (identity.platformRole as string | null) ?? null,
   };
@@ -112,15 +128,62 @@ export async function requireOrgAuth(
 ): Promise<AuthContext & { organizationId: string }> {
   const auth = await requireAuth(ctx);
 
-  if (!auth.organizationId) {
-    throw new ConvexError({
-      message:
-        "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization before performing this action.)",
-      code: "NO_ACTIVE_ORGANIZATION",
-    });
+  if (auth.organizationId) {
+    return auth as AuthContext & { organizationId: string };
   }
 
-  return auth as AuthContext & { organizationId: string };
+  // JWT fallback: Better Auth Convex component cannot store custom additionalFields
+  // (activeOrganizationId), so organizationId is often null in the JWT.
+  // M6: Dual lookup — try tokenIdentifier first (secure, O(log n)), then
+  // fall back to email index (O(log n)). Backfill tokenIdentifier on match.
+  // WHY tokenIdentifier: per Convex docs, it is a cryptographically signed,
+  // unique identifier — safer than email (which is mutable and optional).
+  let user = null;
+
+  if (auth.tokenIdentifier) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    user = await (ctx.db as any)
+      .query("users")
+      .withIndex("by_token", (q: any) =>
+        q.eq("tokenIdentifier", auth.tokenIdentifier),
+      )
+      .first();
+  }
+
+  if (!user && auth.email) {
+    const emailValue = auth.email; // narrow string | null → string for TS callback
+    user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", emailValue))
+      .first();
+    // Backfill tokenIdentifier for next time (mutation ctx only — queries are read-only).
+    if (user && auth.tokenIdentifier && "patch" in ctx.db) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (ctx.db as any).patch(user._id, {
+        tokenIdentifier: auth.tokenIdentifier,
+      });
+    }
+  }
+
+  if (user) {
+    const membership = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+
+    if (membership) {
+      return {
+        ...auth,
+        organizationId: membership.orgId.toString(),
+      } as AuthContext & { organizationId: string };
+    }
+  }
+
+  throw new ConvexError({
+    message:
+      "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization before performing this action.)",
+    code: "NO_ACTIVE_ORGANIZATION",
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -173,12 +236,12 @@ export async function requireOrgMembership(
 ) {
   const user = await getAuthenticatedUser(ctx);
 
-  // Look up the user in our users table via email match
+  // Look up the user in our users table via by_email index.
   // WHY: authComponent.getAuthUser returns the Better Auth user with email.
-  // We query our users table to get the Convex ID.
+  // We query our users table to get the Convex ID. Uses index to avoid full scan.
   const convexUser = await ctx.db
     .query("users")
-    .filter((q) => q.eq(q.field("email"), user.email))
+    .withIndex("by_email", (q) => q.eq("email", user.email))
     .first();
 
   if (!convexUser) {

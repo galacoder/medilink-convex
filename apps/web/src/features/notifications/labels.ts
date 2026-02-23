@@ -49,7 +49,10 @@ export const notificationLabels = {
       vi: "Báo giá bị từ chối",
       en: "Quote Rejected",
     },
-    service_request_started: { vi: "Dịch vụ đã bắt đầu", en: "Service Started" },
+    service_request_started: {
+      vi: "Dịch vụ đã bắt đầu",
+      en: "Service Started",
+    },
     service_request_completed: {
       vi: "Dịch vụ hoàn thành",
       en: "Service Completed",
@@ -58,7 +61,10 @@ export const notificationLabels = {
     equipment_status_broken: { vi: "Thiết bị hỏng", en: "Equipment Broken" },
     consumable_stock_low: { vi: "Vật tư sắp hết", en: "Low Stock" },
     dispute_new_message: { vi: "Tin nhắn tranh chấp", en: "Dispute Message" },
-    dispute_resolved: { vi: "Tranh chấp đã giải quyết", en: "Dispute Resolved" },
+    dispute_resolved: {
+      vi: "Tranh chấp đã giải quyết",
+      en: "Dispute Resolved",
+    },
   },
 
   // Preferences

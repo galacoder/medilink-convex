@@ -7,7 +7,11 @@
  * vi: "Kiểm tra hook useNotifications" / en: "useNotifications hook tests"
  */
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { useMutation, useQuery } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useNotificationPreferences } from "../use-notification-preferences";
+import { useNotifications } from "../use-notifications";
 
 // Mock convex/react before importing the hooks
 vi.mock("convex/react", () => ({
@@ -35,10 +39,6 @@ vi.mock("~/auth/client", () => ({
   })),
 }));
 
-import { useQuery, useMutation } from "convex/react";
-import { useNotifications } from "../use-notifications";
-import { useNotificationPreferences } from "../use-notification-preferences";
-
 const mockUseQuery = vi.mocked(useQuery);
 const mockUseMutation = vi.mocked(useMutation);
 
@@ -46,7 +46,9 @@ describe("useNotifications", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // WHY: Double cast via unknown avoids ReactMutation type mismatch in tests
-    mockUseMutation.mockReturnValue(vi.fn() as unknown as ReturnType<typeof useMutation>);
+    mockUseMutation.mockReturnValue(
+      vi.fn() as unknown as ReturnType<typeof useMutation>,
+    );
   });
 
   it("test_useNotifications_returns_notifications_array", () => {
@@ -65,7 +67,9 @@ describe("useNotifications", () => {
         _creationTime: Date.now(),
       },
     ];
-    mockUseQuery.mockReturnValue(mockNotifications as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      mockNotifications as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useNotifications());
 
@@ -83,11 +87,49 @@ describe("useNotifications", () => {
 
   it("test_useNotifications_computes_unread_count", () => {
     const mockNotifications = [
-      { _id: "n1", read: false, userId: "u", type: "service_request_new_quote", titleVi: "", titleEn: "", bodyVi: "", bodyEn: "", createdAt: 0, updatedAt: 0, _creationTime: 0 },
-      { _id: "n2", read: true, userId: "u", type: "service_request_new_quote", titleVi: "", titleEn: "", bodyVi: "", bodyEn: "", createdAt: 0, updatedAt: 0, _creationTime: 0 },
-      { _id: "n3", read: false, userId: "u", type: "service_request_new_quote", titleVi: "", titleEn: "", bodyVi: "", bodyEn: "", createdAt: 0, updatedAt: 0, _creationTime: 0 },
+      {
+        _id: "n1",
+        read: false,
+        userId: "u",
+        type: "service_request_new_quote",
+        titleVi: "",
+        titleEn: "",
+        bodyVi: "",
+        bodyEn: "",
+        createdAt: 0,
+        updatedAt: 0,
+        _creationTime: 0,
+      },
+      {
+        _id: "n2",
+        read: true,
+        userId: "u",
+        type: "service_request_new_quote",
+        titleVi: "",
+        titleEn: "",
+        bodyVi: "",
+        bodyEn: "",
+        createdAt: 0,
+        updatedAt: 0,
+        _creationTime: 0,
+      },
+      {
+        _id: "n3",
+        read: false,
+        userId: "u",
+        type: "service_request_new_quote",
+        titleVi: "",
+        titleEn: "",
+        bodyVi: "",
+        bodyEn: "",
+        createdAt: 0,
+        updatedAt: 0,
+        _creationTime: 0,
+      },
     ];
-    mockUseQuery.mockReturnValue(mockNotifications as ReturnType<typeof useQuery>);
+    mockUseQuery.mockReturnValue(
+      mockNotifications as ReturnType<typeof useQuery>,
+    );
 
     const { result } = renderHook(() => useNotifications());
 
@@ -97,7 +139,9 @@ describe("useNotifications", () => {
   it("test_useNotifications_exposes_markRead_function", () => {
     const mockMarkRead = vi.fn();
     mockUseMutation
-      .mockReturnValueOnce(mockMarkRead as unknown as ReturnType<typeof useMutation>)
+      .mockReturnValueOnce(
+        mockMarkRead as unknown as ReturnType<typeof useMutation>,
+      )
       .mockReturnValue(vi.fn() as unknown as ReturnType<typeof useMutation>);
     mockUseQuery.mockReturnValue([] as ReturnType<typeof useQuery>);
 
@@ -119,7 +163,9 @@ describe("useNotificationPreferences", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // WHY: Double cast via unknown avoids ReactMutation type mismatch in tests
-    mockUseMutation.mockReturnValue(vi.fn() as unknown as ReturnType<typeof useMutation>);
+    mockUseMutation.mockReturnValue(
+      vi.fn() as unknown as ReturnType<typeof useMutation>,
+    );
   });
 
   it("test_useNotificationPreferences_returns_preferences", () => {

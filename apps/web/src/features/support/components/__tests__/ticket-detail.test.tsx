@@ -10,7 +10,11 @@
  * vi: "Kiem tra chi tiet phieu ho tro" / en: "Ticket detail component tests"
  */
 import { screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { SupportTicketWithDetails } from "../../types";
+import { renderWithProviders } from "~/test-utils";
+import { TicketDetail } from "../ticket-detail";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -31,10 +35,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { renderWithProviders } from "~/test-utils";
-import type { SupportTicketWithDetails } from "../../types";
-import { TicketDetail } from "../ticket-detail";
 
 function makeMockTicketWithDetails(
   overrides: Partial<SupportTicketWithDetails> = {},

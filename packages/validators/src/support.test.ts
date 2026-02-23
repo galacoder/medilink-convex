@@ -23,7 +23,9 @@ describe("supportTicketStatusSchema", () => {
 
   it("test_supportTicketStatusSchema_rejects_invalid_status", () => {
     expect(supportTicketStatusSchema.safeParse("pending").success).toBe(false);
-    expect(supportTicketStatusSchema.safeParse("escalated").success).toBe(false);
+    expect(supportTicketStatusSchema.safeParse("escalated").success).toBe(
+      false,
+    );
     expect(supportTicketStatusSchema.safeParse("").success).toBe(false);
   });
 });
@@ -35,7 +37,9 @@ describe("supportTicketPrioritySchema", () => {
   it("test_supportTicketPrioritySchema_accepts_all_valid_priorities", () => {
     const valid = ["low", "medium", "high", "critical"] as const;
     for (const priority of valid) {
-      expect(supportTicketPrioritySchema.safeParse(priority).success).toBe(true);
+      expect(supportTicketPrioritySchema.safeParse(priority).success).toBe(
+        true,
+      );
     }
   });
 
@@ -58,12 +62,16 @@ describe("supportTicketCategorySchema", () => {
       "other",
     ] as const;
     for (const category of valid) {
-      expect(supportTicketCategorySchema.safeParse(category).success).toBe(true);
+      expect(supportTicketCategorySchema.safeParse(category).success).toBe(
+        true,
+      );
     }
   });
 
   it("test_supportTicketCategorySchema_rejects_invalid_category", () => {
-    expect(supportTicketCategorySchema.safeParse("support").success).toBe(false);
+    expect(supportTicketCategorySchema.safeParse("support").success).toBe(
+      false,
+    );
     expect(supportTicketCategorySchema.safeParse("bug").success).toBe(false);
   });
 });

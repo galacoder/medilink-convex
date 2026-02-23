@@ -11,8 +11,11 @@
  *
  * vi: "Kiem tra tai anh len vat tu" / en: "Photo upload component tests"
  */
-import { screen, fireEvent, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { renderWithProviders } from "~/test-utils";
+import { PhotoUpload } from "../PhotoUpload";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -34,16 +37,13 @@ vi.mock("convex/_generated/api", () => ({
   },
 }));
 
-import { renderWithProviders } from "~/test-utils";
-import { PhotoUpload } from "../PhotoUpload";
-
 /**
  * WHY: Both non-nullable-type-assertion-style (prefers `!` over `as T`) and
  * no-non-null-assertion (forbids `!`) are active in this project. For querying
  * the hidden file input in tests, we centralize the single disable here.
  */
 // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-const getFileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement;
+const getFileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement; // prettier-ignore
 
 describe("PhotoUpload", () => {
   let mockOnUpload: ReturnType<typeof vi.fn>;
@@ -124,9 +124,7 @@ describe("PhotoUpload", () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Loai tep khong hop le/),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Loai tep khong hop le/)).toBeInTheDocument();
     });
 
     // onUpload should NOT have been called

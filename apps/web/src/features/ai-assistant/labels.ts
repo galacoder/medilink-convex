@@ -9,7 +9,10 @@ export const aiAssistantLabels = {
   floatingButton: { vi: "Trợ lý AI", en: "AI Assistant" },
 
   // Portal-specific titles
-  hospitalTitle: { vi: "Trợ lý thiết bị y tế", en: "Medical Equipment Assistant" },
+  hospitalTitle: {
+    vi: "Trợ lý thiết bị y tế",
+    en: "Medical Equipment Assistant",
+  },
   providerTitle: { vi: "Trợ lý nhà cung cấp", en: "Provider Assistant" },
 
   // Placeholder texts for sidebar input

@@ -78,8 +78,7 @@ export const updateSupportTicketSchema = createSupportTicketSchema.partial();
  */
 export const updateSupportTicketStatusSchema = z.object({
   ticketId: z.string().min(1, {
-    message:
-      "ID phiếu hỗ trợ không được để trống (Ticket ID is required)",
+    message: "ID phiếu hỗ trợ không được để trống (Ticket ID is required)",
   }),
   status: supportTicketStatusSchema,
 });
@@ -90,12 +89,10 @@ export const updateSupportTicketStatusSchema = z.object({
  */
 export const createSupportMessageSchema = z.object({
   ticketId: z.string().min(1, {
-    message:
-      "ID phiếu hỗ trợ không được để trống (Ticket ID is required)",
+    message: "ID phiếu hỗ trợ không được để trống (Ticket ID is required)",
   }),
   contentVi: z.string().min(1, {
-    message:
-      "Nội dung không được để trống (Content cannot be empty)",
+    message: "Nội dung không được để trống (Content cannot be empty)",
   }),
   contentEn: z.string().optional(),
   attachmentUrls: z
@@ -111,8 +108,12 @@ export const createSupportMessageSchema = z.object({
 export type SupportTicketStatus = z.infer<typeof supportTicketStatusSchema>;
 export type SupportTicketPriority = z.infer<typeof supportTicketPrioritySchema>;
 export type SupportTicketCategory = z.infer<typeof supportTicketCategorySchema>;
-export type CreateSupportTicketInput = z.infer<typeof createSupportTicketSchema>;
-export type UpdateSupportTicketInput = z.infer<typeof updateSupportTicketSchema>;
+export type CreateSupportTicketInput = z.infer<
+  typeof createSupportTicketSchema
+>;
+export type UpdateSupportTicketInput = z.infer<
+  typeof updateSupportTicketSchema
+>;
 export type UpdateSupportTicketStatusInput = z.infer<
   typeof updateSupportTicketStatusSchema
 >;

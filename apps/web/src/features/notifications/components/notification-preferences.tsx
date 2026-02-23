@@ -14,9 +14,9 @@ import { useCallback, useState } from "react";
 import { Button } from "@medilink/ui/button";
 import { Checkbox } from "@medilink/ui/checkbox";
 
+import type { NotificationType } from "../types";
 import { useNotificationPreferences } from "../hooks/use-notification-preferences";
 import { notificationLabels } from "../labels";
-import type { NotificationType } from "../types";
 
 interface NotificationPreferencesProps {
   locale?: "vi" | "en";
@@ -63,9 +63,12 @@ export function NotificationPreferences({
     [localPrefs, preferences],
   );
 
-  const handleToggle = useCallback((type: NotificationType, enabled: boolean) => {
-    setLocalPrefs((prev) => ({ ...prev, [type]: enabled }));
-  }, []);
+  const handleToggle = useCallback(
+    (type: NotificationType, enabled: boolean) => {
+      setLocalPrefs((prev) => ({ ...prev, [type]: enabled }));
+    },
+    [],
+  );
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -103,7 +106,9 @@ export function NotificationPreferences({
       <div className="space-y-3">
         {PREFERENCE_TYPES.map((type) => {
           const typeEntry =
-            notificationLabels.types[type as keyof typeof notificationLabels.types];
+            notificationLabels.types[
+              type as keyof typeof notificationLabels.types
+            ];
           const label = typeEntry[locale];
           const enabled = getPreferenceValue(type);
 

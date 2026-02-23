@@ -59,9 +59,7 @@ export function NotificationItem({
   }
 
   const readLabel =
-    locale === "vi"
-      ? notificationLabels.read.vi
-      : notificationLabels.read.en;
+    locale === "vi" ? notificationLabels.read.vi : notificationLabels.read.en;
   const unreadLabel =
     locale === "vi"
       ? notificationLabels.unread.vi

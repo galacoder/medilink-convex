@@ -166,108 +166,108 @@ async function globalSetup(_config: FullConfig): Promise<void> {
         "[global-setup] Valid admin fixture found — skipping admin user creation.",
       );
     } else {
-    /* eslint-disable no-restricted-properties */
-    const nextPublicConvexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
-    const convexSiteUrl =
-      nextPublicConvexSiteUrl ?? process.env.CONVEX_SITE_URL;
-    /* eslint-enable no-restricted-properties */
-    // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
-    const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
+      /* eslint-disable no-restricted-properties */
+      const nextPublicConvexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
+      const convexSiteUrl =
+        nextPublicConvexSiteUrl ?? process.env.CONVEX_SITE_URL;
+      /* eslint-enable no-restricted-properties */
+      // eslint-disable-next-line turbo/no-undeclared-env-vars, no-restricted-properties
+      const adminSetupSecret = process.env.ADMIN_SETUP_SECRET;
 
-    if (!convexSiteUrl || !adminSetupSecret) {
-      console.warn(
-        "[global-setup] Skipping admin user setup: NEXT_PUBLIC_CONVEX_SITE_URL and ADMIN_SETUP_SECRET must be set.\n" +
-          "  Set these in .env.local to enable admin E2E tests.",
-      );
-      // Create empty placeholder so admin fixture doesn't crash
-      fs.writeFileSync(
-        "./e2e/.auth/admin.json",
-        JSON.stringify({ cookies: [], origins: [] }),
-      );
-    } else {
-      const adminContext = await browser.newContext();
-      const adminPage = await adminContext.newPage();
-
-      // Step 1: Sign up admin user via the standard form
-      // The form requires orgType + orgName — we use hospital as placeholder
-      await adminPage.goto(`${baseURL}/sign-up`);
-      // WHY: Wait for the form to be ready before interacting. The sign-up page
-      // is a Client Component that hydrates after initial page load, so we
-      // wait for the name input to be visible before filling.
-      await adminPage.waitForSelector("#name", {
-        state: "visible",
-        timeout: 60000,
-      });
-      await adminPage.fill("#name", ADMIN_USER.name);
-      await adminPage.fill("#email", ADMIN_USER.email);
-      await adminPage.fill("#password", ADMIN_USER.password);
-      await adminPage.click(`#${ADMIN_USER.orgType}`);
-      await adminPage.fill("#orgName", ADMIN_USER.orgName);
-      await adminPage.click('button[type="submit"]');
-      // After signup, the proxy routes based on orgType (hospital) -> hospital/dashboard
-      // Then we sign out immediately — we just needed the Better Auth account created
-      await adminPage.waitForURL("**/hospital/dashboard", { timeout: 20000 });
-
-      // Step 2: Sign out to clear the hospital session cookie
-      // WHY: We need a clean session before re-signing in with the admin role set
-      await adminPage.goto(`${baseURL}/sign-out`);
-      // Better Auth sign-out — use the API route
-      await adminPage.request.post(`${baseURL}/api/auth/sign-out`, {
-        headers: { "Content-Type": "application/json" },
-      });
-      // Navigate to sign-in to verify we're logged out
-      await adminPage.goto(`${baseURL}/sign-in`);
-      await adminPage
-        .waitForURL(`${baseURL}/sign-in`, { timeout: 10000 })
-        .catch(() => {
-          // Some proxies might redirect — just continue
-        });
-
-      // Step 3: Call the Convex HTTP endpoint to set platformRole
-      // WHY: The Better Auth session for this user currently has no platformRole.
-      // Calling this endpoint updates BOTH our custom users table AND the
-      // Better Auth user record (via betterAuth.adapter.updateMany), so that
-      // the next sign-in will return platformRole in the session.
-      const setPlatformRoleUrl = `${convexSiteUrl}/api/admin/set-platform-role`;
-      const setPlatformRoleResponse = await adminPage.request.post(
-        setPlatformRoleUrl,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-setup-secret": adminSetupSecret,
-          },
-          data: JSON.stringify({
-            email: ADMIN_USER.email,
-            role: "platform_admin",
-          }),
-        },
-      );
-
-      if (!setPlatformRoleResponse.ok()) {
-        const errorText = await setPlatformRoleResponse.text();
-        throw new Error(
-          `[global-setup] Failed to set platform role for admin user: ${errorText}`,
+      if (!convexSiteUrl || !adminSetupSecret) {
+        console.warn(
+          "[global-setup] Skipping admin user setup: NEXT_PUBLIC_CONVEX_SITE_URL and ADMIN_SETUP_SECRET must be set.\n" +
+            "  Set these in .env.local to enable admin E2E tests.",
         );
+        // Create empty placeholder so admin fixture doesn't crash
+        fs.writeFileSync(
+          "./e2e/.auth/admin.json",
+          JSON.stringify({ cookies: [], origins: [] }),
+        );
+      } else {
+        const adminContext = await browser.newContext();
+        const adminPage = await adminContext.newPage();
+
+        // Step 1: Sign up admin user via the standard form
+        // The form requires orgType + orgName — we use hospital as placeholder
+        await adminPage.goto(`${baseURL}/sign-up`);
+        // WHY: Wait for the form to be ready before interacting. The sign-up page
+        // is a Client Component that hydrates after initial page load, so we
+        // wait for the name input to be visible before filling.
+        await adminPage.waitForSelector("#name", {
+          state: "visible",
+          timeout: 60000,
+        });
+        await adminPage.fill("#name", ADMIN_USER.name);
+        await adminPage.fill("#email", ADMIN_USER.email);
+        await adminPage.fill("#password", ADMIN_USER.password);
+        await adminPage.click(`#${ADMIN_USER.orgType}`);
+        await adminPage.fill("#orgName", ADMIN_USER.orgName);
+        await adminPage.click('button[type="submit"]');
+        // After signup, the proxy routes based on orgType (hospital) -> hospital/dashboard
+        // Then we sign out immediately — we just needed the Better Auth account created
+        await adminPage.waitForURL("**/hospital/dashboard", { timeout: 20000 });
+
+        // Step 2: Sign out to clear the hospital session cookie
+        // WHY: We need a clean session before re-signing in with the admin role set
+        await adminPage.goto(`${baseURL}/sign-out`);
+        // Better Auth sign-out — use the API route
+        await adminPage.request.post(`${baseURL}/api/auth/sign-out`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        // Navigate to sign-in to verify we're logged out
+        await adminPage.goto(`${baseURL}/sign-in`);
+        await adminPage
+          .waitForURL(`${baseURL}/sign-in`, { timeout: 10000 })
+          .catch(() => {
+            // Some proxies might redirect — just continue
+          });
+
+        // Step 3: Call the Convex HTTP endpoint to set platformRole
+        // WHY: The Better Auth session for this user currently has no platformRole.
+        // Calling this endpoint updates BOTH our custom users table AND the
+        // Better Auth user record (via betterAuth.adapter.updateMany), so that
+        // the next sign-in will return platformRole in the session.
+        const setPlatformRoleUrl = `${convexSiteUrl}/api/admin/set-platform-role`;
+        const setPlatformRoleResponse = await adminPage.request.post(
+          setPlatformRoleUrl,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-admin-setup-secret": adminSetupSecret,
+            },
+            data: JSON.stringify({
+              email: ADMIN_USER.email,
+              role: "platform_admin",
+            }),
+          },
+        );
+
+        if (!setPlatformRoleResponse.ok()) {
+          const errorText = await setPlatformRoleResponse.text();
+          throw new Error(
+            `[global-setup] Failed to set platform role for admin user: ${errorText}`,
+          );
+        }
+
+        // Step 4: Sign in again to get a fresh session with platformRole
+        // WHY: The old session doesn't include platformRole. A fresh sign-in
+        // will trigger a new JWT with the updated platformRole field,
+        // which the proxy reads to route to /admin/dashboard.
+        await adminPage.goto(`${baseURL}/sign-in`);
+        await adminPage.fill("#email", ADMIN_USER.email);
+        await adminPage.fill("#password", ADMIN_USER.password);
+        await adminPage.click('button[type="submit"]');
+
+        // Step 5: Wait for proxy to route admin to /admin/dashboard (Branch 2)
+        // WHY: The proxy reads platformRole from Better Auth session and redirects
+        // platform_admin users to /admin/dashboard.
+        await adminPage.waitForURL("**/admin/dashboard", { timeout: 20000 });
+
+        // Step 6: Save storageState for use by admin test fixtures
+        await adminContext.storageState({ path: "./e2e/.auth/admin.json" });
+        await adminContext.close();
       }
-
-      // Step 4: Sign in again to get a fresh session with platformRole
-      // WHY: The old session doesn't include platformRole. A fresh sign-in
-      // will trigger a new JWT with the updated platformRole field,
-      // which the proxy reads to route to /admin/dashboard.
-      await adminPage.goto(`${baseURL}/sign-in`);
-      await adminPage.fill("#email", ADMIN_USER.email);
-      await adminPage.fill("#password", ADMIN_USER.password);
-      await adminPage.click('button[type="submit"]');
-
-      // Step 5: Wait for proxy to route admin to /admin/dashboard (Branch 2)
-      // WHY: The proxy reads platformRole from Better Auth session and redirects
-      // platform_admin users to /admin/dashboard.
-      await adminPage.waitForURL("**/admin/dashboard", { timeout: 20000 });
-
-      // Step 6: Save storageState for use by admin test fixtures
-      await adminContext.storageState({ path: "./e2e/.auth/admin.json" });
-      await adminContext.close();
-    }
     } // end else (!adminFixtureValid)
   } finally {
     await browser.close();

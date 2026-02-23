@@ -41,7 +41,7 @@ export const getOrganization = query({
     // Find the user record by email
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -78,7 +78,7 @@ export const getUserContext = query({
     // (e.g., seeded user + provisioned user both with the same email)
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .first();
     if (!user) return null;
 
@@ -148,7 +148,7 @@ export const getOrganizationBySlug = query({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) return null;
@@ -185,7 +185,7 @@ export const listOrganizationMembers = query({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -241,7 +241,7 @@ export const getOrganizationStats = query({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -292,7 +292,7 @@ export const updateOrganization = mutation({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -376,7 +376,7 @@ export const updateMemberRole = mutation({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -469,7 +469,7 @@ export const removeMember = mutation({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {

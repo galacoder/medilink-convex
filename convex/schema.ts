@@ -82,12 +82,20 @@ export default defineSchema({
     platformRole: v.optional(
       v.union(v.literal("platform_admin"), v.literal("platform_support")),
     ),
+    // M6: Convex-recommended secure user identifier (tokenIdentifier pattern).
+    // Per Convex docs, tokenIdentifier is a cryptographically signed, unique
+    // string from the auth provider — safer than email for DB lookups.
+    // Optional: existing users are backfilled on their next auth call.
+    tokenIdentifier: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     // M5-6: Performance indexes — avoid full table scans on auth lookups
     // by_email: used by Better Auth adapter to look up user by email on sign-in
     .index("by_email", ["email"])
+    // M6: by_token: primary secure lookup index (tokenIdentifier from JWT)
+    // Backfilled gradually as users authenticate; falls back to by_email during transition.
+    .index("by_token", ["tokenIdentifier"])
     // by_platform_role: used by admin queries to list platform_admin/platform_support users
     .index("by_platform_role", ["platformRole"]),
 

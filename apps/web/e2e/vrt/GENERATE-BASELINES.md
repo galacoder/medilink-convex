@@ -2,14 +2,14 @@
 
 ## Current Status
 
-| Spec File | Tests | Baselines Captured | Config Used |
-|-----------|-------|--------------------|-------------|
-| `visual.spec.ts` | 3 | 3 (complete) | `playwright.config.vrt.ts` |
-| `auth/auth-vrt.spec.ts` | 7 | 7 (complete) | `playwright.config.vrt.ts` |
-| `portal-visual.spec.ts` | 3 | 3 (complete) | `playwright.config.portal-vrt.ts` |
-| `hospital/hospital-vrt.spec.ts` | 17 | 17 (complete) | `playwright.config.portal-vrt.ts` |
-| `provider/provider-vrt.spec.ts` | 14 | 14 (complete) | `playwright.config.portal-vrt.ts` |
-| `platform-admin/platform-admin-vrt.spec.ts` | 10 | **10 (complete)** | `playwright.config.portal-vrt.ts` |
+| Spec File                                   | Tests | Baselines Captured | Config Used                       |
+| ------------------------------------------- | ----- | ------------------ | --------------------------------- |
+| `visual.spec.ts`                            | 3     | 3 (complete)       | `playwright.config.vrt.ts`        |
+| `auth/auth-vrt.spec.ts`                     | 7     | 7 (complete)       | `playwright.config.vrt.ts`        |
+| `portal-visual.spec.ts`                     | 3     | 3 (complete)       | `playwright.config.portal-vrt.ts` |
+| `hospital/hospital-vrt.spec.ts`             | 17    | 17 (complete)      | `playwright.config.portal-vrt.ts` |
+| `provider/provider-vrt.spec.ts`             | 14    | 14 (complete)      | `playwright.config.portal-vrt.ts` |
+| `platform-admin/platform-admin-vrt.spec.ts` | 10    | **10 (complete)**  | `playwright.config.portal-vrt.ts` |
 
 **Total**: 54 baselines captured (all complete ✅)
 
@@ -46,12 +46,14 @@ __snapshots__/platform-admin/platform-admin-vrt.spec.ts/   (10 files)
 ## Prerequisites
 
 1. **Convex dev server** running in a separate terminal:
+
    ```bash
    cd /home/sangle/dev/medilink-convex
    npx convex dev
    ```
 
 2. **Next.js dev server** running on port 3002 (port 3000 occupied by Dokploy on homelab):
+
    ```bash
    cd /home/sangle/dev/medilink-convex
    PORT=3002 pnpm dev:web
@@ -85,6 +87,7 @@ PORT=3002 pnpm vrt:portal:update
 ```
 
 This runs `playwright.config.portal-vrt.ts` with `--update-snapshots` against:
+
 - `portal-visual.spec.ts` (2 screenshots — legacy dashboard baselines)
 - `hospital/hospital-vrt.spec.ts` (17 screenshots)
 - `provider/provider-vrt.spec.ts` (14 screenshots)
@@ -113,6 +116,7 @@ cd apps/web && PORT=3002 pnpm vrt:all
 ## Expected Snapshot Locations
 
 The `snapshotPathTemplate` in `playwright.config.portal-vrt.ts` is:
+
 ```
 {testDir}/__snapshots__/{testFilePath}/{arg}{ext}
 ```
@@ -171,31 +175,37 @@ e2e/vrt/__snapshots__/platform-admin/platform-admin-vrt.spec.ts/
 ## Notes
 
 ### Admin Portal Tests
+
 Admin VRT tests skip gracefully when `ADMIN_SETUP_SECRET` is not set. The tests use
 `test.skip()` with the message "Admin not configured — ADMIN_SETUP_SECRET not set"
 rather than failing hard. This means the 10 admin tests will show as "skipped" in CI
 if the env var is missing.
 
 ### Authentication Fixtures
+
 The `globalSetup` at `e2e/global-setup.ts` creates `e2e/.auth/hospital.json`,
 `e2e/.auth/provider.json`, and `e2e/.auth/admin.json` before portal VRT tests run.
 These fixtures store browser cookies/localStorage for pre-authenticated sessions,
 avoiding the full 3-step sign-up flow for each test.
 
 ### Port Configuration
+
 The root `.env` sets `PORT=3000` (for CI). On homelab, `.env.local` overrides with `PORT=3002`
 (Dokploy occupies port 3000). The `with-env-local` script loads both files with `--override`, so
 `.env.local` takes precedence. **Do not pass `PORT=3002` explicitly** — it's now handled by `.env.local`.
+
 ```bash
 pnpm vrt:portal:update        # homelab: uses PORT=3002 from .env.local
 pnpm vrt:portal:update        # CI: uses PORT=3000 from .env (no .env.local)
 ```
 
 ### Animations
+
 All VRT specs disable CSS animations/transitions via `page.addStyleTag()` before
 each test to prevent animated loaders and transitions from causing pixel diffs.
 
 ### Dynamic Content Masking
+
 Tests mask elements with `[data-testid="timestamp"]`, `[data-testid="avatar"]`, and
 `time` elements to prevent dynamic content from causing false-positive failures.
 See `e2e/vrt/fixtures/vrt-helpers.ts` for the `DYNAMIC_CONTENT_MASKS` constants.

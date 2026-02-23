@@ -22,8 +22,8 @@ import { CopilotSidebar } from "@copilotkit/react-ui";
 
 import "@copilotkit/react-ui/styles.css";
 
-import { aiAssistantLabels } from "../labels";
 import type { AiAssistantPortal } from "../types";
+import { aiAssistantLabels } from "../labels";
 
 interface AIAssistantWidgetProps {
   /** Which portal the widget is embedded in (affects system prompt + suggestions) */

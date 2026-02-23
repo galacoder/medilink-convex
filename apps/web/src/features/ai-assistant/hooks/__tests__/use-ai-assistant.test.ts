@@ -7,7 +7,10 @@
  * vi: "Kiểm tra hook useAiAssistant" / en: "useAiAssistant hook tests"
  */
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { useAction } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useAiAssistant } from "../use-ai-assistant";
 
 // Mock convex/react before importing the hook
 vi.mock("convex/react", () => ({
@@ -26,9 +29,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { useAction } from "convex/react";
-import { useAiAssistant } from "../use-ai-assistant";
 
 const mockUseAction = vi.mocked(useAction);
 

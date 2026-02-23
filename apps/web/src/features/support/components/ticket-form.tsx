@@ -92,7 +92,10 @@ export function TicketForm({ onSuccess, onCancel }: TicketFormProps) {
     }
   }
 
-  const isValid = subjectVi.trim().length >= 3 && descriptionVi.trim().length >= 10 && category !== "";
+  const isValid =
+    subjectVi.trim().length >= 3 &&
+    descriptionVi.trim().length >= 10 &&
+    category !== "";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -158,9 +161,7 @@ export function TicketForm({ onSuccess, onCancel }: TicketFormProps) {
 
       {/* Priority */}
       <div className="space-y-1.5">
-        <Label htmlFor="priority">
-          {supportLabels.form.priorityLabel.vi}
-        </Label>
+        <Label htmlFor="priority">{supportLabels.form.priorityLabel.vi}</Label>
         <Select
           value={priority}
           onValueChange={(val) => setPriority(val as SupportTicketPriority)}

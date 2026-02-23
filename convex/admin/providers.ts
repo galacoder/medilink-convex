@@ -39,6 +39,8 @@ import { createAuditLogEntry } from "../lib/auditLog";
  */
 async function requirePlatformAdmin(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
 }): Promise<{ userId: string }> {
   const identity = await ctx.auth.getUserIdentity();
 
@@ -52,15 +54,29 @@ async function requirePlatformAdmin(ctx: {
 
   const platformRole = identity.platformRole as string | null | undefined;
 
-  if (platformRole !== "platform_admin") {
-    throw new ConvexError({
-      message:
-        "Chỉ quản trị viên nền tảng mới có quyền thực hiện thao tác này. (Only platform administrators can perform this action.)",
-      code: "FORBIDDEN",
-    });
+  if (platformRole === "platform_admin") {
+    return { userId: identity.subject as string };
   }
 
-  return { userId: identity.subject as string };
+  // JWT fallback: Better Auth Convex component cannot store platformRole.
+  // Look it up from the custom `users` table using email from the JWT.
+  const email = identity.email as string | null | undefined;
+  if (email) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", email))
+      .first();
+    if (user?.platformRole === "platform_admin") {
+      return { userId: identity.subject as string };
+    }
+  }
+
+  throw new ConvexError({
+    message:
+      "Chỉ quản trị viên nền tảng mới có quyền thực hiện thao tác này. (Only platform administrators can perform this action.)",
+    code: "FORBIDDEN",
+  });
 }
 
 // ---------------------------------------------------------------------------

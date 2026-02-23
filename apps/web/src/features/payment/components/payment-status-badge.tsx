@@ -15,8 +15,7 @@ import { paymentLabels } from "../labels";
 const statusColorMap: Record<PaymentStatus, string> = {
   pending:
     "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200",
-  completed:
-    "bg-green-100 text-green-800 hover:bg-green-100 border-green-200",
+  completed: "bg-green-100 text-green-800 hover:bg-green-100 border-green-200",
   failed: "bg-red-100 text-red-800 hover:bg-red-100 border-red-200",
   refunded:
     "bg-purple-100 text-purple-800 hover:bg-purple-100 border-purple-200",

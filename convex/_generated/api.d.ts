@@ -18,7 +18,9 @@ import type * as analytics from "../analytics.js";
 import type * as auth from "../auth.js";
 import type * as automation_automationLog from "../automation/automationLog.js";
 import type * as automation_rules from "../automation/rules.js";
+import type * as consumablePhotos from "../consumablePhotos.js";
 import type * as consumables from "../consumables.js";
+import type * as crons from "../crons.js";
 import type * as disputes from "../disputes.js";
 import type * as equipment from "../equipment.js";
 import type * as http from "../http.js";
@@ -33,6 +35,7 @@ import type * as memberships from "../memberships.js";
 import type * as notifications from "../notifications.js";
 import type * as orgActions from "../orgActions.js";
 import type * as organizations from "../organizations.js";
+import type * as payment from "../payment.js";
 import type * as providers from "../providers.js";
 import type * as qrCodes from "../qrCodes.js";
 import type * as quotes from "../quotes.js";
@@ -44,6 +47,7 @@ import type * as seedData_users from "../seedData/users.js";
 import type * as seedHelpers from "../seedHelpers.js";
 import type * as serviceRatings from "../serviceRatings.js";
 import type * as serviceRequests from "../serviceRequests.js";
+import type * as support from "../support.js";
 import type * as userActions from "../userActions.js";
 
 import type {
@@ -63,7 +67,9 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "automation/automationLog": typeof automation_automationLog;
   "automation/rules": typeof automation_rules;
+  consumablePhotos: typeof consumablePhotos;
   consumables: typeof consumables;
+  crons: typeof crons;
   disputes: typeof disputes;
   equipment: typeof equipment;
   http: typeof http;
@@ -78,6 +84,7 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   orgActions: typeof orgActions;
   organizations: typeof organizations;
+  payment: typeof payment;
   providers: typeof providers;
   qrCodes: typeof qrCodes;
   quotes: typeof quotes;
@@ -89,6 +96,7 @@ declare const fullApi: ApiFromModules<{
   seedHelpers: typeof seedHelpers;
   serviceRatings: typeof serviceRatings;
   serviceRequests: typeof serviceRequests;
+  support: typeof support;
   userActions: typeof userActions;
 }>;
 

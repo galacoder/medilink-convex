@@ -6,8 +6,11 @@
  *
  * vi: "Kiem tra hook danh sach phieu ho tro" / en: "Support tickets hook tests"
  */
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
+import { useQuery } from "convex/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { useMyTickets, useSupportTickets } from "../use-support-tickets";
 
 // Mock convex/react
 vi.mock("convex/react", () => ({
@@ -28,9 +31,6 @@ vi.mock("convex/_generated/api", () => ({
     },
   },
 }));
-
-import { useQuery } from "convex/react";
-import { useSupportTickets, useMyTickets } from "../use-support-tickets";
 
 const mockUseQuery = vi.mocked(useQuery);
 
@@ -94,10 +94,9 @@ describe("useSupportTickets", () => {
     renderHook(() => useSupportTickets("open"));
 
     // Verify useQuery was called with the status filter
-    expect(mockUseQuery).toHaveBeenCalledWith(
-      expect.anything(),
-      { status: "open" },
-    );
+    expect(mockUseQuery).toHaveBeenCalledWith(expect.anything(), {
+      status: "open",
+    });
   });
 
   it("test_useSupportTickets_passes_empty_object_without_filter", () => {

@@ -69,8 +69,37 @@ export default function SignUpPage() {
     });
 
     if (signUpResult.error) {
-      setError(labels.errorGeneric.vi);
+      // Detect 422 (email already registered) and show bilingual message.
+      // WHY: Better Auth returns 422 when the email already exists. Generic error
+      // messages don't tell the user what to do. Guide them to sign in instead.
+      const isUserExists =
+        signUpResult.error.status === 422 ||
+        (signUpResult.error.message ?? "")
+          .toLowerCase()
+          .includes("already exist") ||
+        (signUpResult.error.message ?? "")
+          .toLowerCase()
+          .includes("email_taken");
+      setError(
+        isUserExists
+          ? "Email này đã được đăng ký. Vui lòng đăng nhập. (Email already registered. Please sign in.)"
+          : labels.errorGeneric.vi,
+      );
       setIsLoading(false);
+      return;
+    }
+
+    // Step 1.5: Check if this user is a platform admin — admins skip org creation.
+    // WHY: Seeded platform admins have platformRole in our custom users table but
+    // have no org. /api/auth/init detects platformRole and routes directly to
+    // /admin/dashboard. Regular new users get a non-admin URL so we fall through
+    // to org creation as normal.
+    const initRes = await fetch("/api/auth/init", {
+      credentials: "include",
+      redirect: "follow",
+    });
+    if (initRes.url.includes("/admin/")) {
+      window.location.href = "/admin/dashboard";
       return;
     }
 
