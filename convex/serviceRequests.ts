@@ -437,6 +437,8 @@ export const declineRequest = mutation({
  */
 async function localRequireOrgAuth(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
 }): Promise<{ userId: string; organizationId: Id<"organizations"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
@@ -446,18 +448,41 @@ async function localRequireOrgAuth(ctx: {
       code: "UNAUTHENTICATED",
     });
   }
-  const organizationId = identity.organizationId as Id<"organizations"> | null;
-  if (!organizationId) {
-    throw new ConvexError({
-      message:
-        "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization.)",
-      code: "NO_ACTIVE_ORGANIZATION",
-    });
+
+  const jwtOrgId = identity.organizationId as Id<"organizations"> | null;
+  if (jwtOrgId) {
+    return { userId: identity.subject as string, organizationId: jwtOrgId };
   }
-  return {
-    userId: identity.subject as string,
-    organizationId,
-  };
+
+  // JWT fallback: Better Auth Convex component cannot store activeOrganizationId.
+  // Look up the user's org membership from the database using email from JWT.
+  const email = identity.email as string | null | undefined;
+  if (email) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", email))
+      .first();
+    if (user) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const membership = await ctx.db
+        .query("organizationMemberships")
+        .withIndex("by_user", (q: any) => q.eq("userId", user._id))
+        .first();
+      if (membership) {
+        return {
+          userId: identity.subject as string,
+          organizationId: membership.orgId as Id<"organizations">,
+        };
+      }
+    }
+  }
+
+  throw new ConvexError({
+    message:
+      "Không tìm thấy tổ chức. Vui lòng chọn tổ chức trước khi thực hiện thao tác này. (Organization not found. Please select an organization.)",
+    code: "NO_ACTIVE_ORGANIZATION",
+  });
 }
 
 /**

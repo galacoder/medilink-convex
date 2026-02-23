@@ -21,22 +21,38 @@ const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
  *
  * Production: SITE_URL is set to the production domain so only that domain is trusted.
  */
-const trustedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [siteUrl]
-    : [
-        siteUrl,
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3002",
-        "http://192.168.2.18:3000", // homelab network access
-        "http://192.168.2.18:3001",
-        "http://192.168.2.18:3002",
-        "http://192.168.2.18:3003",
-      ];
+// WHY: Convex always runs NODE_ENV="production" and CONVEX_DEPLOYMENT is a local
+// CLI variable not available in the function runtime. Instead, detect production
+// via SITE_URL: in dev it's unset (defaults to localhost); in production it's
+// explicitly set to the production domain via `npx convex env set SITE_URL`.
+const isProduction =
+  !!process.env.SITE_URL &&
+  !process.env.SITE_URL.startsWith("http://localhost");
+
+const trustedOrigins = isProduction
+  ? [siteUrl]
+  : [
+      siteUrl,
+      // localhost ports 3000-3006 (Next.js auto-increments past occupied ports)
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:3003",
+      "http://localhost:3004",
+      "http://localhost:3005",
+      "http://localhost:3006",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3002",
+      "http://127.0.0.1:3005",
+      // homelab LAN access (192.168.2.18)
+      "http://192.168.2.18:3000",
+      "http://192.168.2.18:3001",
+      "http://192.168.2.18:3002",
+      "http://192.168.2.18:3003",
+      "http://192.168.2.18:3004",
+      "http://192.168.2.18:3005",
+      "http://192.168.2.18:3006",
+    ];
 
 /**
  * The Better Auth component client.
@@ -117,6 +133,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) =>
             user: Record<string, unknown>;
             session: Record<string, unknown>;
           }) => ({
+            // Email included for DB fallback lookups in requireOrgAuth / requirePlatformAdmin.
+            // WHY: The Better Auth Convex component schema cannot store custom additionalFields
+            // (platformRole, activeOrganizationId, activeOrgType). When these are null, Convex
+            // query helpers fall back to looking up the user in our custom `users` table by email.
+            email: (user.email as string) ?? null,
             // Active organization ID for org-scoped Convex queries
             organizationId: (user.activeOrganizationId as string) ?? null,
             // Organization type for portal routing validation

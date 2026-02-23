@@ -53,10 +53,13 @@ export const createOrganization = mutation({
     const now = Date.now();
 
     // 2. Check slug uniqueness
+    // WHY: .first() instead of .unique() — seed may create organizations before
+    // the user signs up, so multiple code paths can write the same slug.
+    // .unique() throws on duplicates; .first() returns the existing record safely.
     const existing = await ctx.db
       .query("organizations")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
-      .unique();
+      .first();
 
     if (existing !== null) {
       throw new ConvexError(
@@ -68,10 +71,14 @@ export const createOrganization = mutation({
     //    WHY: Users signing up via Better Auth don't automatically get a
     //    record in our business-layer `users` table. We create it here on
     //    first org creation if it doesn't already exist.
+    // WHY: .first() instead of .unique() — seed may create a custom users record
+    // before the user signs up via Better Auth. If both paths insert for the same
+    // email, .unique() throws. .first() is already used in getUserContext for the
+    // same reason.
     let userId = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
-      .unique()
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
+      .first()
       .then((u) => u?._id ?? null);
 
     if (userId === null) {

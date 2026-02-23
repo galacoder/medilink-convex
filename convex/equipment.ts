@@ -21,18 +21,62 @@ import { assertTransition } from "./lib/statusMachine";
  */
 async function requireAuth(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
 }): Promise<{ subject: string; organizationId: Id<"organizations"> }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     throw new ConvexError("Không có quyền truy cập (Not authenticated)");
   }
-  const organizationId = identity.organizationId as Id<"organizations"> | null;
-  if (!organizationId) {
-    throw new ConvexError(
-      "Không tìm thấy tổ chức trong phiên đăng nhập (No active organization in session)",
-    );
+
+  const jwtOrgId = identity.organizationId as Id<"organizations"> | null;
+  if (jwtOrgId) {
+    return { subject: identity.subject as string, organizationId: jwtOrgId };
   }
-  return { subject: identity.subject as string, organizationId };
+
+  // JWT fallback: Better Auth Convex component cannot store activeOrganizationId.
+  // M6: Dual lookup — try tokenIdentifier first (secure), then email index (fallback).
+  const tokenIdentifier = identity.tokenIdentifier as string | null | undefined;
+  const email = identity.email as string | null | undefined;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let user: any = null;
+
+  if (tokenIdentifier) {
+    user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q: any) => q.eq("tokenIdentifier", tokenIdentifier))
+      .first();
+  }
+
+  if (!user && email) {
+    user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", email))
+      .first();
+    // Backfill tokenIdentifier for next time (mutation ctx only).
+    if (user && tokenIdentifier && "patch" in ctx.db) {
+      await (ctx.db as any).patch(user._id, { tokenIdentifier });
+    }
+  }
+
+  if (user) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const membership = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_user", (q: any) => q.eq("userId", user._id))
+      .first();
+    if (membership) {
+      return {
+        subject: identity.subject as string,
+        organizationId: membership.orgId as Id<"organizations">,
+      };
+    }
+  }
+
+  throw new ConvexError(
+    "Không tìm thấy tổ chức trong phiên đăng nhập (No active organization in session)",
+  );
 }
 
 // ===========================================================================
@@ -422,11 +466,12 @@ export const updateStatus = mutation({
       updatedAt: now,
     });
 
-    // Find performer user record by Better Auth subject (sub claim = user ID)
-    // For history tracking, we look up the user by subject
+    // Find performer user record for history tracking.
+    // WHY: `subject` here may be the JWT subject (email in this auth config).
+    // Uses by_email index to avoid full scan.
     const performerUser = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), subject))
+      .withIndex("by_email", (q: any) => q.eq("email", subject))
       .first();
 
     // If user not found, we still create history but need a valid user ID

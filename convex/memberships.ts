@@ -37,7 +37,7 @@ export const listMembers = query({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {
@@ -97,7 +97,7 @@ export const getMember = query({
 
     const user = await ctx.db
       .query("users")
-      .filter((q) => q.eq(q.field("email"), authUser.email))
+      .withIndex("by_email", (q) => q.eq("email", authUser.email))
       .unique();
 
     if (!user) {

@@ -16,9 +16,9 @@
 
 import { v } from "convex/values";
 
-import { internal } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalQuery } from "./_generated/server";
 import {
   ALL_SEED_CONSUMABLES,
   ALL_SEED_EQUIPMENT,
@@ -930,6 +930,181 @@ export const seedServiceRequestData = internalMutation({
     }
 
     return { requestIds, quoteIds };
+  },
+});
+
+// ---------------------------------------------------------------------------
+// seedAuthAccounts: Cleans up stale Better Auth records for all seeded users.
+// Entry point: npx convex run seed:seedAuthAccounts
+//
+// WHY: Run this BEFORE the local sign-up script to remove stale BA accounts
+// that would block re-registration (especially admin@medilink.vn which may have
+// a leftover BA account from a previous session).
+//
+// STEP 1 (this action): npx convex run seed:seedAuthAccounts
+// STEP 2 (local script): bash scripts/seed-auth-accounts.sh
+//
+// NOTE: The HTTP sign-up must run locally (not from Convex cloud) because
+// Convex cloud cannot reach localhost:3002. Run the companion shell script
+// from your local machine after this action completes.
+// ---------------------------------------------------------------------------
+
+export const seedAuthAccounts = action({
+  args: {},
+  handler: async (ctx): Promise<{ email: string; status: string }[]> => {
+    const SEED_EMAILS = [
+      "admin@medilink.vn",
+      "lan.tran@spmet.edu.vn",
+      "duc.pham@spmet.edu.vn",
+      "mai.vo@spmet.edu.vn",
+      "minh.le@techmed.vn",
+      "anh.hoang@techmed.vn",
+    ];
+
+    const results: { email: string; status: string }[] = [];
+
+    for (const email of SEED_EMAILS) {
+      // Find and delete existing BA user record (if any) so sign-up always works.
+      // WHY: admin@medilink.vn may have a stale BA account from a previous session.
+      // findOne is used (not findMany) to avoid pagination complexity.
+      const existingUser = (await ctx.runQuery(
+        components.betterAuth.adapter.findOne,
+        {
+          model: "user",
+          where: [{ field: "email", operator: "eq", value: email }],
+        },
+      )) as { _id: string } | null;
+
+      if (existingUser !== null) {
+        const baUserId = existingUser._id;
+        // Delete credential account records (contain hashed password)
+        await ctx.runMutation(components.betterAuth.adapter.deleteMany, {
+          input: {
+            model: "account",
+            where: [{ field: "userId", operator: "eq", value: baUserId }],
+          },
+          paginationOpts: { cursor: null, numItems: 100 },
+        });
+        // Delete active sessions
+        await ctx.runMutation(components.betterAuth.adapter.deleteMany, {
+          input: {
+            model: "session",
+            where: [{ field: "userId", operator: "eq", value: baUserId }],
+          },
+          paginationOpts: { cursor: null, numItems: 100 },
+        });
+        // Delete the BA user record itself
+        await ctx.runMutation(components.betterAuth.adapter.deleteMany, {
+          input: {
+            model: "user",
+            where: [{ field: "email", operator: "eq", value: email }],
+          },
+          paginationOpts: { cursor: null, numItems: 10 },
+        });
+        console.log(`Cleaned BA record for: ${email}`);
+        results.push({ email, status: "cleaned" });
+      } else {
+        console.log(`No BA record found for: ${email}`);
+        results.push({ email, status: "not_found" });
+      }
+    }
+
+    console.log("\nNext step: run 'bash scripts/seed-auth-accounts.sh'");
+    console.log("to register credentials via http://localhost:3002");
+    console.log(
+      "Then run: npx convex run seed:seedOrgContext to set active org on each user",
+    );
+    return results;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// seedOrgContext: Sets activeOrganizationId + activeOrgType on each org user's
+// Better Auth record so the Convex JWT includes org context.
+//
+// WHY: seed-auth-accounts.sh creates Better Auth credentials via sign-up, but
+// sign-up doesn't set activeOrganizationId/activeOrgType (those fields are set
+// when a user creates or joins an org via the UI). For seeded users we must
+// update these fields manually after sign-up so queries that call requireOrgAuth
+// receive a JWT with organizationId.
+//
+// Entry point: npx convex run seed:seedOrgContext
+// Run AFTER: bash scripts/seed-auth-accounts.sh
+// ---------------------------------------------------------------------------
+
+export const seedOrgContext = action({
+  args: {},
+  handler: async (ctx): Promise<{ email: string; status: string }[]> => {
+    // Resolve org IDs from organizations table
+    const hospitalOrg = await ctx.runQuery(
+      internal.seed.findOrgBySlugInternal,
+      { slug: "spmet-hospital" },
+    ) as { _id: string; org_type: string } | null;
+
+    const providerOrg = await ctx.runQuery(
+      internal.seed.findOrgBySlugInternal,
+      { slug: "techmed-services" },
+    ) as { _id: string; org_type: string } | null;
+
+    if (!hospitalOrg || !providerOrg) {
+      throw new Error(
+        "Seed orgs not found. Run `npx convex run seed:default` first.",
+      );
+    }
+
+    // Map: email → { activeOrganizationId, activeOrgType }
+    const orgUserMap: Record<string, { orgId: string; orgType: string }> = {
+      "lan.tran@spmet.edu.vn": {
+        orgId: hospitalOrg._id,
+        orgType: "hospital",
+      },
+      "duc.pham@spmet.edu.vn": {
+        orgId: hospitalOrg._id,
+        orgType: "hospital",
+      },
+      "mai.vo@spmet.edu.vn": { orgId: hospitalOrg._id, orgType: "hospital" },
+      "minh.le@techmed.vn": { orgId: providerOrg._id, orgType: "provider" },
+      "anh.hoang@techmed.vn": { orgId: providerOrg._id, orgType: "provider" },
+    };
+
+    const results: { email: string; status: string }[] = [];
+
+    for (const [email, { orgId, orgType }] of Object.entries(orgUserMap)) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await ctx.runMutation(components.betterAuth.adapter.updateMany, {
+          input: {
+            model: "user",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            update: {
+              activeOrganizationId: orgId,
+              activeOrgType: orgType,
+            } as any,
+            where: [{ field: "email", operator: "eq", value: email }],
+          },
+          paginationOpts: { cursor: null, numItems: 1 },
+        } as any);
+        console.log(`Set org context for ${email}: orgId=${orgId} type=${orgType}`);
+        results.push({ email, status: `ok (${orgType})` });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`Failed to set org context for ${email}: ${msg}`);
+        results.push({ email, status: `error: ${msg}` });
+      }
+    }
+
+    return results;
+  },
+});
+
+// Internal query helper for seedOrgContext to find an org by slug.
+export const findOrgBySlugInternal = internalQuery({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    return ctx.db
+      .query("organizations")
+      .filter((q) => q.eq(q.field("slug"), args.slug))
+      .first();
   },
 });
 

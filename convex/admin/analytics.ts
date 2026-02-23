@@ -49,7 +49,7 @@ interface PlatformAuthContext {
  */
 async function localRequireAuth(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
-}): Promise<PlatformAuthContext> {
+}): Promise<PlatformAuthContext & { email: string | null }> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) {
     throw new ConvexError({
@@ -60,13 +60,15 @@ async function localRequireAuth(ctx: {
   }
   return {
     userId: identity.subject as string,
+    email: (identity.email as string | null) ?? null,
     platformRole: (identity.platformRole as string | null) ?? null,
   };
 }
 
 /**
  * Asserts the caller has platformRole === "platform_admin".
- * Throws a bilingual ConvexError if not.
+ * Falls back to the custom `users` table when JWT lacks platformRole
+ * (Better Auth Convex component cannot store custom additionalFields).
  *
  * WHY: All platformAdmin.analytics.* queries share the same authorization guard.
  * Without this, any authenticated user could query cross-tenant platform data.
@@ -75,18 +77,35 @@ async function localRequireAuth(ctx: {
  */
 async function requirePlatformAdmin(ctx: {
   auth: { getUserIdentity: () => Promise<Record<string, unknown> | null> };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any;
 }): Promise<PlatformAuthContext> {
   const auth = await localRequireAuth(ctx);
-  if (auth.platformRole !== "platform_admin") {
-    throw new ConvexError({
-      code: "FORBIDDEN",
-      // vi: "Chỉ quản trị viên nền tảng mới có quyền truy cập"
-      // en: "Only platform admins can access this resource"
-      message:
-        "Chỉ quản trị viên nền tảng mới có quyền truy cập (Only platform admins can access this resource)",
-    });
+
+  if (auth.platformRole === "platform_admin") {
+    return auth;
   }
-  return auth;
+
+  // JWT fallback: Better Auth Convex component cannot store platformRole.
+  // Look it up from the custom `users` table using email from the JWT.
+  if (auth.email) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q: any) => q.eq("email", auth.email))
+      .first();
+    if (user?.platformRole === "platform_admin") {
+      return { userId: auth.userId, platformRole: "platform_admin" };
+    }
+  }
+
+  throw new ConvexError({
+    code: "FORBIDDEN",
+    // vi: "Chỉ quản trị viên nền tảng mới có quyền truy cập"
+    // en: "Only platform admins can access this resource"
+    message:
+      "Chỉ quản trị viên nền tảng mới có quyền truy cập (Only platform admins can access this resource)",
+  });
 }
 
 // ---------------------------------------------------------------------------
