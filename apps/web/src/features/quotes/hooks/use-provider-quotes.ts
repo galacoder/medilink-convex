@@ -7,8 +7,9 @@
  * returns typed ProviderQuote[] including the joined service request summary.
  * Real-time via Convex useQuery — updates when hospitals accept/reject quotes.
  */
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { ProviderQuote, QuoteDashboardStats, QuoteStatus } from "../types";
 

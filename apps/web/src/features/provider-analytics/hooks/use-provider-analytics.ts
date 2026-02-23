@@ -8,8 +8,9 @@
  *
  * vi: "Hook tải dữ liệu phân tích nhà cung cấp" / en: "Provider analytics data hook"
  */
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 export interface ProviderAnalyticsSummary {
   // Revenue

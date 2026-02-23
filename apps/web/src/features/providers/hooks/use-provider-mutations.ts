@@ -8,8 +8,9 @@
  * maintaining clean feature boundaries and making mutations easy to mock
  * in tests.
  */
-import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 // Convex codegen does not include providers namespace in the worktree
 // until `npx convex codegen` is run with a live deployment. The `as any`

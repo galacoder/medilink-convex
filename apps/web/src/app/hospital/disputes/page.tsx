@@ -1,10 +1,10 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
 import Link from "next/link";
 import { AlertCircleIcon } from "lucide-react";
 
+import type { Id } from "@medilink/db/dataModel";
 import { Button } from "@medilink/ui/button";
 import {
   Dialog,

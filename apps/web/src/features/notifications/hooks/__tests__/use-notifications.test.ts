@@ -20,7 +20,7 @@ vi.mock("convex/react", () => ({
 }));
 
 // Mock the Convex generated API so api.notifications is defined
-vi.mock("convex/_generated/api", () => ({
+vi.mock("@medilink/db/api", () => ({
   api: {
     notifications: {
       listForUser: "notifications:listForUser",

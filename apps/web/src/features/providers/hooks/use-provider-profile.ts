@@ -7,8 +7,9 @@
  * a single composable hook. Returns combined loading state so components
  * don't need to handle two separate loading flags.
  */
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { Certification, ProviderProfile } from "../types";
 

@@ -4,7 +4,9 @@ import { baseConfig } from "@medilink/eslint-config/base";
 
 export default defineConfig(
   {
-    ignores: ["dist/**"],
+    // convex/** has its own tsconfig and linting requirements;
+    // it is linted separately via packages/db/convex/tsconfig.json
+    ignores: ["dist/**", "convex/**"],
   },
   baseConfig,
 );

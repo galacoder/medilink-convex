@@ -7,11 +7,12 @@
  * with typed callbacks and real loading state. Components call these hooks instead
  * of calling useMutation() directly, keeping mutation logic out of UI components.
  */
-import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
-import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
+
+import type { Id } from "@medilink/db/dataModel";
+import { api } from "@medilink/db/api";
 
 export interface SubmitQuoteArgs {
   serviceRequestId: Id<"serviceRequests">;

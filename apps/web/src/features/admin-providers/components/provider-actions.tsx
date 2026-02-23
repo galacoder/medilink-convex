@@ -1,8 +1,8 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
 import { useState } from "react";
 
+import type { Id } from "@medilink/db/dataModel";
 import { Button } from "@medilink/ui/button";
 import {
   Dialog,

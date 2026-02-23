@@ -10,9 +10,9 @@
  * Only shows available and in_use equipment (damaged/retired not shown since
  * they may already have service requests or be decommissioned).
  */
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
 
+import { api } from "@medilink/db/api";
 import {
   Select,
   SelectContent,

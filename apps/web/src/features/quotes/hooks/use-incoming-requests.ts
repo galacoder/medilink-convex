@@ -8,8 +8,9 @@
  * reactivity — the UI updates automatically when hospital creates a new request
  * or a request status changes.
  */
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type { IncomingServiceRequest, ServiceRequestStatus } from "../types";
 

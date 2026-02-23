@@ -9,7 +9,7 @@ import { QROfflineFallback, QRScanner } from "~/features/qr-scan";
 
 // TODO(M3): Uncomment once `npx convex dev` generates types
 // import { useMutation } from "convex/react";
-// import { api } from "convex/_generated/api";
+// import { api } from "@medilink/db/api";
 
 /**
  * Mobile-first QR code scanner page at /hospital/scan.

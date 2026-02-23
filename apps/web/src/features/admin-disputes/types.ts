@@ -4,7 +4,7 @@
  *
  * vi: "Kiểu dữ liệu cho quản trị tranh chấp" / en: "Admin dispute arbitration types"
  */
-import type { Doc, Id } from "convex/_generated/dataModel";
+import type { Doc, Id } from "@medilink/db/dataModel";
 
 // Base document types
 export type Dispute = Doc<"disputes">;

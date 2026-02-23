@@ -9,12 +9,12 @@
  *
  * vi: "Hành động quản lý bệnh viện" / en: "Hospital management actions"
  */
-import type { Id } from "convex/_generated/dataModel";
 import type { FunctionReference } from "convex/server";
 import { useState } from "react";
-import { api } from "convex/_generated/api";
 import { useMutation } from "convex/react";
 
+import type { Id } from "@medilink/db/dataModel";
+import { api } from "@medilink/db/api";
 import { Button } from "@medilink/ui/button";
 import {
   Dialog,

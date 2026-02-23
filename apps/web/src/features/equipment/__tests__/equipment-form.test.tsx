@@ -10,7 +10,7 @@ vi.mock("convex/react", () => ({
   useMutation: () => vi.fn().mockResolvedValue("new-id"),
 }));
 
-vi.mock("convex/_generated/api", () => ({
+vi.mock("@medilink/db/api", () => ({
   api: {
     equipment: {
       create: "mock:equipment:create",

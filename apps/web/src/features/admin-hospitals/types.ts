@@ -6,7 +6,7 @@
  *
  * vi: "Kiểu dữ liệu quản lý bệnh viện" / en: "Hospital management types"
  */
-import type { Id } from "convex/_generated/dataModel";
+import type { Id } from "@medilink/db/dataModel";
 
 // Hospital status type — managed by platform_admin
 export type HospitalStatus = "active" | "suspended" | "trial";

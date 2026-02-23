@@ -11,8 +11,9 @@
  * en: "Hospital list hook — Platform Admin"
  */
 import type { FunctionReference } from "convex/server";
-import { api } from "convex/_generated/api";
 import { useQuery } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type {
   HospitalFilters,

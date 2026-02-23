@@ -11,8 +11,9 @@
  * vi: "Hook tương tác với trợ lý AI" / en: "Hook for AI assistant interactions"
  */
 import { useCallback, useState } from "react";
-import { api } from "convex/_generated/api";
 import { useAction } from "convex/react";
+
+import { api } from "@medilink/db/api";
 
 import type {
   AnalyticsAnswer,

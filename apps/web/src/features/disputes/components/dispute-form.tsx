@@ -1,11 +1,11 @@
 "use client";
 
-import type { Id } from "convex/_generated/dataModel";
 import type { FunctionReference } from "convex/server";
 import { useState } from "react";
-import { api } from "convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 
+import type { Id } from "@medilink/db/dataModel";
+import { api } from "@medilink/db/api";
 import { Button } from "@medilink/ui/button";
 import { Label } from "@medilink/ui/label";
 import {

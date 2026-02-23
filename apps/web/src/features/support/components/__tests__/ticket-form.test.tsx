@@ -23,7 +23,7 @@ vi.mock("convex/react", () => ({
 }));
 
 // Mock the Convex generated API
-vi.mock("convex/_generated/api", () => ({
+vi.mock("@medilink/db/api", () => ({
   api: {
     support: {
       create: "support:create",
