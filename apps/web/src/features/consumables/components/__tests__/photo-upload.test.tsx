@@ -43,8 +43,7 @@ vi.mock("convex/_generated/api", () => ({
  * the hidden file input in tests, we centralize the single disable here.
  */
 // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-const getFileInput = () =>
-  document.querySelector('input[type="file"]') as HTMLInputElement;
+const getFileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement; // prettier-ignore
 
 describe("PhotoUpload", () => {
   let mockOnUpload: ReturnType<typeof vi.fn>;
