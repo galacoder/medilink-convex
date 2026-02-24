@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 
 import { useActiveOrganization } from "~/auth/client";
 import { EquipmentForm } from "~/features/equipment/components/equipment-form";

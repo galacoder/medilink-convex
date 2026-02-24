@@ -10,7 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { MonthlyRevenue } from "../types";
 
@@ -36,8 +36,8 @@ export function useProviderRevenue(
   const { providerId, months = 6 } = options;
 
   const data = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.analytics.getProviderRevenueByMonth as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).analytics.getProviderRevenueByMonth,
     providerId ? { providerId, months } : "skip",
   ) as MonthlyRevenue[] | undefined;
 

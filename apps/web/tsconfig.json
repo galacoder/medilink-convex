@@ -5,15 +5,13 @@
     "jsx": "preserve",
     "paths": {
       "~/*": ["./src/*"],
-      "@medilink/db/api": [
-        "./src/__mocks__/convex-api-typed.ts",
-        "../../packages/db/convex/_generated/api"
-      ],
-      "@medilink/db/dataModel": [
-        "../../packages/db/convex/_generated/dataModel"
-      ]
+      "@medilink/backend": ["../../packages/backend/src/index.ts"]
     },
-    "plugins": [{ "name": "next" }]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [".", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

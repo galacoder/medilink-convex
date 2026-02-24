@@ -13,7 +13,7 @@
 import { useCallback, useState } from "react";
 import { useAction } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type {
   AnalyticsAnswer,

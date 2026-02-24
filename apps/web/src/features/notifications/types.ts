@@ -3,7 +3,7 @@
  *
  * vi: "Kiểu TypeScript cho module thông báo" / en: "TypeScript types for notifications module"
  */
-import type { Doc } from "@medilink/db/dataModel";
+import type { Doc } from "@medilink/backend";
 
 /** Notification document from Convex */
 export type NotificationItem = Doc<"notifications">;

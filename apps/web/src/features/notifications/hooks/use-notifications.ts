@@ -12,9 +12,10 @@
 import { useCallback } from "react";
 import { useMutation, useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 
-import type { NotificationItem, UseNotificationsReturn } from "../types";
+import type { UseNotificationsReturn } from "../types";
 import { useSession } from "~/auth/client";
 
 /**
@@ -33,12 +34,10 @@ export function useNotifications(): UseNotificationsReturn {
   const userId = session?.user.id;
 
   // Reactive Convex query — skipped until session loads
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const rawNotifications = useQuery(
+  const notifications = useQuery(
     api.notifications.listForUser,
     userId ? { userId } : "skip",
   );
-  const notifications = rawNotifications as NotificationItem[] | undefined;
 
   const markReadMutation = useMutation(api.notifications.markRead);
   const markAllReadMutation = useMutation(api.notifications.markAllRead);
@@ -48,18 +47,16 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      await (
-        markReadMutation as (args: { notificationId: string }) => Promise<void>
-      )({ notificationId });
+      await markReadMutation({
+        notificationId: notificationId as Id<"notifications">,
+      });
     },
     [markReadMutation],
   );
 
   const markAllRead = useCallback(async () => {
     if (!userId) return;
-    await (markAllReadMutation as (args: { userId: string }) => Promise<void>)({
-      userId,
-    });
+    await markAllReadMutation({ userId });
   }, [userId, markAllReadMutation]);
 
   return { notifications, isLoading, unreadCount, markRead, markAllRead };

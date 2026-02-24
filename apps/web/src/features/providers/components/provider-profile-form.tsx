@@ -10,7 +10,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
@@ -20,8 +20,8 @@ import { providerLabels } from "../labels";
 
 // Convex codegen does not include providers namespace locally -- cast is safe,
 // all argument shapes are validated by the Convex schema.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-const providersApi = api.providers as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const providersApi = (api as any).providers;
 
 interface ProviderProfileFormProps {
   profile: ProviderProfile | null;

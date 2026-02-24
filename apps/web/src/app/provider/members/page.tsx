@@ -10,7 +10,7 @@ import {
 import { Skeleton } from "@medilink/ui/skeleton";
 
 import type { OrgMember, OrgRole } from "~/components/members-table";
-import { useActiveOrganization } from "~/auth/client";
+import { organization, useActiveOrganization } from "~/auth/client";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { MembersTable } from "~/components/members-table";
 import { settingsLabels } from "~/lib/i18n/settings-labels";
@@ -45,14 +45,18 @@ export default function ProviderMembersPage() {
       throw new Error("Không tìm thấy tổ chức (Organization not found)");
     }
 
-    const response = await fetch("/api/trpc/organization.inviteMember", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, role }),
+    // WHY: Better Auth organization plugin exposes inviteMembers() directly on
+    // the client, replacing the removed tRPC organization.inviteMember procedure.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const result = await (organization as any).inviteMembers({
+      organizationId: activeOrg.id,
+      invitees: [{ email, role }],
     });
 
-    if (!response.ok) {
-      throw new Error(settingsLabels.invite.error.vi);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (result.error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+      throw new Error(result.error.message ?? settingsLabels.invite.error.vi);
     }
   }
 

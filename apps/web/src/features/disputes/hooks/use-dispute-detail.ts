@@ -3,14 +3,14 @@
 import type { FunctionReference } from "convex/server";
 import { useQuery } from "convex/react";
 
-import type { Id } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 
 import type { DisputeMessageWithAuthor, DisputeWithDetails } from "../types";
 
 // Cast the api reference to avoid noUncheckedIndexedAccess issues with AnyApi stub.
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const disputesApi = api.disputes as any;
+const disputesApi = (api as any).disputes;
 type QueryRef = FunctionReference<"query">;
 const getByIdFn: QueryRef = disputesApi.getById;
 const getMessagesFn: QueryRef = disputesApi.getMessages;

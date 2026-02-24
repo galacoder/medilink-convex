@@ -9,7 +9,7 @@
  *
  * vi: "Danh sách thông báo có cuộn" / en: "Scrollable notification list"
  */
-import type { Doc } from "@medilink/db/dataModel";
+import type { Doc } from "@medilink/backend";
 import { ScrollArea } from "@medilink/ui/scroll-area";
 import { Skeleton } from "@medilink/ui/skeleton";
 

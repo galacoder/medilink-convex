@@ -13,7 +13,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { ServiceRequest } from "../types";
 import { useActiveOrganization } from "~/auth/client";

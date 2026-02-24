@@ -8,7 +8,17 @@
  * Tests use vi.mock("convex/react") to mock useQuery/useMutation, so
  * the actual function references just need to be distinguishable strings.
  * The vitest.config.ts alias points here, keeping tests compatible.
+ *
+ * Also exports Doc and Id type stubs so test files that import
+ * `import type { Doc, Id } from "@medilink/backend"` compile correctly.
  */
+
+export type Doc<T extends string> = {
+  _id: Id<T>;
+  _creationTime: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} & Record<string, any>;
+export type Id<T extends string> = string & { __tableName: T };
 
 export const api = {
   serviceRequests: {

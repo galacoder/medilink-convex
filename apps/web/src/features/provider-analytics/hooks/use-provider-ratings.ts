@@ -10,7 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { ProviderRatings } from "../types";
 
@@ -34,8 +34,8 @@ export function useProviderRatings(
   const { providerId } = options;
 
   const data = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.analytics.getProviderRatings as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).analytics.getProviderRatings,
     providerId ? { providerId } : "skip",
   ) as ProviderRatings | undefined;
 

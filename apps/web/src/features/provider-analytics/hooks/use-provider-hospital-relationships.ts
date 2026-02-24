@@ -10,7 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { HospitalRelationship } from "../types";
 
@@ -36,8 +36,8 @@ export function useProviderHospitalRelationships(
   const { providerId, limit = 10 } = options;
 
   const data = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.analytics.getProviderHospitalRelationships as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).analytics.getProviderHospitalRelationships,
     providerId ? { providerId, limit } : "skip",
   ) as HospitalRelationship[] | undefined;
 

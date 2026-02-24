@@ -20,7 +20,7 @@ vi.mock("convex/react", () => ({
 }));
 
 // Mock the Convex generated API so api.aiAssistant is defined
-vi.mock("@medilink/db/api", () => ({
+vi.mock("@medilink/backend", () => ({
   api: {
     aiAssistant: {
       queryEquipment: "aiAssistant:queryEquipment",

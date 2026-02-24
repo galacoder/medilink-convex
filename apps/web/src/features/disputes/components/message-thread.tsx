@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { SendIcon } from "lucide-react";
 
-import type { Id } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 import { Textarea } from "@medilink/ui/textarea";
@@ -16,7 +16,7 @@ import { useDisputeMessages } from "../hooks/use-dispute-detail";
 import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const disputesApi = api.disputes as any;
+const disputesApi = (api as any).disputes;
 const addMessageFn: FunctionReference<"mutation"> = disputesApi.addMessage;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 

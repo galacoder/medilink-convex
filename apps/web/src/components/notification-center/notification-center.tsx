@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Bell } from "lucide-react";
 
-import type { Doc } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import { Separator } from "@medilink/ui/separator";
@@ -64,7 +64,7 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
   const notifications = useQuery(
     api.notifications.listForUser,
     userId ? { userId } : "skip",
-  ) as Doc<"notifications">[] | undefined;
+  );
 
   // Mutations
   const markReadMutation = useMutation(api.notifications.markRead);
@@ -75,7 +75,9 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
 
   const handleMarkRead = useCallback(
     async (notificationId: string) => {
-      await markReadMutation({ notificationId });
+      await markReadMutation({
+        notificationId: notificationId as Id<"notifications">,
+      });
     },
     [markReadMutation],
   );

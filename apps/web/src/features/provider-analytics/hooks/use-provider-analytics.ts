@@ -10,7 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 export interface ProviderAnalyticsSummary {
   // Revenue
@@ -53,8 +53,8 @@ export function useProviderAnalytics(
   const { providerId, dateRange, customStartDate, customEndDate } = options;
 
   const summary = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.analytics.getProviderSummary as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).analytics.getProviderSummary,
     providerId
       ? { providerId, dateRange, customStartDate, customEndDate }
       : "skip",

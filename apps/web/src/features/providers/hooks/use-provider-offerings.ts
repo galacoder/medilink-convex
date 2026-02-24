@@ -9,7 +9,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { ServiceOffering } from "../types";
 
@@ -33,8 +33,8 @@ export function useProviderOfferings(
   // Convex codegen does not include providers namespace locally -- cast is safe,
   // all argument shapes are validated by the Convex schema.
   const offerings = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.providers.listServiceOfferings as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).providers.listServiceOfferings,
     organizationId ? { organizationId } : "skip",
   ) as ServiceOffering[] | undefined;
 

@@ -4,8 +4,8 @@ import type { PaginatedQueryReference } from "convex/react";
 import type { FunctionReference } from "convex/server";
 import { usePaginatedQuery, useQuery } from "convex/react";
 
-import type { Id } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 
 import type { Equipment } from "../types";
 

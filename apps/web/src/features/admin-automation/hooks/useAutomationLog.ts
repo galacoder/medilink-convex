@@ -10,7 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type {
   AutomationLogEntry,
@@ -33,7 +33,8 @@ export function useAutomationLog(
   limit = 100,
 ): AutomationLogEntry[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
-  return useQuery(api.automation.automationLog.listAutomationLogs, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  return useQuery((api as any).automation.automationLog.listAutomationLogs, {
     ruleName,
     limit,
   }) as AutomationLogEntry[] | undefined;
@@ -51,7 +52,9 @@ export function useAutomationLog(
  */
 export function useAutomationRuleStatus(): AutomationRuleStatus[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
-  return useQuery(api.automation.automationLog.getAutomationRuleStatus, {}) as
-    | AutomationRuleStatus[]
-    | undefined;
+  return useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).automation.automationLog.getAutomationRuleStatus,
+    {},
+  ) as AutomationRuleStatus[] | undefined;
 }

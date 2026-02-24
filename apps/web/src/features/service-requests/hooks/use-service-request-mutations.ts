@@ -14,7 +14,8 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 
 import type { CreateServiceRequestInput } from "../types";
 
@@ -46,9 +47,12 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
 
   const createMutation = useMutation(api.serviceRequests.create);
   const cancelMutation = useMutation(api.serviceRequests.cancel);
-  const acceptMutation = useMutation(api.quotes.accept);
-  const rejectMutation = useMutation(api.quotes.reject);
-  const rateMutation = useMutation(api.serviceRatings.create);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  const acceptMutation = useMutation((api.quotes as any).accept);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  const rejectMutation = useMutation((api.quotes as any).reject);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  const rateMutation = useMutation((api as any).serviceRatings.create);
 
   async function createRequest(
     input: CreateServiceRequestInput,
@@ -56,8 +60,8 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
     setIsCreating(true);
     try {
       return (await createMutation({
-        organizationId: input.organizationId,
-        equipmentId: input.equipmentId,
+        organizationId: input.organizationId as Id<"organizations">,
+        equipmentId: input.equipmentId as Id<"equipment">,
         type: input.type,
         priority: input.priority,
         descriptionVi: input.descriptionVi,
@@ -72,7 +76,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function cancelRequest(id: string): Promise<void> {
     setIsCancelling(true);
     try {
-      await cancelMutation({ id });
+      await cancelMutation({ id: id as Id<"serviceRequests"> });
     } finally {
       setIsCancelling(false);
     }
@@ -81,7 +85,8 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function acceptQuote(quoteId: string): Promise<void> {
     setIsAccepting(true);
     try {
-      await acceptMutation({ id: quoteId });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await acceptMutation({ id: quoteId as Id<"quotes"> });
     } finally {
       setIsAccepting(false);
     }
@@ -90,7 +95,8 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function rejectQuote(quoteId: string): Promise<void> {
     setIsRejecting(true);
     try {
-      await rejectMutation({ id: quoteId });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      await rejectMutation({ id: quoteId as Id<"quotes"> });
     } finally {
       setIsRejecting(false);
     }
@@ -100,8 +106,9 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
     serviceRequestId: string,
     data: RatingInput,
   ): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await rateMutation({
-      serviceRequestId,
+      serviceRequestId: serviceRequestId as Id<"serviceRequests">,
       rating: data.rating,
       serviceQuality: data.serviceQuality,
       timeliness: data.timeliness,

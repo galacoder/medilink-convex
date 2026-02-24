@@ -8,7 +8,6 @@ import { Toaster } from "@medilink/ui/toast";
 import { ConvexClientProvider } from "~/app/convex-client-provider";
 import { env } from "~/env";
 import { getToken } from "~/lib/convex";
-import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/styles.css";
 
@@ -66,7 +65,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       >
         <ThemeProvider>
           <ConvexClientProvider initialToken={initialToken}>
-            <TRPCReactProvider>{props.children}</TRPCReactProvider>
+            {props.children}
           </ConvexClientProvider>
           <Toaster />
         </ThemeProvider>

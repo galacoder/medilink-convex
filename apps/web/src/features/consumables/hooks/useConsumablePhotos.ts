@@ -3,7 +3,7 @@
 import type { FunctionReference } from "convex/server";
 import { useAction, useMutation, useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 // Cast via (api as any) until `npx convex dev` regenerates types.
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

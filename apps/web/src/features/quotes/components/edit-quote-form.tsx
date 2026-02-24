@@ -14,7 +14,7 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";

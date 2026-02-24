@@ -11,7 +11,7 @@
  */
 import { useState } from "react";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 import {
   AlertDialog,
   AlertDialogCancel,

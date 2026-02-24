@@ -42,6 +42,7 @@
   },
   "prettier": "@medilink/prettier-config",
   "dependencies": {
-    "@convex-dev/better-auth": "^0.10.10"
+    "@convex-dev/better-auth": "^0.10.10",
+    "better-auth": "catalog:"
   }
 }

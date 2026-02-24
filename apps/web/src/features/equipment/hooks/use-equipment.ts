@@ -3,7 +3,7 @@
 import type { PaginatedQueryReference } from "convex/react";
 import { usePaginatedQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { Equipment, EquipmentFilters } from "../types";
 

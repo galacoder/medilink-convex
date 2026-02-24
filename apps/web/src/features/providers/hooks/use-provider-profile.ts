@@ -9,7 +9,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { Certification, ProviderProfile } from "../types";
 
@@ -30,14 +30,14 @@ export function useProviderProfile(
   // Convex codegen does not include providers namespace locally -- cast is safe,
   // all argument shapes are validated by the Convex schema.
   const profile = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.providers.getProfile as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).providers.getProfile,
     organizationId ? { organizationId } : "skip",
   ) as ProviderProfile | null | undefined;
 
   const certifications = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    api.providers.getCertifications as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    (api as any).providers.getCertifications,
     organizationId ? { organizationId } : "skip",
   ) as Certification[] | undefined;
 

@@ -34,7 +34,6 @@ import {
 const BYPASS_PREFIXES = [
   "/api/auth",
   "/api/org",
-  "/api/trpc",
   "/api/health",
   "/api/admin",
   "/_next",
@@ -161,7 +160,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   // Bypass: Public auth paths (sign-in, sign-up, etc.)
   // WHY: isPublicPath from auth middleware handles the canonical public path list
-  // NOTE: /api/health and /api/trpc are already handled by shouldBypass() above
+  // NOTE: /api/health is already handled by shouldBypass() above
   if (isPublicPath(pathname)) {
     return NextResponse.next();
   }

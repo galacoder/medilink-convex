@@ -4,7 +4,7 @@ import type { FunctionReference } from "convex/server";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import { Input } from "@medilink/ui/input";
 import { Label } from "@medilink/ui/label";
