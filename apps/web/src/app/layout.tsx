@@ -9,9 +9,6 @@ import { ConvexClientProvider } from "~/app/convex-client-provider";
 import { env } from "~/env";
 import { getToken } from "~/lib/convex";
 
-// TODO: M0-2 — TRPCReactProvider removed (tRPC deleted).
-// TODO: M0-5 — Convex useQuery/useMutation hooks replace tRPC throughout the app.
-
 import "~/app/styles.css";
 
 export const metadata: Metadata = {
