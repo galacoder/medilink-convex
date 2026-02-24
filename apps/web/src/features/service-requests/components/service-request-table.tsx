@@ -60,7 +60,7 @@ export function ServiceRequestTable({
 }: ServiceRequestTableProps) {
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div data-testid="service-request-list" className="space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
           <Skeleton key={i} className="h-14 w-full" />
         ))}
@@ -70,14 +70,17 @@ export function ServiceRequestTable({
 
   if (requests.length === 0) {
     return (
-      <p className="text-muted-foreground rounded-md border border-dashed px-6 py-10 text-center text-sm">
+      <p
+        data-testid="service-request-list"
+        className="text-muted-foreground rounded-md border border-dashed px-6 py-10 text-center text-sm"
+      >
         {labels.table.empty.vi}
       </p>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-md border">
+    <div data-testid="service-request-list" className="overflow-hidden rounded-md border">
       {/* Table header */}
       <div className="bg-muted/50 text-muted-foreground grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 px-4 py-3 text-xs font-medium tracking-wide uppercase">
         <span>{labels.table.equipment.vi}</span>

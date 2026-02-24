@@ -22,6 +22,8 @@ import { CopilotSidebar } from "@copilotkit/react-ui";
 
 import "@copilotkit/react-ui/styles.css";
 
+import { ClassErrorBoundary } from "~/components/error-boundary";
+
 import type { AiAssistantPortal } from "../types";
 import { aiAssistantLabels } from "../labels";
 
@@ -125,6 +127,10 @@ export function AIAssistantWidget({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
+    // WHY: CopilotKit throws a runtime error when the backend has no agents
+    // registered (e.g., missing OPENAI_API_KEY or empty CopilotRuntime).
+    // The AI assistant is optional — a crash here must never block the page.
+    <ClassErrorBoundary fallback={() => null}>
     <CopilotKit runtimeUrl={runtimeUrl}>
       {/* Floating action button — bottom-right corner */}
       <button
@@ -163,5 +169,6 @@ export function AIAssistantWidget({
         onClose={() => setIsOpen(false)}
       />
     </CopilotKit>
+    </ClassErrorBoundary>
   );
 }
