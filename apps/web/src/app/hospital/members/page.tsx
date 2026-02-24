@@ -10,7 +10,7 @@ import {
 import { Skeleton } from "@medilink/ui/skeleton";
 
 import type { OrgMember, OrgRole } from "~/components/members-table";
-import { useActiveOrganization } from "~/auth/client";
+import { organization, useActiveOrganization } from "~/auth/client";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { MembersTable } from "~/components/members-table";
 import { settingsLabels } from "~/lib/i18n/settings-labels";
@@ -52,17 +52,15 @@ export default function HospitalMembersPage() {
       throw new Error("Không tìm thấy tổ chức (Organization not found)");
     }
 
-    const response = await fetch("/api/trpc/organization.inviteMember", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, role }),
+    // WHY: Better Auth organization plugin exposes inviteMembers() directly on
+    // the client, replacing the removed tRPC organization.inviteMember procedure.
+    const result = await organization.inviteMembers({
+      organizationId: activeOrg.id,
+      invitees: [{ email, role }],
     });
 
-    if (!response.ok) {
-      const error = (await response.json().catch(() => ({}))) as {
-        message?: string;
-      };
-      throw new Error(error.message ?? settingsLabels.invite.error.vi);
+    if (result.error) {
+      throw new Error(result.error.message ?? settingsLabels.invite.error.vi);
     }
   }
 

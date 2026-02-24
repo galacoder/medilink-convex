@@ -23,18 +23,14 @@ export const getSession = cache(getToken);
 export const isUserAuthenticated = cache(isAuthenticated);
 
 /**
- * Auth API shim for backward compatibility with tRPC context.
+ * Auth API shim for server-side session retrieval.
  *
- * WHY: The tRPC context (packages/api/src/trpc.ts) expects an auth instance
- * with auth.api.getSession(). With the Convex component model, the real auth
- * instance lives in convex/auth.ts (per-request). This shim provides a
- * getSession() that fetches from the Better Auth API route.
+ * WHY: Server Components and API routes cannot call Convex directly — they need
+ * the Better Auth session from the HTTP layer. This shim provides a getSession()
+ * that fetches from the Better Auth API route.
  *
  * The auth route handler at /api/auth/[...all] is backed by the Convex
  * Better Auth component (see convex/auth.ts + apps/web/src/app/api/auth/[...all]/route.ts).
- *
- * TODO (M1-2): Update tRPC context to use Convex-native session retrieval
- * directly (via getToken() + Convex fetchAuthQuery) instead of this HTTP shim.
  */
 export const auth = {
   api: {
