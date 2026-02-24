@@ -27,6 +27,15 @@ catalogs:
     '@tanstack/react-query':
       specifier: ^5.90.8
       version: 5.90.8
+    '@trpc/client':
+      specifier: ^11.7.1
+      version: 11.7.1
+    '@trpc/server':
+      specifier: ^11.7.1
+      version: 11.7.1
+    '@trpc/tanstack-react-query':
+      specifier: ^11.7.1
+      version: 11.7.1
     '@types/node':
       specifier: 22.18.12
       version: 22.18.12
@@ -36,9 +45,6 @@ catalogs:
     better-auth:
       specifier: 1.4.9
       version: 1.4.9
-    convex-test:
-      specifier: ^0.0.34
-      version: 0.0.34
     eslint:
       specifier: ^9.38.0
       version: 9.38.0
@@ -126,9 +132,21 @@ importers:
       '@legendapp/list':
         specifier: ^2.0.14
         version: 2.0.14(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.1.12)(bufferutil@4.0.8)(react@19.1.4)(utf-8-validate@6.0.4))(react@19.1.4)
+      '@medilink/backend':
+        specifier: workspace:*
+        version: link:../../packages/backend
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.8(react@19.1.4)
+      '@trpc/client':
+        specifier: 'catalog:'
+        version: 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server':
+        specifier: 'catalog:'
+        version: 11.7.1(typescript@5.9.3)
+      '@trpc/tanstack-react-query':
+        specifier: 'catalog:'
+        version: 11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
         version: 1.4.9(b194d856d6aea3afddcffc58b0b661c5)
@@ -196,6 +214,9 @@ importers:
         specifier: 2.2.3
         version: 2.2.3
     devDependencies:
+      '@medilink/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@medilink/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -241,12 +262,15 @@ importers:
       '@copilotkit/runtime':
         specifier: ^1.51.4
         version: 1.51.4(@copilotkit/shared@1.51.4(@ag-ui/core@0.0.43))(@copilotkitnext/agent@1.51.4(@cfworker/json-schema@4.1.1))(@copilotkitnext/runtime@1.51.4(@ag-ui/client@0.0.43)(@ag-ui/core@0.0.43)(@ag-ui/encoder@0.0.43)(@copilotkitnext/shared@1.51.4))(@langchain/core@0.3.80(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6)))(@langchain/langgraph-sdk@0.1.10(@langchain/core@0.3.80(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6)))(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
+      '@medilink/api':
+        specifier: workspace:*
+        version: link:../../packages/api
       '@medilink/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@medilink/db':
+      '@medilink/backend':
         specifier: workspace:*
-        version: link:../../packages/db
+        version: link:../../packages/backend
       '@medilink/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -265,6 +289,15 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
+      '@trpc/client':
+        specifier: 'catalog:'
+        version: 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server':
+        specifier: 'catalog:'
+        version: 11.7.1(typescript@5.9.3)
+      '@trpc/tanstack-react-query':
+        specifier: 'catalog:'
+        version: 11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
         version: 1.4.9(cec4b9040ba8fc3fc2ab5a0d6926e8fc)
@@ -372,6 +405,43 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
+  packages/api:
+    dependencies:
+      '@medilink/auth':
+        specifier: workspace:*
+        version: link:../auth
+      '@medilink/validators':
+        specifier: workspace:*
+        version: link:../validators
+      '@trpc/server':
+        specifier: 'catalog:'
+        version: 11.7.1(typescript@5.9.3)
+      superjson:
+        specifier: 2.2.3
+        version: 2.2.3
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.6
+    devDependencies:
+      '@medilink/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
+      '@medilink/prettier-config':
+        specifier: workspace:*
+        version: link:../../tooling/prettier
+      '@medilink/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      eslint:
+        specifier: 'catalog:'
+        version: 9.38.0(jiti@2.6.1)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.6.2
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+
   packages/auth:
     dependencies:
       '@better-auth/expo':
@@ -418,54 +488,15 @@ importers:
         specifier: 'catalog:'
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
-  packages/db:
+  packages/backend:
     dependencies:
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
-    devDependencies:
-      '@convex-dev/better-auth':
-        specifier: ^0.10.10
-        version: 0.10.10(@better-auth/core@1.4.18(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.1.8(zod@4.3.6))(jose@6.1.3)(kysely@0.28.5)(nanostores@1.0.1))(@better-auth/utils@0.3.0)(@standard-schema/spec@1.1.0)(better-auth@1.4.9(cec4b9040ba8fc3fc2ab5a0d6926e8fc))(better-call@1.1.8(zod@4.3.6))(convex@1.31.7(react@19.1.4))(hono@4.12.1)(nanostores@1.0.1)(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
-      '@edge-runtime/vm':
-        specifier: 'catalog:'
-        version: 5.0.0
-      '@medilink/eslint-config':
-        specifier: workspace:*
-        version: link:../../tooling/eslint
-      '@medilink/prettier-config':
-        specifier: workspace:*
-        version: link:../../tooling/prettier
-      '@medilink/tsconfig':
-        specifier: workspace:*
-        version: link:../../tooling/typescript
-      '@types/node':
-        specifier: 'catalog:'
-        version: 22.18.12
-      better-auth:
-        specifier: 'catalog:'
-        version: 1.4.9(cec4b9040ba8fc3fc2ab5a0d6926e8fc)
       convex:
         specifier: ^1.31.7
         version: 1.31.7(react@19.1.4)
-      convex-test:
-        specifier: 'catalog:'
-        version: 0.0.34(convex@1.31.7(react@19.1.4))
-      eslint:
-        specifier: 'catalog:'
-        version: 9.38.0(jiti@2.6.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.6.2
+    devDependencies:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
-      vite:
-        specifier: 7.1.12
-        version: 7.1.12(@types/node@22.18.12)(jiti@2.6.1)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
-      vitest:
-        specifier: 'catalog:'
-        version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/ui:
     dependencies:
@@ -4146,6 +4177,27 @@ packages:
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
 
+  '@trpc/client@11.7.1':
+    resolution: {integrity: sha512-uOnAjElKI892/U6aQMcBHYs3x7mme3Cvv1F87ytBL56rBvs7+DyK7r43zgaXKf13+GtPEI6ex5xjVUfyDW8XcQ==}
+    peerDependencies:
+      '@trpc/server': 11.7.1
+      typescript: '>=5.7.2'
+
+  '@trpc/server@11.7.1':
+    resolution: {integrity: sha512-N3U8LNLIP4g9C7LJ/sLkjuPHwqlvE3bnspzC4DEFVdvx2+usbn70P80E3wj5cjOTLhmhRiwJCSXhlB+MHfGeCw==}
+    peerDependencies:
+      typescript: '>=5.7.2'
+
+  '@trpc/tanstack-react-query@11.7.1':
+    resolution: {integrity: sha512-qc7kz4NY7CCvCxLy5HGptfKd3e3yJnWmTd6/Gkr4IY8B73PNFmcHKvLWE4kzU7r+R72MfT57TXrCEJ7ErLSMtw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.80.3
+      '@trpc/client': 11.7.1
+      '@trpc/server': 11.7.1
+      react: '>=18.2.0'
+      react-dom: '>=18.2.0'
+      typescript: '>=5.7.2'
+
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
 
@@ -5431,11 +5483,6 @@ packages:
         optional: true
       zod:
         optional: true
-
-  convex-test@0.0.34:
-    resolution: {integrity: sha512-srntn1drKy0Aa8zzatvJ10ZJFVpBYvLWQrhTibdfnslQqNdzQV5Ui4XKFtmrEmqw+DjmeJATgvZHbLzhP7Dh4w==}
-    peerDependencies:
-      convex: ^1.16.4
 
   convex-test@0.0.41:
     resolution: {integrity: sha512-GPHeYFOi70n7UtW0eCEQFVhzl/+m8PvbWkDCbKpHLybI1MrScf4sVpGeM0cC2qmtxiduxa2nLPbehPalhh9oyQ==}
@@ -15717,6 +15764,24 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
+  '@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)':
+    dependencies:
+      '@trpc/server': 11.7.1(typescript@5.9.3)
+      typescript: 5.9.3
+
+  '@trpc/server@11.7.1(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
+
+  '@trpc/tanstack-react-query@11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)':
+    dependencies:
+      '@tanstack/react-query': 5.90.8(react@19.1.4)
+      '@trpc/client': 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
+      '@trpc/server': 11.7.1(typescript@5.9.3)
+      react: 19.1.4
+      react-dom: 19.1.4(react@19.1.4)
+      typescript: 5.9.3
+
   '@tsconfig/node10@1.0.11': {}
 
   '@tsconfig/node12@1.0.11': {}
@@ -17358,10 +17423,6 @@ snapshots:
       react: 19.1.4
       typescript: 5.9.3
       zod: 4.1.12
-
-  convex-test@0.0.34(convex@1.31.7(react@19.1.4)):
-    dependencies:
-      convex: 1.31.7(react@19.1.4)
 
   convex-test@0.0.41(convex@1.31.7(react@19.1.4)):
     dependencies:
