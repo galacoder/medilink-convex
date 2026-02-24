@@ -14,7 +14,10 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Doc<T extends string> = { _id: Id<T>; _creationTime: number } & Record<string, any>;
+export type Doc<T extends string> = {
+  _id: Id<T>;
+  _creationTime: number;
+} & Record<string, any>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Id<T extends string> = string & { __tableName: T };
 

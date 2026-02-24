@@ -1,19 +1,11 @@
 {
   "extends": "@medilink/tsconfig/base.json",
   "compilerOptions": {
-    "lib": [
-      "ES2022",
-      "dom",
-      "dom.iterable"
-    ],
+    "lib": ["ES2022", "dom", "dom.iterable"],
     "jsx": "preserve",
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "@medilink/backend": [
-        "../../packages/backend/src/index.ts"
-      ]
+      "~/*": ["./src/*"],
+      "@medilink/backend": ["../../packages/backend/src/index.ts"]
     },
     "plugins": [
       {
@@ -21,11 +13,6 @@
       }
     ]
   },
-  "include": [
-    ".",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": [".", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

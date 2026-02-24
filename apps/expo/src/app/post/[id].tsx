@@ -28,7 +28,9 @@ export default function EquipmentDetail() {
    */
   const equipment = useQuery(
     api.equipment.getById,
-    id ? { id: id as Parameters<typeof api.equipment.getById>[0]["id"] } : "skip",
+    id
+      ? { id: id as Parameters<typeof api.equipment.getById>[0]["id"] }
+      : "skip",
   );
 
   if (!equipment) return null;
