@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**MediLink** is a medical equipment management system for SPMET Healthcare School built with T3 Turbo + Convex + Better Auth. Single Next.js app with route groups for role-based access (student/staff/admin), feature modules in `src/features/`, and Convex as the real-time database. Bilingual Vietnamese/English support throughout.
+**MediLink** is a medical equipment management system for SPMET Healthcare School built with Convex + Better Auth + Next.js (App Router). Pure Convex architecture — no tRPC layer. Single Next.js app with route groups for role-based access (student/staff/admin), feature modules in `src/features/`, and Convex as the real-time database. Bilingual Vietnamese/English support throughout.
 
 - **GitHub**: TBD after repository creation
 - **Architecture Standard**: See `@agents/prox/architecture-decision/ARCHITECTURE_STANDARD.md`
@@ -16,7 +16,6 @@ All packages use `@medilink/*` scope.
 | Workspace                   | Path                   | Purpose                                         |
 | --------------------------- | ---------------------- | ----------------------------------------------- |
 | `@medilink/web`             | `apps/web/`            | Main Next.js web app (single app, route groups) |
-| `@medilink/api`             | `packages/api/`        | tRPC routers (non-reactive API)                 |
 | `@medilink/auth`            | `packages/auth/`       | Better Auth config + Convex adapter             |
 | `@medilink/db`              | `packages/db/`         | Database schema + Convex reference types        |
 | `@medilink/ui`              | `packages/ui/`         | shadcn/ui design system (Radix primitives)      |
@@ -48,8 +47,7 @@ apps/web/src/
     admin/           # User management, system settings
   components/        # Shared: layout/, common/, providers/
   hooks/             # Shared hooks (useEquipment, useBorrowing)
-  lib/               # Utilities (cn, formatDate, constants, i18n)
-  trpc/              # tRPC client setup
+  lib/               # Utilities (cn, formatDate, constants, i18n, convex helpers)
   env.ts             # @t3-oss/env-nextjs validation
 ```
 
@@ -110,7 +108,7 @@ For parallel multi-agent execution via git worktrees:
 | Feature agent | `src/features/<name>/`, route group pages   | Other features, shared components, schema |
 | Schema agent  | `convex/schema.ts`, `packages/db/`          | Feature code, UI components               |
 | UI agent      | `packages/ui/`, `src/components/`           | Business logic, schema, API routes        |
-| API agent     | `packages/api/`, `convex/*.ts` (not schema) | UI, features, tooling                     |
+| Convex agent  | `packages/db/convex/` (not schema.ts)       | UI, features, tooling                     |
 | Tooling agent | `tooling/`, root configs                    | Application code                          |
 
 **Execution limits**:
@@ -149,6 +147,7 @@ For parallel multi-agent execution via git worktrees:
 - UTF-8 encoding required for all files (for Vietnamese diacritics)
 - Medical equipment safety codes must follow Vietnamese medical device regulations
 - Patient data must comply with Vietnamese Personal Data Protection Decree 13/2023
+- NEVER use tRPC in MediLink -- all data access goes through Convex functions (useQuery/useMutation/useAction)
   </critical_rules>
 
 ## Skills Library
@@ -167,7 +166,7 @@ For parallel multi-agent execution via git worktrees:
 
 - **Status**: Legacy MediLink (`../project-medilink/`) uses Supabase + Prisma - READ-ONLY reference
 - **Migration Path**: Supabase PostgreSQL -> Convex (schema mapping, data import)
-- **Data Layer Split**: Convex (reactive queries/mutations/subscriptions) + tRPC (non-reactive: webhooks, external APIs)
+- **Data Layer Split**: Convex exclusively — `useQuery` / `useMutation` / `useAction` for all data access. No tRPC layer (pure Convex project, ADR-001).
 - **Legacy Features to Preserve**:
   - Equipment tracking (Supabase table -> Convex equipment table)
   - Borrowing workflow (Supabase borrowing + approval -> Convex borrowing + real-time status)
@@ -274,4 +273,4 @@ equipmentCategory: defineTable({
 
 ---
 
-**Migration from Legacy MediLink**: This repository replaces `project-medilink` (Supabase + Prisma). Legacy codebase is READ-ONLY reference for business logic and bilingual content. All new development follows T3 Turbo + Convex standard.
+**Migration from Legacy MediLink**: This repository replaces `project-medilink` (Supabase + Prisma). Legacy codebase is READ-ONLY reference for business logic and bilingual content. All new development follows the Convex-pure architecture standard (ADR-001).
