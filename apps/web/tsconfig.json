@@ -13,6 +13,12 @@
       ],
       "@medilink/backend": [
         "../../packages/backend/src/index.ts"
+      ],
+      "@medilink/db/api": [
+        "../../convex/_generated/api.d.ts"
+      ],
+      "@medilink/db/dataModel": [
+        "../../convex/_generated/dataModel.d.ts"
       ]
     },
     "plugins": [
