@@ -10,10 +10,11 @@ import { v } from "convex/values";
  *  - Indexes:    by_<field> prefix
  *  - All tables: createdAt + updatedAt as v.number()
  *
- * Domain table count: 23 tables across 8 domains
- *   Base: organizations (+ optional status field for M4-1), organizationMemberships, users (3)
- *   Equipment: equipmentCategories, equipment, equipmentHistory,
- *              maintenanceRecords, failureReports (5)
+ * Domain table count: 25 tables across 8 domains
+ *   Base: organizations (+ optional status field for M4-1), organizationMemberships, users,
+ *         departments (4)
+ *   Equipment: equipmentCategories, equipment (+ departmentId), equipmentHistory,
+ *              maintenanceRecords, failureReports, borrowRequests (6)
  *   QR Code: qrCodes, qrScanLog (2)
  *   Providers: providers, serviceOfferings, certifications, coverageAreas (4)
  *   Service Requests: serviceRequests, quotes, serviceRatings (3)
@@ -23,7 +24,7 @@ import { v } from "convex/values";
  */
 export default defineSchema({
   // ===========================================================================
-  // BASE DOMAIN (3 tables)
+  // BASE DOMAIN (4 tables)
   // ===========================================================================
 
   /**
@@ -99,8 +100,26 @@ export default defineSchema({
     // by_platform_role: used by admin queries to list platform_admin/platform_support users
     .index("by_platform_role", ["platformRole"]),
 
+  /**
+   * Organizational departments for grouping equipment and staff.
+   * vi: "Phòng ban" / en: "Departments"
+   *
+   * WHY: Equipment and staff belong to departments within a hospital.
+   * This enables department-level reporting, access control, and equipment
+   * assignment workflows (e.g., "Radiology department's CT scanner").
+   */
+  departments: defineTable({
+    organizationId: v.id("organizations"),
+    name: v.string(),
+    description: v.optional(v.string()),
+    // vi: "Trưởng phòng" / en: "Department head"
+    headUserId: v.optional(v.id("users")),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_organization", ["organizationId"]),
+
   // ===========================================================================
-  // EQUIPMENT DOMAIN (5 tables)
+  // EQUIPMENT DOMAIN (6 tables)
   // vi: "Lĩnh vực thiết bị" / en: "Equipment domain"
   // ===========================================================================
 
@@ -149,6 +168,9 @@ export default defineSchema({
     descriptionEn: v.optional(v.string()),
     categoryId: v.id("equipmentCategories"),
     organizationId: v.id("organizations"),
+    // vi: "Phòng ban" / en: "Department assignment"
+    // M0-4: Links equipment to a department within the organization
+    departmentId: v.optional(v.id("departments")),
     // vi: "Trạng thái" / en: "Status"
     status: v.union(
       v.literal("available"),
@@ -180,7 +202,8 @@ export default defineSchema({
     .index("by_org", ["organizationId"])
     .index("by_org_and_status", ["organizationId", "status"])
     .index("by_category", ["categoryId"])
-    .index("by_org_and_serialNumber", ["organizationId", "serialNumber"]),
+    .index("by_org_and_serialNumber", ["organizationId", "serialNumber"])
+    .index("by_department", ["departmentId"]),
 
   /**
    * Audit trail for equipment status transitions.
@@ -333,6 +356,51 @@ export default defineSchema({
     .index("by_equipment", ["equipmentId"])
     .index("by_status", ["status"])
     .index("by_urgency", ["urgency"]),
+
+  /**
+   * Equipment borrow/lending requests for tracking equipment loans.
+   * vi: "Yêu cầu mượn thiết bị" / en: "Borrow requests"
+   *
+   * WHY: Hospital staff need to borrow equipment across departments.
+   * This tracks the full lifecycle: request → approval → usage → return.
+   *
+   * Status enum:
+   *   pending   - vi: "Đang chờ"       / en: "Pending"
+   *   approved  - vi: "Đã duyệt"       / en: "Approved"
+   *   rejected  - vi: "Đã từ chối"     / en: "Rejected"
+   *   returned  - vi: "Đã trả"         / en: "Returned"
+   *   cancelled - vi: "Đã hủy"         / en: "Cancelled"
+   */
+  borrowRequests: defineTable({
+    organizationId: v.id("organizations"),
+    equipmentId: v.id("equipment"),
+    requesterId: v.id("users"),
+    // vi: "Trạng thái yêu cầu mượn" / en: "Borrow request status"
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("returned"),
+      v.literal("cancelled"),
+    ),
+    // vi: "Ngày bắt đầu yêu cầu" / en: "Requested start date" (epoch ms)
+    requestedStartDate: v.number(),
+    // vi: "Ngày kết thúc yêu cầu" / en: "Requested end date" (epoch ms)
+    requestedEndDate: v.number(),
+    // vi: "Ngày trả thực tế" / en: "Actual return date" (epoch ms)
+    actualReturnDate: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    // vi: "Người duyệt" / en: "Approved by"
+    approvedById: v.optional(v.id("users")),
+    // vi: "Thời điểm duyệt" / en: "Approved at" (epoch ms)
+    approvedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organization", ["organizationId"])
+    .index("by_equipment", ["equipmentId"])
+    .index("by_requester", ["requesterId"])
+    .index("by_status", ["status"]),
 
   // ===========================================================================
   // QR CODE DOMAIN (2 tables)
