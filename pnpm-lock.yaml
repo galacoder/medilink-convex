@@ -27,15 +27,6 @@ catalogs:
     '@tanstack/react-query':
       specifier: ^5.90.8
       version: 5.90.8
-    '@trpc/client':
-      specifier: ^11.7.1
-      version: 11.7.1
-    '@trpc/server':
-      specifier: ^11.7.1
-      version: 11.7.1
-    '@trpc/tanstack-react-query':
-      specifier: ^11.7.1
-      version: 11.7.1
     '@types/node':
       specifier: 22.18.12
       version: 22.18.12
@@ -138,15 +129,6 @@ importers:
       '@tanstack/react-query':
         specifier: 'catalog:'
         version: 5.90.8(react@19.1.4)
-      '@trpc/client':
-        specifier: 'catalog:'
-        version: 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
-      '@trpc/server':
-        specifier: 'catalog:'
-        version: 11.7.1(typescript@5.9.3)
-      '@trpc/tanstack-react-query':
-        specifier: 'catalog:'
-        version: 11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
         version: 1.4.9(b194d856d6aea3afddcffc58b0b661c5)
@@ -214,9 +196,6 @@ importers:
         specifier: 2.2.3
         version: 2.2.3
     devDependencies:
-      '@medilink/api':
-        specifier: workspace:*
-        version: link:../../packages/api
       '@medilink/eslint-config':
         specifier: workspace:*
         version: link:../../tooling/eslint
@@ -262,9 +241,6 @@ importers:
       '@copilotkit/runtime':
         specifier: ^1.51.4
         version: 1.51.4(@copilotkit/shared@1.51.4(@ag-ui/core@0.0.43))(@copilotkitnext/agent@1.51.4(@cfworker/json-schema@4.1.1))(@copilotkitnext/runtime@1.51.4(@ag-ui/client@0.0.43)(@ag-ui/core@0.0.43)(@ag-ui/encoder@0.0.43)(@copilotkitnext/shared@1.51.4))(@langchain/core@0.3.80(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6)))(@langchain/langgraph-sdk@0.1.10(@langchain/core@0.3.80(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6)))(react-dom@19.1.4(react@19.1.4))(react@19.1.4))(@opentelemetry/api@1.9.0)(openai@6.22.0(ws@8.18.3(bufferutil@4.0.8)(utf-8-validate@6.0.4))(zod@4.3.6))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
-      '@medilink/api':
-        specifier: workspace:*
-        version: link:../../packages/api
       '@medilink/auth':
         specifier: workspace:*
         version: link:../../packages/auth
@@ -289,15 +265,6 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.1.4(react@19.1.4))(react@19.1.4)
-      '@trpc/client':
-        specifier: 'catalog:'
-        version: 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
-      '@trpc/server':
-        specifier: 'catalog:'
-        version: 11.7.1(typescript@5.9.3)
-      '@trpc/tanstack-react-query':
-        specifier: 'catalog:'
-        version: 11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)
       better-auth:
         specifier: 'catalog:'
         version: 1.4.9(cec4b9040ba8fc3fc2ab5a0d6926e8fc)
@@ -404,46 +371,6 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.2.4(@edge-runtime/vm@5.0.0)(@types/debug@4.1.12)(@types/node@22.18.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.0))(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
-
-  packages/api:
-    dependencies:
-      '@medilink/auth':
-        specifier: workspace:*
-        version: link:../auth
-      '@medilink/db':
-        specifier: workspace:*
-        version: link:../db
-      '@medilink/validators':
-        specifier: workspace:*
-        version: link:../validators
-      '@trpc/server':
-        specifier: 'catalog:'
-        version: 11.7.1(typescript@5.9.3)
-      superjson:
-        specifier: 2.2.3
-        version: 2.2.3
-      zod:
-        specifier: 'catalog:'
-        version: 4.3.6
-    devDependencies:
-      '@medilink/eslint-config':
-        specifier: workspace:*
-        version: link:../../tooling/eslint
-      '@medilink/prettier-config':
-        specifier: workspace:*
-        version: link:../../tooling/prettier
-      '@medilink/tsconfig':
-        specifier: workspace:*
-        version: link:../../tooling/typescript
-      eslint:
-        specifier: 'catalog:'
-        version: 9.38.0(jiti@2.6.1)
-      prettier:
-        specifier: 'catalog:'
-        version: 3.6.2
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   packages/auth:
     dependencies:
@@ -4218,27 +4145,6 @@ packages:
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
-
-  '@trpc/client@11.7.1':
-    resolution: {integrity: sha512-uOnAjElKI892/U6aQMcBHYs3x7mme3Cvv1F87ytBL56rBvs7+DyK7r43zgaXKf13+GtPEI6ex5xjVUfyDW8XcQ==}
-    peerDependencies:
-      '@trpc/server': 11.7.1
-      typescript: '>=5.7.2'
-
-  '@trpc/server@11.7.1':
-    resolution: {integrity: sha512-N3U8LNLIP4g9C7LJ/sLkjuPHwqlvE3bnspzC4DEFVdvx2+usbn70P80E3wj5cjOTLhmhRiwJCSXhlB+MHfGeCw==}
-    peerDependencies:
-      typescript: '>=5.7.2'
-
-  '@trpc/tanstack-react-query@11.7.1':
-    resolution: {integrity: sha512-qc7kz4NY7CCvCxLy5HGptfKd3e3yJnWmTd6/Gkr4IY8B73PNFmcHKvLWE4kzU7r+R72MfT57TXrCEJ7ErLSMtw==}
-    peerDependencies:
-      '@tanstack/react-query': ^5.80.3
-      '@trpc/client': 11.7.1
-      '@trpc/server': 11.7.1
-      react: '>=18.2.0'
-      react-dom: '>=18.2.0'
-      typescript: '>=5.7.2'
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -15810,24 +15716,6 @@ snapshots:
       '@testing-library/dom': 10.4.1
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
-
-  '@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)':
-    dependencies:
-      '@trpc/server': 11.7.1(typescript@5.9.3)
-      typescript: 5.9.3
-
-  '@trpc/server@11.7.1(typescript@5.9.3)':
-    dependencies:
-      typescript: 5.9.3
-
-  '@trpc/tanstack-react-query@11.7.1(@tanstack/react-query@5.90.8(react@19.1.4))(@trpc/client@11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3))(@trpc/server@11.7.1(typescript@5.9.3))(react-dom@19.1.4(react@19.1.4))(react@19.1.4)(typescript@5.9.3)':
-    dependencies:
-      '@tanstack/react-query': 5.90.8(react@19.1.4)
-      '@trpc/client': 11.7.1(@trpc/server@11.7.1(typescript@5.9.3))(typescript@5.9.3)
-      '@trpc/server': 11.7.1(typescript@5.9.3)
-      react: 19.1.4
-      react-dom: 19.1.4(react@19.1.4)
-      typescript: 5.9.3
 
   '@tsconfig/node10@1.0.11': {}
 
