@@ -4,8 +4,8 @@ import { useCallback, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Bell } from "lucide-react";
 
-import type { Doc } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Doc } from "@medilink/backend";
+import { api } from "@medilink/backend";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import { Separator } from "@medilink/ui/separator";

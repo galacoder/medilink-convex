@@ -14,7 +14,7 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { CreateServiceRequestInput } from "../types";
 

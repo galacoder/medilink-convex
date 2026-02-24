@@ -9,7 +9,7 @@
  *
  * vi: "Mục thông báo đơn" / en: "Single notification item"
  */
-import type { Doc } from "@medilink/db/dataModel";
+import type { Doc } from "@medilink/backend";
 import { cn } from "@medilink/ui";
 
 import { notificationLabels } from "../labels";

@@ -17,7 +17,7 @@
 import { use } from "react";
 import Link from "next/link";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 import {
   Card,
   CardContent,

@@ -10,7 +10,7 @@
  */
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 // Convex codegen does not include providers namespace in the worktree
 // until `npx convex codegen` is run with a live deployment. The `as any`

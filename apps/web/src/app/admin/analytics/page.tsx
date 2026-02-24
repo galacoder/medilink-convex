@@ -24,7 +24,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { PlatformHealthMetrics } from "~/features/admin-analytics/types";
 import { GrowthChart } from "~/features/admin-analytics/components/growth-chart";

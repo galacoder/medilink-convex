@@ -24,7 +24,7 @@ import {
   WrenchIcon,
 } from "lucide-react";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
 import {

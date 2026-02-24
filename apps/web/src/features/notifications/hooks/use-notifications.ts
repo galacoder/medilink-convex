@@ -12,7 +12,7 @@
 import { useCallback } from "react";
 import { useMutation, useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
 import type { NotificationItem, UseNotificationsReturn } from "../types";
 import { useSession } from "~/auth/client";

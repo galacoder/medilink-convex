@@ -1,4 +1,4 @@
-import type { Doc, Id } from "@medilink/db/dataModel";
+import type { Doc, Id } from "@medilink/backend";
 
 // Dispute document type from Convex
 export type Dispute = Doc<"disputes">;

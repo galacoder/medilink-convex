@@ -13,8 +13,8 @@ import type { FunctionReference } from "convex/server";
 import { useState } from "react";
 import { useMutation } from "convex/react";
 
-import type { Id } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import {
   Dialog,

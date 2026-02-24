@@ -12,7 +12,7 @@
  */
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 import {
   Select,
   SelectContent,

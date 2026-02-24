@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { useQuery } from "convex/react";
 import { DownloadIcon, RefreshCwIcon, ShieldIcon } from "lucide-react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 
 import type {

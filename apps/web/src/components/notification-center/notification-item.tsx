@@ -1,6 +1,6 @@
 "use client";
 
-import type { Doc } from "@medilink/db/dataModel";
+import type { Doc } from "@medilink/backend";
 import { cn } from "@medilink/ui";
 
 /**
