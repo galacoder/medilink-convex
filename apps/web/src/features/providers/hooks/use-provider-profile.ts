@@ -31,13 +31,13 @@ export function useProviderProfile(
   // all argument shapes are validated by the Convex schema.
   const profile = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.providers.getProfile as any,
+    (api as any).providers.getProfile,
     organizationId ? { organizationId } : "skip",
   ) as ProviderProfile | null | undefined;
 
   const certifications = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.providers.getCertifications as any,
+    (api as any).providers.getCertifications,
     organizationId ? { organizationId } : "skip",
   ) as Certification[] | undefined;
 

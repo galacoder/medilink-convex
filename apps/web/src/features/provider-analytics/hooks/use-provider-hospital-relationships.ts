@@ -37,7 +37,7 @@ export function useProviderHospitalRelationships(
 
   const data = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.analytics.getProviderHospitalRelationships as any,
+    (api as any).analytics.getProviderHospitalRelationships,
     providerId ? { providerId, limit } : "skip",
   ) as HospitalRelationship[] | undefined;
 

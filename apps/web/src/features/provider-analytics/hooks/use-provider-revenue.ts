@@ -37,7 +37,7 @@ export function useProviderRevenue(
 
   const data = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.analytics.getProviderRevenueByMonth as any,
+    (api as any).analytics.getProviderRevenueByMonth,
     providerId ? { providerId, months } : "skip",
   ) as MonthlyRevenue[] | undefined;
 

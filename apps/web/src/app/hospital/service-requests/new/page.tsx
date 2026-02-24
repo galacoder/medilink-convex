@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 
+import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 
@@ -37,8 +38,8 @@ export default function NewServiceRequestPage() {
     }
 
     const id = (await createRequest({
-      organizationId: activeOrg.id,
-      equipmentId: formData.equipmentId,
+      organizationId: activeOrg.id as Id<"organizations">,
+      equipmentId: formData.equipmentId as Id<"equipment">,
       type: formData.type,
       priority: formData.priority,
       descriptionVi: formData.descriptionVi,

@@ -16,8 +16,8 @@ import { api } from "@medilink/backend";
 // until `npx convex codegen` is run with a live deployment. The `as any`
 // cast is intentional and safe -- all runtime shapes are validated by
 // the Convex schema and mutation argument validators.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-const providersApi = api.providers as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const providersApi = (api as any).providers;
 
 export interface UseProviderMutationsResult {
   addServiceOffering: ReturnType<typeof useMutation>;

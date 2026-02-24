@@ -34,7 +34,7 @@ export function useProviderOfferings(
   // all argument shapes are validated by the Convex schema.
   const offerings = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.providers.listServiceOfferings as any,
+    (api as any).providers.listServiceOfferings,
     organizationId ? { organizationId } : "skip",
   ) as ServiceOffering[] | undefined;
 

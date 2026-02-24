@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Bell } from "lucide-react";
 
+import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
@@ -74,7 +75,7 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
 
   const handleMarkRead = useCallback(
     async (notificationId: string) => {
-      await markReadMutation({ notificationId });
+      await markReadMutation({ notificationId: notificationId as Id<"notifications"> });
     },
     [markReadMutation],
   );

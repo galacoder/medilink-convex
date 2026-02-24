@@ -54,7 +54,7 @@ export function useProviderAnalytics(
 
   const summary = useQuery(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    api.analytics.getProviderSummary as any,
+    (api as any).analytics.getProviderSummary,
     providerId
       ? { providerId, dateRange, customStartDate, customEndDate }
       : "skip",

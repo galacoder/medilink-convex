@@ -12,6 +12,7 @@
 import { useCallback } from "react";
 import { useMutation, useQuery } from "convex/react";
 
+import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
 
 import type { UseNotificationsReturn } from "../types";
@@ -46,18 +47,16 @@ export function useNotifications(): UseNotificationsReturn {
 
   const markRead = useCallback(
     async (notificationId: string) => {
-      await (
-        markReadMutation as (args: { notificationId: string }) => Promise<void>
-      )({ notificationId });
+      await markReadMutation({
+        notificationId: notificationId as Id<"notifications">,
+      });
     },
     [markReadMutation],
   );
 
   const markAllRead = useCallback(async () => {
     if (!userId) return;
-    await (markAllReadMutation as (args: { userId: string }) => Promise<void>)({
-      userId,
-    });
+    await markAllReadMutation({ userId });
   }, [userId, markAllReadMutation]);
 
   return { notifications, isLoading, unreadCount, markRead, markAllRead };

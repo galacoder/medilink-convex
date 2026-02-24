@@ -11,7 +11,7 @@ import type { DisputeFilters, DisputeWithRef } from "../types";
 // Cast the api reference to avoid noUncheckedIndexedAccess issues with AnyApi stub.
 // The generated api object always has these functions at runtime.
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const disputesApi = api.disputes as any;
+const disputesApi = (api as any).disputes;
 type QueryRef = FunctionReference<"query">;
 const listByHospitalFn: QueryRef = disputesApi.listByHospital;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

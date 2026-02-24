@@ -10,6 +10,7 @@
  */
 import { useQuery } from "convex/react";
 
+import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
 
 import type { ServiceRequestDetail } from "../types";
@@ -32,7 +33,7 @@ export function useServiceRequestDetail(
   // Skip the query if no ID is provided
   const result = useQuery(
     api.serviceRequests.getById,
-    id ? ({ id } as { id: string }) : "skip",
+    id ? { id: id as Id<"serviceRequests"> } : "skip",
   ) as ServiceRequestDetail | null | undefined;
 
   return {

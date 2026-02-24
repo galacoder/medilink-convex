@@ -28,8 +28,8 @@ import { SPECIALTY_OPTIONS } from "../types";
 
 // Convex codegen does not include providers namespace locally -- cast is safe,
 // all argument shapes are validated by the Convex schema.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-const providersApi = api.providers as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+const providersApi = (api as any).providers;
 
 interface OfferingFormProps {
   mode: "create" | "edit";
