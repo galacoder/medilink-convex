@@ -14,7 +14,7 @@ import { useMutation, useQuery } from "convex/react";
 
 import { api } from "@medilink/backend";
 
-import type { NotificationItem, UseNotificationsReturn } from "../types";
+import type { UseNotificationsReturn } from "../types";
 import { useSession } from "~/auth/client";
 
 /**

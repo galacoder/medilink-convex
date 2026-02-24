@@ -14,8 +14,8 @@
 import { SafeAreaView, Text, View } from "react-native";
 import { Stack, useGlobalSearchParams } from "expo-router";
 import { useQuery } from "convex/react";
-import type { Id } from "convex/values";
 
+import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
 
 export default function EquipmentDetail() {
