@@ -418,6 +418,9 @@ importers:
       '@medilink/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.18.12
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
