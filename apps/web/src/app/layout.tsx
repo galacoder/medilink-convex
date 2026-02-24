@@ -8,7 +8,9 @@ import { Toaster } from "@medilink/ui/toast";
 import { ConvexClientProvider } from "~/app/convex-client-provider";
 import { env } from "~/env";
 import { getToken } from "~/lib/convex";
-import { TRPCReactProvider } from "~/trpc/react";
+
+// TODO: M0-2 — TRPCReactProvider removed (tRPC deleted).
+// TODO: M0-5 — Convex useQuery/useMutation hooks replace tRPC throughout the app.
 
 import "~/app/styles.css";
 
@@ -66,7 +68,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       >
         <ThemeProvider>
           <ConvexClientProvider initialToken={initialToken}>
-            <TRPCReactProvider>{props.children}</TRPCReactProvider>
+            {props.children}
           </ConvexClientProvider>
           <Toaster />
         </ThemeProvider>
