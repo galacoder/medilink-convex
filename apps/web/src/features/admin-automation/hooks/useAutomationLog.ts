@@ -52,8 +52,8 @@ export function useAutomationLog(
  */
 export function useAutomationRuleStatus(): AutomationRuleStatus[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
   return useQuery(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     (api as any).automation.automationLog.getAutomationRuleStatus,
     {},
   ) as AutomationRuleStatus[] | undefined;
