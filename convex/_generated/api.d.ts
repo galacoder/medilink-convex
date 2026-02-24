@@ -24,7 +24,6 @@ import type * as orgActions from "../orgActions.js";
 import type * as organizations from "../organizations.js";
 import type * as qrCodes from "../qrCodes.js";
 import type * as quotes from "../quotes.js";
-import type * as seed from "../seed.js";
 import type * as serviceRequests from "../serviceRequests.js";
 import type * as userActions from "../userActions.js";
 
@@ -51,7 +50,6 @@ declare const fullApi: ApiFromModules<{
   organizations: typeof organizations;
   qrCodes: typeof qrCodes;
   quotes: typeof quotes;
-  seed: typeof seed;
   serviceRequests: typeof serviceRequests;
   userActions: typeof userActions;
 }>;

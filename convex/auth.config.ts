@@ -17,15 +17,27 @@
  *
  * vi: "Cấu hình cơ bản Better Auth" / en: "Base Better Auth options"
  */
+/**
+ * Convex JWT provider configuration.
+ *
+ * WHY: The @convex-dev/better-auth `convex()` plugin requires a standard Convex
+ * AuthConfig specifying which JWT issuer Convex should trust for token verification.
+ * The domain must match the Convex deployment URL set via CONVEX_SITE_URL env var.
+ *
+ * In development: CONVEX_SITE_URL is set by `npx convex dev` automatically.
+ * In production: Set `npx convex env set CONVEX_SITE_URL https://your-site.com`
+ *
+ * vi: "Cấu hình JWT Convex" / en: "Convex JWT provider configuration"
+ */
 const authConfig = {
-  // vi: "Danh sách nhà cung cấp xác thực" / en: "Authentication providers"
-  // Providers are configured in auth.ts based on environment variables
-  socialProviders: {} as Record<string, unknown>,
-
-  // vi: "Cấu hình email và mật khẩu" / en: "Email/password configuration"
-  emailAndPassword: {
-    enabled: true,
-  },
-} as const;
+  providers: [
+    {
+      // Domain where Better Auth issues JWTs that Convex will verify.
+      // WHY: Convex validates incoming JWTs against this issuer URL.
+      domain: process.env.CONVEX_SITE_URL ?? "http://localhost:3000",
+      applicationID: "convex",
+    },
+  ],
+};
 
 export default authConfig;
