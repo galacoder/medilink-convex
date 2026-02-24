@@ -32,7 +32,7 @@
     "@copilotkit/runtime": "^1.51.4",
     "@medilink/api": "workspace:*",
     "@medilink/auth": "workspace:*",
-    "@medilink/db": "workspace:*",
+    "@medilink/backend": "workspace:*",
     "@medilink/ui": "workspace:*",
     "@medilink/validators": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",

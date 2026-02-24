@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@medilink/auth": "workspace:*",
-    "@medilink/db": "workspace:*",
     "@medilink/validators": "workspace:*",
     "@trpc/server": "catalog:",
     "superjson": "2.2.3",

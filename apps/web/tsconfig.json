@@ -1,20 +1,31 @@
 {
   "extends": "@medilink/tsconfig/base.json",
   "compilerOptions": {
-    "lib": ["ES2022", "dom", "dom.iterable"],
+    "lib": [
+      "ES2022",
+      "dom",
+      "dom.iterable"
+    ],
     "jsx": "preserve",
     "paths": {
-      "~/*": ["./src/*"],
-      "@medilink/db/api": [
-        "./src/__mocks__/convex-api-typed.ts",
-        "../../packages/db/convex/_generated/api"
+      "~/*": [
+        "./src/*"
       ],
-      "@medilink/db/dataModel": [
-        "../../packages/db/convex/_generated/dataModel"
+      "@medilink/backend": [
+        "../../packages/backend/src/index.ts"
       ]
     },
-    "plugins": [{ "name": "next" }]
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": [".", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    ".",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
