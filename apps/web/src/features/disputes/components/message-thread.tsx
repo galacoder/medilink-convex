@@ -16,7 +16,7 @@ import { useDisputeMessages } from "../hooks/use-dispute-detail";
 import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const disputesApi = api.disputes as any;
+const disputesApi = (api as any).disputes;
 const addMessageFn: FunctionReference<"mutation"> = disputesApi.addMessage;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 

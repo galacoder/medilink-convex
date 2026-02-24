@@ -75,7 +75,9 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
 
   const handleMarkRead = useCallback(
     async (notificationId: string) => {
-      await markReadMutation({ notificationId: notificationId as Id<"notifications"> });
+      await markReadMutation({
+        notificationId: notificationId as Id<"notifications">,
+      });
     },
     [markReadMutation],
   );

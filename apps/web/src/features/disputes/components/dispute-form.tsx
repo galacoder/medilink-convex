@@ -21,7 +21,7 @@ import type { DisputeType } from "../types";
 import { disputeLabels } from "../labels";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const disputesApi = api.disputes as any;
+const disputesApi = (api as any).disputes;
 const serviceRequestsApi = api.serviceRequests as any;
 const createFn: FunctionReference<"mutation"> = disputesApi.create;
 const listByHospitalSrFn: FunctionReference<"query"> =
