@@ -14,6 +14,7 @@
 import { SafeAreaView, Text, View } from "react-native";
 import { Stack, useGlobalSearchParams } from "expo-router";
 import { useQuery } from "convex/react";
+import type { Id } from "convex/values";
 
 import { api } from "@medilink/backend";
 
@@ -25,24 +26,27 @@ export default function EquipmentDetail() {
    * `useQuery(api.equipment.getById, { id })`.
    * No queryClient, no invalidation — Convex subscriptions handle real-time
    * updates automatically.
+   *
+   * WHY cast: useGlobalSearchParams returns string | string[]; we assert
+   * it is a valid equipment Id for the query args type.
    */
   const equipment = useQuery(
     api.equipment.getById,
-    id
-      ? { id: id as Parameters<typeof api.equipment.getById>[0]["id"] }
-      : "skip",
+    id ? { id: id as Id<"equipment"> } : "skip",
   );
 
   if (!equipment) return null;
 
   return (
     <SafeAreaView className="bg-background">
-      <Stack.Screen options={{ title: equipment.name }} />
+      <Stack.Screen options={{ title: equipment.nameVi }} />
       <View className="h-full w-full p-4">
         <Text className="text-primary py-2 text-3xl font-bold">
-          {equipment.name}
+          {equipment.nameVi}
         </Text>
-        <Text className="text-foreground py-4">{equipment.category}</Text>
+        <Text className="text-foreground py-4">
+          {equipment.category?.nameVi ?? ""}
+        </Text>
       </View>
     </SafeAreaView>
   );

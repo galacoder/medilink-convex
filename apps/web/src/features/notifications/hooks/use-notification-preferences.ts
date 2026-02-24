@@ -34,21 +34,16 @@ export function useNotificationPreferences(): UseNotificationPreferencesReturn {
   const userId = session?.user.id;
 
   // Reactive Convex query — skipped until session loads
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const rawPreferences = useQuery(
+  const preferences = useQuery(
     api.notifications.getPreferences,
     userId ? { userId } : "skip",
   );
-  const preferences = rawPreferences as
-    | NotificationPreferences
-    | null
-    | undefined;
 
   const updatePreferencesMutation = useMutation(
     api.notifications.updatePreferences,
   );
 
-  const isLoading = rawPreferences === undefined;
+  const isLoading = preferences === undefined;
 
   const updatePreferences = useCallback(
     async (prefs: Record<string, boolean>) => {

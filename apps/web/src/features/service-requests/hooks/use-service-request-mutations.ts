@@ -48,6 +48,7 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   const cancelMutation = useMutation(api.serviceRequests.cancel);
   const acceptMutation = useMutation(api.quotes.accept);
   const rejectMutation = useMutation(api.quotes.reject);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const rateMutation = useMutation(api.serviceRatings.create);
 
   async function createRequest(

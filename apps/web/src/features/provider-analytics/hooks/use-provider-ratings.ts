@@ -34,7 +34,7 @@ export function useProviderRatings(
   const { providerId } = options;
 
   const data = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     api.analytics.getProviderRatings as any,
     providerId ? { providerId } : "skip",
   ) as ProviderRatings | undefined;

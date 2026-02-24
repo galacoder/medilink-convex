@@ -33,12 +33,10 @@ export function useNotifications(): UseNotificationsReturn {
   const userId = session?.user.id;
 
   // Reactive Convex query — skipped until session loads
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const rawNotifications = useQuery(
+  const notifications = useQuery(
     api.notifications.listForUser,
     userId ? { userId } : "skip",
   );
-  const notifications = rawNotifications as NotificationItem[] | undefined;
 
   const markReadMutation = useMutation(api.notifications.markRead);
   const markAllReadMutation = useMutation(api.notifications.markAllRead);

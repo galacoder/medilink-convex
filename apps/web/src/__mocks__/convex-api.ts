@@ -13,12 +13,11 @@
  * `import type { Doc, Id } from "@medilink/backend"` compile correctly.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Doc<T extends string> = {
   _id: Id<T>;
   _creationTime: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } & Record<string, any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Id<T extends string> = string & { __tableName: T };
 
 export const api = {

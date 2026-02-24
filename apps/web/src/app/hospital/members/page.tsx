@@ -54,7 +54,7 @@ export default function HospitalMembersPage() {
 
     // WHY: Better Auth organization plugin exposes inviteMembers() directly on
     // the client, replacing the removed tRPC organization.inviteMember procedure.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const result = await organization.inviteMembers({
       organizationId: activeOrg.id,
       invitees: [{ email, role }],

@@ -53,7 +53,7 @@ export function useProviderAnalytics(
   const { providerId, dateRange, customStartDate, customEndDate } = options;
 
   const summary = useQuery(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
     api.analytics.getProviderSummary as any,
     providerId
       ? { providerId, dateRange, customStartDate, customEndDate }

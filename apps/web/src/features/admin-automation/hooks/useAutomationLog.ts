@@ -33,6 +33,7 @@ export function useAutomationLog(
   limit = 100,
 ): AutomationLogEntry[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return useQuery(api.automation.automationLog.listAutomationLogs, {
     ruleName,
     limit,
@@ -51,6 +52,7 @@ export function useAutomationLog(
  */
 export function useAutomationRuleStatus(): AutomationRuleStatus[] | undefined {
   // useQuery returns undefined while loading; cast to the expected type
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return useQuery(api.automation.automationLog.getAutomationRuleStatus, {}) as
     | AutomationRuleStatus[]
     | undefined;

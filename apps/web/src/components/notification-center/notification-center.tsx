@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { Bell } from "lucide-react";
 
-import type { Doc } from "@medilink/backend";
 import { api } from "@medilink/backend";
 import { Badge } from "@medilink/ui/badge";
 import { Button } from "@medilink/ui/button";
@@ -64,7 +63,7 @@ export function NotificationCenter({ locale = "vi" }: NotificationCenterProps) {
   const notifications = useQuery(
     api.notifications.listForUser,
     userId ? { userId } : "skip",
-  ) as Doc<"notifications">[] | undefined;
+  );
 
   // Mutations
   const markReadMutation = useMutation(api.notifications.markRead);
