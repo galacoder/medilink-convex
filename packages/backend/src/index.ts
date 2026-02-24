@@ -9,7 +9,7 @@
 
 // Re-export Convex generated API — provides type-safe function references
 // Usage: import { api } from "@medilink/backend"
-export { api } from "../../convex/_generated/api";
+export { api } from "../../../convex/_generated/api";
 
 // Re-export Convex data types for TypeScript
-export type { Id, Doc } from "../../convex/_generated/dataModel";
+export type { Id, Doc } from "../../../convex/_generated/dataModel";

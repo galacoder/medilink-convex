@@ -415,6 +415,9 @@ importers:
         specifier: ^1.31.7
         version: 1.31.7(react@19.1.4)
     devDependencies:
+      '@medilink/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
