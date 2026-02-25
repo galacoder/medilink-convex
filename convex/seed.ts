@@ -4,14 +4,29 @@
  *
  * Exports a default action (entry point: npx convex run seed:default) that
  * calls internal mutations in strict dependency order:
- *   1. seedBaseEntities  — users, orgs, memberships
- *   2. seedEquipmentData — categories, equipment, QR codes
- *   3. seedProviderData  — provider profile, offerings, certifications, coverage
- *   4. seedConsumablesData — consumables
- *   5. seedServiceRequestData — service requests, quotes, maintenance record
+ *   1. seedBaseEntities        — users, orgs, memberships
+ *   2. seedEquipmentData       — categories, equipment, QR codes
+ *   3. seedProviderData        — provider profile, offerings, certifications, coverage
+ *   4. seedConsumablesData     — consumables
+ *   5. seedServiceRequestData  — service requests, quotes, maintenance record
+ *   6. seedAdminData           — auditLog, automationLog, escalated disputes, extra orgs
+ *   7. seedProviderRichnessData — serviceRatings, completionReports, extra offerings/certs/coverage
+ *   8. seedHospitalWorkflowData — departments, borrowRequests, failureReports, equipmentHistory,
+ *                                  qrScanLog, consumableUsageLog, reorderRequests, notifications
  *
  * All internal mutations are idempotent: they skip insertion if the record
- * already exists (using helpers from seedHelpers.ts).
+ * already exists (using helpers from seedHelpers.ts). Running the seed twice
+ * produces no duplicate records.
+ *
+ * Data source modules:
+ *   convex/seedData/users.ts          — user seed constants
+ *   convex/seedData/organizations.ts  — org seed constants
+ *   convex/seedData/equipment.ts      — equipment/consumable seed constants
+ *   convex/seedData/serviceRequests.ts — service request/quote seed constants
+ *   convex/seedData/admin.ts          — auditLog/automationLog/extra org seed constants
+ *   convex/seedData/providerRichness.ts — ratings/reports/offerings seed constants
+ *   convex/seedData/hospitalWorkflow.ts — workflow seed constants
+ *   convex/seedHelpers.ts             — shared idempotency lookup helpers
  */
 
 import { v } from "convex/values";
@@ -806,9 +821,11 @@ export const seedServiceRequestData = internalMutation({
 
     // Insert service requests
     for (const request of ALL_SEED_SERVICE_REQUESTS) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const equipmentId =
-        equipmentIds[equipmentKeyToIndex[request.equipmentKey]];
-      const requestedBy = userKeyMap[request.requestedByKey];
+        equipmentIds[equipmentKeyToIndex[request.equipmentKey]!]!;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const requestedBy = userKeyMap[request.requestedByKey]!;
 
       // Idempotency: check by equipment + org + status combination
       const existing = await ctx.db
@@ -856,8 +873,9 @@ export const seedServiceRequestData = internalMutation({
       (r) => r.status === "disputed",
     );
     if (disputedRequest !== null && disputedRequest !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const disputedEquipmentId =
-        equipmentIds[equipmentKeyToIndex[disputedRequest.equipmentKey]];
+        equipmentIds[equipmentKeyToIndex[disputedRequest.equipmentKey]!]!;
       const disputedRequestRecord = await ctx.db
         .query("serviceRequests")
         .withIndex("by_equipment", (q) =>
@@ -912,8 +930,9 @@ export const seedServiceRequestData = internalMutation({
     };
 
     for (const quote of ALL_SEED_QUOTES) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const serviceRequestId =
-        requestIds[requestKeyToIndex[quote.serviceRequestKey]];
+        requestIds[requestKeyToIndex[quote.serviceRequestKey]!]!;
 
       // Idempotency: check by service request + provider + status
       const existing = await ctx.db
@@ -1017,8 +1036,10 @@ export const seedAdminData = internalMutation({
     let auditLogCount = 0;
     if (existingAuditCount < 20) {
       for (const entry of SEED_AUDIT_LOG_ENTRIES) {
-        const actorId = actorMap[entry.actorKey];
-        const organizationId = orgMap[entry.orgKey];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const actorId = actorMap[entry.actorKey]!;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const organizationId = orgMap[entry.orgKey]!;
         const entryCreatedAt = now - entry.daysAgo * MS_PER_DAY;
 
         await ctx.db.insert("auditLog", {
