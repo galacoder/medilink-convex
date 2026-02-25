@@ -110,9 +110,7 @@ export async function GET(request: NextRequest) {
     context.platformRole === "platform_admin" ||
     context.platformRole === "platform_support"
   ) {
-    const response = NextResponse.redirect(
-      new URL("/admin/dashboard", base),
-    );
+    const response = NextResponse.redirect(new URL("/admin/dashboard", base));
     response.cookies.set(
       "medilink-org-context",
       `admin:${context.platformRole}`,

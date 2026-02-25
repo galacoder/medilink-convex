@@ -80,7 +80,10 @@ export function ServiceRequestTable({
   }
 
   return (
-    <div data-testid="service-request-list" className="overflow-hidden rounded-md border">
+    <div
+      data-testid="service-request-list"
+      className="overflow-hidden rounded-md border"
+    >
       {/* Table header */}
       <div className="bg-muted/50 text-muted-foreground grid grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 px-4 py-3 text-xs font-medium tracking-wide uppercase">
         <span>{labels.table.equipment.vi}</span>
