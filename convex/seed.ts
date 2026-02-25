@@ -934,6 +934,123 @@ export const seedServiceRequestData = internalMutation({
 });
 
 // ---------------------------------------------------------------------------
+// Step 6: seedAiConversationData
+// Creates: 2 sample AI conversations with messages
+// ---------------------------------------------------------------------------
+
+export const seedAiConversationData = internalMutation({
+  args: {
+    hospitalOwnerUserId: v.id("users"),
+    hospitalOrgId: v.id("organizations"),
+    providerOwnerUserId: v.id("users"),
+    providerOrgId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+
+    // Hospital conversation: Equipment search (lan.tran@spmet.edu.vn)
+    const hospitalConvos = await ctx.db
+      .query("aiConversation")
+      .withIndex("by_user_and_org", (q) =>
+        q
+          .eq("userId", args.hospitalOwnerUserId)
+          .eq("organizationId", args.hospitalOrgId),
+      )
+      .collect();
+    const hospitalExists = hospitalConvos.some(
+      (c) => c.titleVi === "Tim thiet bi sieu am",
+    );
+    if (!hospitalExists) {
+      await ctx.db.insert("aiConversation", {
+        userId: args.hospitalOwnerUserId,
+        organizationId: args.hospitalOrgId,
+        titleVi: "Tim thiet bi sieu am",
+        titleEn: "Find ultrasound equipment",
+        messages: [
+          {
+            role: "user",
+            content: "Tim tat ca may sieu am dang san dung",
+            timestamp: now - 3600000,
+          },
+          {
+            role: "assistant",
+            content:
+              "Hien tai co 2 may sieu am dang san dung: SN-US001 tai Phong 201 va SN-US002 tai Phong 305.",
+            timestamp: now - 3500000,
+          },
+          {
+            role: "user",
+            content: "May nao duoc bao tri gan day nhat?",
+            timestamp: now - 3400000,
+          },
+        ],
+        model: "stub",
+        createdAt: now - 3600000,
+        updatedAt: now - 3400000,
+      });
+      console.log("Created AI conversation: hospital equipment search");
+    } else {
+      console.log(
+        "Skipping AI conversation: hospital equipment search (exists)",
+      );
+    }
+
+    // Provider conversation: Service request status (minh.le@techmed.vn)
+    const providerConvos = await ctx.db
+      .query("aiConversation")
+      .withIndex("by_user_and_org", (q) =>
+        q
+          .eq("userId", args.providerOwnerUserId)
+          .eq("organizationId", args.providerOrgId),
+      )
+      .collect();
+    const providerExists = providerConvos.some(
+      (c) => c.titleVi === "Trang thai yeu cau dich vu",
+    );
+    if (!providerExists) {
+      await ctx.db.insert("aiConversation", {
+        userId: args.providerOwnerUserId,
+        organizationId: args.providerOrgId,
+        titleVi: "Trang thai yeu cau dich vu",
+        titleEn: "Service request status",
+        messages: [
+          {
+            role: "user",
+            content: "Toi co bao nhieu yeu cau dich vu dang cho xu ly?",
+            timestamp: now - 7200000,
+          },
+          {
+            role: "assistant",
+            content:
+              "Ban co 3 yeu cau dich vu dang cho xu ly: 2 bao tri dinh ky va 1 sua chua khan cap.",
+            timestamp: now - 7100000,
+          },
+          {
+            role: "user",
+            content: "Yeu cau khan cap la gi?",
+            timestamp: now - 7000000,
+          },
+          {
+            role: "assistant",
+            content:
+              "Yeu cau khan cap la sua chua may do huyet ap SN-BP003 tai Phong 102 - bao cao hong ngay 20/02.",
+            timestamp: now - 6900000,
+          },
+        ],
+        model: "stub",
+        createdAt: now - 7200000,
+        updatedAt: now - 6900000,
+      });
+      console.log("Created AI conversation: provider service request status");
+    } else {
+      console.log(
+        "Skipping AI conversation: provider service request status (exists)",
+      );
+    }
+  },
+});
+
+// ---------------------------------------------------------------------------
 // seedAuthAccounts: Cleans up stale Better Auth records for all seeded users.
 // Entry point: npx convex run seed:seedAuthAccounts
 //
@@ -1036,15 +1153,15 @@ export const seedOrgContext = action({
   args: {},
   handler: async (ctx): Promise<{ email: string; status: string }[]> => {
     // Resolve org IDs from organizations table
-    const hospitalOrg = await ctx.runQuery(
+    const hospitalOrg = (await ctx.runQuery(
       internal.seed.findOrgBySlugInternal,
       { slug: "spmet-hospital" },
-    ) as { _id: string; org_type: string } | null;
+    )) as { _id: string; org_type: string } | null;
 
-    const providerOrg = await ctx.runQuery(
+    const providerOrg = (await ctx.runQuery(
       internal.seed.findOrgBySlugInternal,
       { slug: "techmed-services" },
-    ) as { _id: string; org_type: string } | null;
+    )) as { _id: string; org_type: string } | null;
 
     if (!hospitalOrg || !providerOrg) {
       throw new Error(
@@ -1084,7 +1201,9 @@ export const seedOrgContext = action({
           },
           paginationOpts: { cursor: null, numItems: 1 },
         } as any);
-        console.log(`Set org context for ${email}: orgId=${orgId} type=${orgType}`);
+        console.log(
+          `Set org context for ${email}: orgId=${orgId} type=${orgType}`,
+        );
         results.push({ email, status: `ok (${orgType})` });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -1291,7 +1410,7 @@ export default action({
     );
 
     // Step 6: Notification preferences
-    console.log("\n[6/6] Seeding notification preferences...");
+    console.log("\n[6/7] Seeding notification preferences...");
     const notifPrefsCreated = (await ctx.runMutation(
       internal.seed.seedNotificationPreferences,
       {
@@ -1304,6 +1423,16 @@ export default action({
       },
     )) as number;
     console.log(`  ✓ Notification preferences: ${notifPrefsCreated} created`);
+
+    // Step 7: AI conversations
+    console.log("\n[7/7] Seeding AI conversations...");
+    await ctx.runMutation(internal.seed.seedAiConversationData, {
+      hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+      hospitalOrgId: baseIds.hospitalOrgId,
+      providerOwnerUserId: baseIds.providerOwnerUserId,
+      providerOrgId: baseIds.providerOrgId,
+    });
+    console.log("  ✓ AI conversations: 2 (1 hospital + 1 provider)");
 
     // Final summary
     console.log("\n" + "=".repeat(60));
@@ -1334,6 +1463,9 @@ export default action({
     console.log("  Dispute       : 1 (quality dispute on disputed request)");
     console.log(
       "  Notif prefs   : 6 (1 per user, admin=all-on, hospital=all-on, provider=no-maint)",
+    );
+    console.log(
+      "  AI convos     : 2 (1 hospital equip search + 1 provider SR status)",
     );
     console.log("\nRun again safely — seed is idempotent.");
   },

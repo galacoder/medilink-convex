@@ -1188,7 +1188,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_org", ["organizationId"]),
+    .index("by_org", ["organizationId"])
+    .index("by_user_and_org", ["userId", "organizationId"]),
 
   // ===========================================================================
   // SUPPORT DOMAIN (2 tables) — Wave 2

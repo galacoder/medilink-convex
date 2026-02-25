@@ -1,38 +1,47 @@
 "use client";
 
 /**
- * Hook for managing AI conversation history.
+ * Hook for managing AI conversation history via Convex.
  *
- * WHY: This is a skeleton hook for Wave 1. The aiConversation Convex table
- * will be added in Wave 2 (Schema Extensions). For now, this hook returns
- * an empty list and no-op functions so the UI can be built ahead of the
- * persistence layer.
+ * WHY: Provides real-time conversation list, CRUD operations, and message
+ * management. Uses useQuery for reactive data and useMutation for writes.
  *
- * Wire-up plan (Wave 2):
- *   - Replace empty array with useQuery(api.aiAssistant.listConversations, ...)
- *   - Implement selectConversation to fetch single conversation
- *
- * vi: "Hook lịch sử hội thoại AI (skeleton)" / en: "AI history hook (skeleton for Wave 2)"
+ * vi: "Hook lich su hoi thoai AI" / en: "AI conversation history hook"
  */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 
-import type { AiConversation, UseAiHistoryReturn } from "../types";
+import { api } from "@medilink/backend";
+
+import type {
+  AiConversation,
+  AiMessageRole,
+  UseAiHistoryReturn,
+} from "../types";
 
 /**
- * Returns AI conversation history and selection state.
+ * Returns AI conversation history, selection state, and CRUD mutations.
  *
- * NOTE: Returns empty data in Wave 1. Wired to Convex in Wave 2.
- *
- * vi: "Hook lịch sử AI" / en: "AI history hook"
+ * vi: "Hook lich su AI" / en: "AI history hook"
  */
-export function useAiHistory(): UseAiHistoryReturn {
-  // Skeleton: no conversations until Wave 2 adds the aiConversation table.
-  // WHY useMemo: stable reference avoids exhaustive-deps warning in selectConversation.
-  const conversations = useMemo<AiConversation[]>(() => [], []);
-  const isLoading = false;
+export function useAiHistory(
+  organizationId: string | undefined,
+): UseAiHistoryReturn {
+  const rawConversations = useQuery(
+    api.aiConversation.list,
+    organizationId ? { organizationId: organizationId as any } : "skip",
+  );
+
+  const conversations: AiConversation[] = (rawConversations ?? []) as any;
+  const isLoading = rawConversations === undefined;
 
   const [selectedConversation, setSelectedConversation] =
     useState<AiConversation | null>(null);
+
+  // Keep selected conversation in sync with live data
+  const currentSelected = selectedConversation
+    ? (conversations.find((c) => c._id === selectedConversation._id) ?? null)
+    : null;
 
   const selectConversation = useCallback(
     (id: string) => {
@@ -46,11 +55,58 @@ export function useAiHistory(): UseAiHistoryReturn {
     setSelectedConversation(null);
   }, []);
 
+  const createMutation = useMutation(api.aiConversation.create);
+  const removeMutation = useMutation(api.aiConversation.remove);
+  const addMessageMutation = useMutation(api.aiConversation.addMessage);
+
+  const createConversation = useCallback(
+    async (titleVi: string, titleEn: string): Promise<string> => {
+      if (!organizationId) {
+        throw new Error("No active organization");
+      }
+      const id = await createMutation({
+        organizationId: organizationId as any,
+        titleVi,
+        titleEn,
+      });
+      return id as string;
+    },
+    [createMutation, organizationId],
+  );
+
+  const deleteConversation = useCallback(
+    async (id: string): Promise<void> => {
+      await removeMutation({ id: id as any });
+      if (selectedConversation?._id === id) {
+        setSelectedConversation(null);
+      }
+    },
+    [removeMutation, selectedConversation],
+  );
+
+  const addMessage = useCallback(
+    async (
+      conversationId: string,
+      role: AiMessageRole,
+      content: string,
+    ): Promise<void> => {
+      await addMessageMutation({
+        id: conversationId as any,
+        role,
+        content,
+      });
+    },
+    [addMessageMutation],
+  );
+
   return {
     conversations,
     isLoading,
-    selectedConversation,
+    selectedConversation: currentSelected,
     selectConversation,
     clearSelection,
+    createConversation,
+    deleteConversation,
+    addMessage,
   };
 }

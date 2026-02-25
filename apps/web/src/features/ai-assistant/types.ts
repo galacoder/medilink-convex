@@ -7,8 +7,8 @@
 /** Portal contexts the AI assistant supports */
 export type AiAssistantPortal = "hospital" | "provider";
 
-/** Role in an AI conversation message */
-export type AiMessageRole = "user" | "assistant" | "system";
+/** Role in an AI conversation message (matches Convex schema) */
+export type AiMessageRole = "user" | "assistant";
 
 /** A single message in an AI conversation */
 export interface AiMessage {
@@ -18,11 +18,11 @@ export interface AiMessage {
   timestamp: number;
 }
 
-/** A full AI conversation record (matches the future aiConversation Convex table) */
+/** A full AI conversation record (matches aiConversation Convex table) */
 export interface AiConversation {
   _id: string;
   userId: string;
-  organizationId?: string;
+  organizationId: string;
   titleVi: string;
   titleEn: string;
   messages: AiMessage[];
@@ -71,11 +71,18 @@ export interface UseAiAssistantReturn {
   error: string | null;
 }
 
-/** Shape returned by the useAiHistory hook (skeleton until Wave 2 adds persistence) */
+/** Shape returned by the useAiHistory hook (wired to Convex) */
 export interface UseAiHistoryReturn {
   conversations: AiConversation[];
   isLoading: boolean;
   selectedConversation: AiConversation | null;
   selectConversation: (id: string) => void;
   clearSelection: () => void;
+  createConversation: (titleVi: string, titleEn: string) => Promise<string>;
+  deleteConversation: (id: string) => Promise<void>;
+  addMessage: (
+    conversationId: string,
+    role: AiMessageRole,
+    content: string,
+  ) => Promise<void>;
 }
