@@ -38,10 +38,7 @@ import {
   SheetTrigger,
 } from "@medilink/ui/sheet";
 
-import type {
-  AdminServiceRequest,
-  AdminServiceRequestFilters,
-} from "~/features/admin-disputes";
+import type { AdminServiceRequestFilters } from "~/features/admin-disputes";
 import {
   adminDisputeLabels,
   AdminServiceRequestTable,
@@ -95,19 +92,17 @@ export default function AdminServiceRequestsPage() {
   const [showBottlenecksOnly, setShowBottlenecksOnly] = useState(false);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
-  // Query all service requests — cross-tenant, no org filter
-  const allRequests = useAdminServiceRequests({
+  // Query all service requests — cross-tenant, paginated (default 50 per page)
+  const {
+    results: typedRequests,
+    status: paginationStatus,
+    loadMore,
+  } = useAdminServiceRequests({
     status: filters.status,
     hospitalId: filters.hospitalId,
-    providerId: filters.providerId,
-    fromDate: filters.fromDate,
-    toDate: filters.toDate,
   });
 
-  const isLoading = allRequests === undefined;
-
-  // useAdminServiceRequests returns AdminServiceRequest[] | undefined (typed in hook)
-  const typedRequests: AdminServiceRequest[] = allRequests ?? [];
+  const isLoading = paginationStatus === "LoadingFirstPage";
 
   // Client-side bottleneck filter (applied on top of server results)
   const displayRequests = showBottlenecksOnly
@@ -147,7 +142,7 @@ export default function AdminServiceRequestsPage() {
             <Button variant="outline" className="gap-2">
               <FilterIcon className="h-4 w-4" />
               {adminDisputeLabels.filters.title.vi} {/* Filters */}
-              {(filters.status ?? filters.hospitalId ?? filters.providerId) && (
+              {(filters.status ?? filters.hospitalId) && (
                 <Badge variant="secondary" className="ml-1 text-xs">
                   Đang lọc
                 </Badge>
@@ -276,6 +271,22 @@ export default function AdminServiceRequestsPage() {
         serviceRequests={displayRequests}
         isLoading={isLoading}
       />
+
+      {/* Load more button for pagination */}
+      {paginationStatus === "CanLoadMore" && (
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={() => loadMore(50)}>
+            Tải thêm {/* Load More */}
+          </Button>
+        </div>
+      )}
+      {paginationStatus === "LoadingMore" && (
+        <div className="flex justify-center">
+          <Button variant="outline" disabled>
+            Đang tải... {/* Loading... */}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
