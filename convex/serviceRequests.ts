@@ -17,6 +17,7 @@ import type { ServiceRequestStatus } from "./lib/workflowStateMachine";
 import { mutation, query } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
 import { requireAuth, requireOrgAuth } from "./lib/auth";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 import { canTransition } from "./lib/workflowStateMachine";
 
 // ---------------------------------------------------------------------------
@@ -136,6 +137,9 @@ export const create = mutation({
   handler: async (ctx, args) => {
     // 1. Authenticate the caller
     const auth = await requireAuth(ctx);
+
+    // 1a. Rate limit per org
+    await checkOrgRateLimit(ctx, args.organizationId, "serviceRequests.create");
 
     // 2. Verify the org is a hospital
     await assertHospitalOrg(ctx, args.organizationId);
@@ -627,6 +631,13 @@ export const updateProgress = mutation({
   handler: async (ctx, args) => {
     // 1. Authenticate (local helper to avoid better-auth dep in tests)
     const auth = await localRequireOrgAuth(ctx);
+
+    // 1a. Rate limit per org
+    await checkOrgRateLimit(
+      ctx,
+      auth.organizationId,
+      "serviceRequests.updateProgress",
+    );
 
     // 2. Load the service request
     const request = await ctx.db.get(args.id);

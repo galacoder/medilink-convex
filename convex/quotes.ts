@@ -14,6 +14,7 @@ import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
 import { requireAuth, requireOrgAuth } from "./lib/auth";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 
 /**
  * Submits a new quote for a service request.
@@ -80,6 +81,13 @@ export const submit = mutation({
         vi: "Không tìm thấy hồ sơ nhà cung cấp",
       });
     }
+
+    // Rate limit per provider org
+    await checkOrgRateLimit(
+      ctx,
+      provider.organizationId as Id<"organizations">,
+      "quotes.submit",
+    );
 
     const quoteId = await ctx.db.insert("quotes", {
       serviceRequestId: args.serviceRequestId,

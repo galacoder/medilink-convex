@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 
 import { type Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 
 // ---------------------------------------------------------------------------
 // Helper: extract authenticated organizationId from JWT identity
@@ -466,6 +467,7 @@ export const recordUsage = mutation({
   },
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
+    await checkOrgRateLimit(ctx, organizationId, "consumables.recordUsage");
 
     // FIX 5: Reject non-positive quantity
     if (args.quantity <= 0) {
