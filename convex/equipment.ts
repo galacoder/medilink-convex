@@ -474,25 +474,26 @@ export const updateStatus = mutation({
       .withIndex("by_email", (q: any) => q.eq("email", subject))
       .first();
 
-    // If user not found, we still create history but need a valid user ID
-    // In a real system the user would always exist; for safety use a system approach
-    // We'll store the subject string as a reference note in the history
-    // For the performedBy field (required Id<"users">), we need to handle this carefully
-    // Since subject is the Better Auth user ID, we look up the user
-    // If performerUser is null (test scenario), we skip history insertion
-    if (performerUser) {
-      // Create history entry
-      await ctx.db.insert("equipmentHistory", {
-        equipmentId: args.id,
-        actionType: "status_change",
-        previousStatus,
-        newStatus: args.newStatus,
-        notes: args.notes,
-        performedBy: performerUser._id,
-        createdAt: now,
-        updatedAt: now,
+    // Every status change MUST have an audit trail entry.
+    // Convex auto-rolls back the entire mutation on throw,
+    // so the status update above does NOT commit if performer is missing.
+    if (!performerUser) {
+      throw new ConvexError({
+        vi: "Không tìm thấy người thực hiện trong hệ thống",
+        en: "Performer user not found in system",
       });
     }
+
+    await ctx.db.insert("equipmentHistory", {
+      equipmentId: args.id,
+      actionType: "status_change",
+      previousStatus,
+      newStatus: args.newStatus,
+      notes: args.notes,
+      performedBy: performerUser._id,
+      createdAt: now,
+      updatedAt: now,
+    });
 
     return args.id;
   },
