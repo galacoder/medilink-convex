@@ -26,4 +26,17 @@ crons.daily(
   internal.billing.crons.dailySubscriptionCheck,
 );
 
+// ---------------------------------------------------------------------------
+// Billing: Monthly AI credit reset
+// ---------------------------------------------------------------------------
+
+// Reset credit AI hang thang / Monthly AI credit reset
+// Chay vao ngay 1 moi thang luc 00:00 UTC
+// Runs on the 1st of every month at 00:00 UTC
+crons.monthly(
+  "monthly AI credit reset",
+  { day: 1, hourUTC: 0, minuteUTC: 0 },
+  internal.billing.crons.monthlyAiCreditReset,
+);
+
 export default crons;
