@@ -26,6 +26,7 @@
     "./tooltip": "./src/tooltip.tsx",
     "./table": "./src/table.tsx",
     "./dialog": "./src/dialog.tsx",
+    "./switch": "./src/switch.tsx",
     "./textarea": "./src/textarea.tsx"
   },
   "license": "MIT",
