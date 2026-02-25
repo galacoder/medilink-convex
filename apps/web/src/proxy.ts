@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { isPublicPath } from "@medilink/auth/middleware";
 
 import type { MiddlewareSessionData } from "~/lib/portal-routing";
+import { buildCspHeader, generateNonce } from "~/lib/csp";
 import {
   getDefaultRedirectForPortal,
   getExpectedOrgTypeForPortal,
@@ -29,6 +30,29 @@ import {
  *    b. No active organization → redirect to /sign-up
  *    c. Has org → allow current portal access
  */
+
+/**
+ * Create a NextResponse.next() with CSP and security headers.
+ *
+ * WHY: CSP headers block inline script execution system-wide. Even if malicious
+ * HTML were stored in a Convex text field and rendered, the browser would refuse
+ * to execute it. The nonce is passed via x-nonce header so layout.tsx can apply
+ * it to legitimate <script> elements.
+ */
+function nextWithSecurityHeaders(): NextResponse {
+  const nonce = generateNonce();
+  const isDev = process.env.NODE_ENV === "development";
+
+  const response = NextResponse.next({
+    headers: { "x-nonce": nonce },
+  });
+
+  response.headers.set("Content-Security-Policy", buildCspHeader(nonce, isDev));
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+
+  return response;
+}
 
 /** Paths that bypass proxy entirely (static files, Next.js internals, API routes). */
 const BYPASS_PREFIXES = [
@@ -162,7 +186,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // WHY: isPublicPath from auth middleware handles the canonical public path list
   // NOTE: /api/health is already handled by shouldBypass() above
   if (isPublicPath(pathname)) {
-    return NextResponse.next();
+    return nextWithSecurityHeaders();
   }
 
   const sessionToken = getSessionCookie(request);
@@ -209,7 +233,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     if (currentPortal !== "platform-admin") {
       return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
-    return NextResponse.next();
+    return nextWithSecurityHeaders();
   }
 
   // Branch 2.5: Non-admin user attempting to access /admin routes
@@ -234,7 +258,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     if (pathname !== "/sign-up") {
       return NextResponse.redirect(new URL("/sign-up", request.url));
     }
-    return NextResponse.next();
+    return nextWithSecurityHeaders();
   }
 
   // Branch 4: Has active org → validate portal access
@@ -269,7 +293,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL(correctDashboard, request.url));
   }
 
-  return NextResponse.next();
+  return nextWithSecurityHeaders();
 }
 
 /**
