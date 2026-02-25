@@ -34,7 +34,24 @@ import {
   CATEGORY_PATIENT_MONITORING,
   CATEGORY_SURGICAL,
 } from "./seedData/equipment";
+import {
+  SEED_BORROW_REQUESTS,
+  SEED_CONSUMABLE_USAGE_LOG,
+  SEED_DEPARTMENTS,
+  SEED_EQUIPMENT_HISTORY,
+  SEED_FAILURE_REPORTS,
+  SEED_NOTIFICATIONS,
+  SEED_QR_SCAN_LOG,
+  SEED_REORDER_REQUESTS,
+} from "./seedData/hospitalWorkflow";
 import { SPMET_HOSPITAL, TECHMED_PROVIDER } from "./seedData/organizations";
+import {
+  SEED_COMPLETION_REPORTS,
+  SEED_EXTRA_CERTIFICATIONS,
+  SEED_EXTRA_COVERAGE_AREAS,
+  SEED_EXTRA_OFFERINGS,
+  SEED_SERVICE_RATINGS,
+} from "./seedData/providerRichness";
 import {
   ALL_SEED_CERTIFICATIONS,
   ALL_SEED_COVERAGE_AREAS,
@@ -1235,6 +1252,715 @@ export const seedAdminData = internalMutation({
 });
 
 // ---------------------------------------------------------------------------
+// Step 7: seedProviderRichnessData
+// Creates: 3 serviceRatings, 1 completionReport, 3 extra offerings,
+//          1 expiring-soon certification, 2 extra coverage areas
+// ---------------------------------------------------------------------------
+
+export const seedProviderRichnessData = internalMutation({
+  args: {
+    providerId: v.id("providers"),
+    requestIds: v.array(v.id("serviceRequests")),
+    hospitalOwnerUserId: v.id("users"),
+    hospitalStaff1UserId: v.id("users"),
+    hospitalStaff2UserId: v.id("users"),
+  },
+  returns: v.object({
+    ratingsCreated: v.number(),
+    reportsCreated: v.number(),
+    extraOfferingsCreated: v.number(),
+    extraCertsCreated: v.number(),
+    extraAreasCreated: v.number(),
+  }),
+  handler: async (
+    ctx,
+    {
+      providerId,
+      requestIds,
+      hospitalOwnerUserId,
+      hospitalStaff1UserId,
+      hospitalStaff2UserId,
+    },
+  ) => {
+    const now = Date.now();
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+
+    // requestKeyToIndex mirrors the mapping in seedServiceRequestData
+    const requestKeyToIndex: Record<string, number> = {
+      REQUEST_PENDING: 0,
+      REQUEST_QUOTED: 1,
+      REQUEST_ACCEPTED: 2,
+      REQUEST_IN_PROGRESS: 3,
+      REQUEST_COMPLETED: 4,
+      REQUEST_DISPUTED: 5,
+    };
+
+    const userKeyMap: Record<string, Id<"users">> = {
+      hospital_owner: hospitalOwnerUserId,
+      hospital_staff_1: hospitalStaff1UserId,
+      hospital_staff_2: hospitalStaff2UserId,
+    };
+
+    // -----------------------------------------------------------------------
+    // 1. Service ratings for completed request
+    // -----------------------------------------------------------------------
+    let ratingsCreated = 0;
+    const existingRatingsCount = (
+      await ctx.db
+        .query("serviceRatings")
+        .withIndex("by_provider", (q) => q.eq("providerId", providerId))
+        .collect()
+    ).length;
+
+    if (existingRatingsCount < 3) {
+      for (const rating of SEED_SERVICE_RATINGS) {
+        const serviceRequestId =
+          requestIds[requestKeyToIndex[rating.serviceRequestKey]!]!;
+        const ratedBy = userKeyMap[rating.ratedByKey]!;
+        const ratingCreatedAt = now - rating.daysAgo * 24 * ONE_HOUR_MS;
+
+        // Check by serviceRequest + ratedBy for idempotency
+        const existing = await ctx.db
+          .query("serviceRatings")
+          .withIndex("by_service_request", (q) =>
+            q.eq("serviceRequestId", serviceRequestId),
+          )
+          .filter((q) => q.eq(q.field("ratedBy"), ratedBy))
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("serviceRatings", {
+            serviceRequestId,
+            providerId,
+            ratedBy,
+            rating: rating.rating,
+            commentVi: rating.commentVi,
+            commentEn: rating.commentEn,
+            serviceQuality: rating.serviceQuality,
+            timeliness: rating.timeliness,
+            professionalism: rating.professionalism,
+            createdAt: ratingCreatedAt,
+            updatedAt: ratingCreatedAt,
+          });
+          ratingsCreated++;
+          console.log(`Created service rating: ${rating.rating} stars by ${rating.ratedByKey}`);
+        } else {
+          console.log(`Skipping service rating: already exists for ${rating.ratedByKey}`);
+        }
+      }
+    } else {
+      console.log(`Skipping service ratings: already has ${existingRatingsCount} ratings`);
+      ratingsCreated = existingRatingsCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. Completion reports for completed request
+    // -----------------------------------------------------------------------
+    let reportsCreated = 0;
+
+    for (const report of SEED_COMPLETION_REPORTS) {
+      const serviceRequestId =
+        requestIds[requestKeyToIndex[report.serviceRequestKey]!]!;
+      const submittedBy = userKeyMap[report.submittedByKey]!;
+
+      const existing = await ctx.db
+        .query("completionReports")
+        .withIndex("by_service_request", (q) =>
+          q.eq("serviceRequestId", serviceRequestId),
+        )
+        .first();
+
+      if (existing === null) {
+        const reportCreatedAt = now - report.daysAgo * 24 * ONE_HOUR_MS;
+        await ctx.db.insert("completionReports", {
+          serviceRequestId,
+          providerId,
+          workDescriptionVi: report.workDescriptionVi,
+          workDescriptionEn: report.workDescriptionEn,
+          partsReplaced: report.partsReplaced,
+          nextMaintenanceRecommendation: report.nextMaintenanceRecommendation,
+          actualHours: report.actualHours,
+          photoUrls: report.photoUrls,
+          actualCompletionTime: reportCreatedAt,
+          submittedBy,
+          createdAt: reportCreatedAt,
+          updatedAt: reportCreatedAt,
+        });
+        reportsCreated++;
+        console.log(`Created completion report for ${report.serviceRequestKey}`);
+      } else {
+        console.log(`Skipping completion report: already exists for ${report.serviceRequestKey}`);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. Extra service offerings (electrical, software, installation)
+    // -----------------------------------------------------------------------
+    let extraOfferingsCreated = 0;
+
+    for (const offering of SEED_EXTRA_OFFERINGS) {
+      const existingOffering = await ctx.db
+        .query("serviceOfferings")
+        .withIndex("by_provider", (q) => q.eq("providerId", providerId))
+        .filter((q) => q.eq(q.field("specialty"), offering.specialty))
+        .first();
+
+      if (existingOffering === null) {
+        await ctx.db.insert("serviceOfferings", {
+          providerId,
+          specialty: offering.specialty,
+          descriptionVi: offering.descriptionVi,
+          descriptionEn: offering.descriptionEn,
+          priceEstimate: offering.priceEstimate,
+          turnaroundDays: offering.turnaroundDays,
+          createdAt: now,
+          updatedAt: now,
+        });
+        extraOfferingsCreated++;
+        console.log(`Created extra service offering: ${offering.specialty}`);
+      } else {
+        console.log(`Skipping extra offering: already exists (${offering.specialty})`);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. Extra certification (expiring-soon)
+    // -----------------------------------------------------------------------
+    let extraCertsCreated = 0;
+
+    for (const cert of SEED_EXTRA_CERTIFICATIONS) {
+      const existingCert = await ctx.db
+        .query("certifications")
+        .withIndex("by_provider", (q) => q.eq("providerId", providerId))
+        .filter((q) => q.eq(q.field("nameEn"), cert.nameEn))
+        .first();
+
+      if (existingCert === null) {
+        await ctx.db.insert("certifications", {
+          providerId,
+          nameVi: cert.nameVi,
+          nameEn: cert.nameEn,
+          issuingBody: cert.issuingBody,
+          issuedAt: cert.issuedAt,
+          expiresAt: cert.expiresAt,
+          documentUrl: cert.documentUrl,
+          createdAt: now,
+          updatedAt: now,
+        });
+        extraCertsCreated++;
+        console.log(`Created extra certification: ${cert.nameEn} (expiring soon)`);
+      } else {
+        console.log(`Skipping extra certification: already exists (${cert.nameEn})`);
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. Extra coverage areas (Dong Nai, Long An)
+    // -----------------------------------------------------------------------
+    let extraAreasCreated = 0;
+
+    for (const area of SEED_EXTRA_COVERAGE_AREAS) {
+      const existingArea = await ctx.db
+        .query("coverageAreas")
+        .withIndex("by_provider", (q) => q.eq("providerId", providerId))
+        .filter((q) => q.eq(q.field("region"), area.region))
+        .first();
+
+      if (existingArea === null) {
+        await ctx.db.insert("coverageAreas", {
+          providerId,
+          region: area.region,
+          district: area.district,
+          isActive: area.isActive,
+          createdAt: now,
+          updatedAt: now,
+        });
+        extraAreasCreated++;
+        console.log(`Created extra coverage area: ${area.region}`);
+      } else {
+        console.log(`Skipping extra coverage area: already exists (${area.region})`);
+      }
+    }
+
+    return {
+      ratingsCreated,
+      reportsCreated,
+      extraOfferingsCreated,
+      extraCertsCreated,
+      extraAreasCreated,
+    };
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Step 8: seedHospitalWorkflowData
+// Creates: 3 departments, 3 borrowRequests, 2 failureReports, 4 equipmentHistory,
+//          5 qrScanLog, 8 consumableUsageLog, 3 reorderRequests, 5 notifications
+// ---------------------------------------------------------------------------
+
+export const seedHospitalWorkflowData = internalMutation({
+  args: {
+    hospitalOrgId: v.id("organizations"),
+    equipmentIds: v.array(v.id("equipment")),
+    consumableIds: v.array(v.id("consumables")),
+    adminUserId: v.id("users"),
+    hospitalOwnerUserId: v.id("users"),
+    hospitalStaff1UserId: v.id("users"),
+    hospitalStaff2UserId: v.id("users"),
+    providerOwnerUserId: v.id("users"),
+  },
+  returns: v.object({
+    departmentsCreated: v.number(),
+    borrowRequestsCreated: v.number(),
+    failureReportsCreated: v.number(),
+    equipmentHistoryCreated: v.number(),
+    qrScanLogCreated: v.number(),
+    consumableUsageLogCreated: v.number(),
+    reorderRequestsCreated: v.number(),
+    notificationsCreated: v.number(),
+  }),
+  handler: async (
+    ctx,
+    {
+      hospitalOrgId,
+      equipmentIds,
+      consumableIds,
+      adminUserId,
+      hospitalOwnerUserId,
+      hospitalStaff1UserId,
+      hospitalStaff2UserId,
+      providerOwnerUserId,
+    },
+  ) => {
+    const now = Date.now();
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+
+    const userKeyMap: Record<string, Id<"users">> = {
+      hospital_owner: hospitalOwnerUserId,
+      hospital_staff_1: hospitalStaff1UserId,
+      hospital_staff_2: hospitalStaff2UserId,
+      provider_owner: providerOwnerUserId,
+      admin: adminUserId,
+    };
+
+    // -----------------------------------------------------------------------
+    // 1. Departments
+    // -----------------------------------------------------------------------
+    let departmentsCreated = 0;
+    const departmentIds: Id<"departments">[] = [];
+
+    // Idempotency: check existing departments for this org
+    const existingDepts = await ctx.db
+      .query("departments")
+      .withIndex("by_organization", (q) => q.eq("organizationId", hospitalOrgId))
+      .collect();
+
+    if (existingDepts.length < 3) {
+      for (const dept of SEED_DEPARTMENTS) {
+        const headUserId = userKeyMap[dept.headUserKey];
+
+        // Check by name within org
+        const existingDept = existingDepts.find((d) => d.name === dept.name);
+        if (existingDept === undefined) {
+          const deptId = await ctx.db.insert("departments", {
+            organizationId: hospitalOrgId,
+            name: dept.name,
+            description: dept.description,
+            headUserId,
+            createdAt: now,
+            updatedAt: now,
+          });
+          departmentIds.push(deptId);
+          departmentsCreated++;
+          console.log(`Created department: ${dept.name}`);
+        } else {
+          departmentIds.push(existingDept._id);
+          console.log(`Skipping department: already exists (${dept.name})`);
+        }
+      }
+    } else {
+      console.log(`Skipping departments: already has ${existingDepts.length} departments`);
+      existingDepts.forEach((d) => departmentIds.push(d._id));
+      departmentsCreated = existingDepts.length;
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. Borrow requests
+    // -----------------------------------------------------------------------
+    let borrowRequestsCreated = 0;
+    const existingBorrowCount = (
+      await ctx.db
+        .query("borrowRequests")
+        .withIndex("by_organization", (q) => q.eq("organizationId", hospitalOrgId))
+        .collect()
+    ).length;
+
+    if (existingBorrowCount < 3) {
+      for (const req of SEED_BORROW_REQUESTS) {
+        const equipmentId = equipmentIds[req.equipmentIndex]!;
+        const requesterId = userKeyMap[req.requesterKey]!;
+        const approvedById =
+          req.approvedByKey !== null ? userKeyMap[req.approvedByKey]! : undefined;
+
+        const existing = await ctx.db
+          .query("borrowRequests")
+          .withIndex("by_equipment", (q) => q.eq("equipmentId", equipmentId))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("requesterId"), requesterId),
+              q.eq(q.field("status"), req.status),
+            ),
+          )
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("borrowRequests", {
+            organizationId: hospitalOrgId,
+            equipmentId,
+            requesterId,
+            status: req.status,
+            requestedStartDate: req.requestedStartDate,
+            requestedEndDate: req.requestedEndDate,
+            actualReturnDate: req.actualReturnDate,
+            notes: req.notes,
+            approvedById,
+            approvedAt: req.approvedAt,
+            createdAt: now - 25 * 24 * ONE_HOUR_MS,
+            updatedAt: now,
+          });
+          borrowRequestsCreated++;
+          console.log(`Created borrow request: ${req.status} for equipment[${req.equipmentIndex}]`);
+        } else {
+          console.log(`Skipping borrow request: already exists (${req.status})`);
+        }
+      }
+    } else {
+      console.log(`Skipping borrow requests: already has ${existingBorrowCount} records`);
+      borrowRequestsCreated = existingBorrowCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. Failure reports
+    // -----------------------------------------------------------------------
+    let failureReportsCreated = 0;
+    const existingFailureCount = (
+      await ctx.db.query("failureReports").collect()
+    ).length;
+
+    if (existingFailureCount < 2) {
+      for (const report of SEED_FAILURE_REPORTS) {
+        const equipmentId = equipmentIds[report.equipmentIndex]!;
+        const reportedBy = userKeyMap[report.reportedByKey]!;
+        const assignedTo =
+          report.assignedToKey !== null
+            ? userKeyMap[report.assignedToKey]!
+            : undefined;
+        const reportCreatedAt = now - report.daysAgo * 24 * ONE_HOUR_MS;
+
+        const existing = await ctx.db
+          .query("failureReports")
+          .withIndex("by_equipment", (q) => q.eq("equipmentId", equipmentId))
+          .filter((q) => q.eq(q.field("status"), report.status))
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("failureReports", {
+            equipmentId,
+            urgency: report.urgency,
+            status: report.status,
+            descriptionVi: report.descriptionVi,
+            descriptionEn: report.descriptionEn,
+            reportedBy,
+            assignedTo,
+            resolvedAt: report.resolvedAt,
+            resolutionNotes: report.resolutionNotes,
+            createdAt: reportCreatedAt,
+            updatedAt: now,
+          });
+          failureReportsCreated++;
+          console.log(`Created failure report: ${report.urgency} urgency for equipment[${report.equipmentIndex}]`);
+        } else {
+          console.log(`Skipping failure report: already exists for equipment[${report.equipmentIndex}]`);
+        }
+      }
+    } else {
+      console.log(`Skipping failure reports: already has ${existingFailureCount} records`);
+      failureReportsCreated = existingFailureCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. Equipment history
+    // -----------------------------------------------------------------------
+    let equipmentHistoryCreated = 0;
+    const existingHistoryCount = (
+      await ctx.db.query("equipmentHistory").collect()
+    ).length;
+
+    if (existingHistoryCount < 4) {
+      for (const entry of SEED_EQUIPMENT_HISTORY) {
+        const equipmentId = equipmentIds[entry.equipmentIndex]!;
+        const performedBy = userKeyMap[entry.performedByKey]!;
+        const entryCreatedAt = now - entry.daysAgo * 24 * ONE_HOUR_MS;
+
+        const existing = await ctx.db
+          .query("equipmentHistory")
+          .withIndex("by_equipment", (q) => q.eq("equipmentId", equipmentId))
+          .filter((q) => q.eq(q.field("actionType"), entry.actionType))
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("equipmentHistory", {
+            equipmentId,
+            actionType: entry.actionType,
+            previousStatus: entry.previousStatus,
+            newStatus: entry.newStatus,
+            notes: entry.notes,
+            performedBy,
+            createdAt: entryCreatedAt,
+            updatedAt: entryCreatedAt,
+          });
+          equipmentHistoryCreated++;
+          console.log(`Created equipment history: ${entry.actionType} for equipment[${entry.equipmentIndex}]`);
+        } else {
+          console.log(`Skipping equipment history: already exists for equipment[${entry.equipmentIndex}] ${entry.actionType}`);
+        }
+      }
+    } else {
+      console.log(`Skipping equipment history: already has ${existingHistoryCount} records`);
+      equipmentHistoryCreated = existingHistoryCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. QR scan log — query existing QR codes first
+    // -----------------------------------------------------------------------
+    let qrScanLogCreated = 0;
+    const existingQrScanCount = (
+      await ctx.db.query("qrScanLog").collect()
+    ).length;
+
+    if (existingQrScanCount < 5) {
+      // Build QR code lookup: equipment serial → qrCodeId
+      // Each equipment has a QR code with pattern MEDILINK-{serialNumber}
+      const qrCodeIdMap = new Map<number, Id<"qrCodes">>();
+
+      for (const scanEntry of SEED_QR_SCAN_LOG) {
+        const equip = ALL_SEED_EQUIPMENT[scanEntry.equipmentIndex];
+        if (equip === undefined) continue;
+
+        // Look up QR code for this equipment if not cached
+        if (!qrCodeIdMap.has(scanEntry.equipmentIndex)) {
+          const qrCode = `MEDILINK-${equip.serialNumber}`;
+          const qrCodeRecord = await ctx.db
+            .query("qrCodes")
+            .withIndex("by_code", (q) => q.eq("code", qrCode))
+            .first();
+
+          if (qrCodeRecord !== null) {
+            qrCodeIdMap.set(scanEntry.equipmentIndex, qrCodeRecord._id);
+          }
+        }
+
+        const qrCodeId = qrCodeIdMap.get(scanEntry.equipmentIndex);
+        if (qrCodeId === undefined) {
+          console.log(`Skipping QR scan: QR code not found for equipment[${scanEntry.equipmentIndex}]`);
+          continue;
+        }
+
+        const scannedBy = userKeyMap[scanEntry.scannedByKey]!;
+        const scanCreatedAt = now - scanEntry.hoursAgo * ONE_HOUR_MS;
+
+        const existing = await ctx.db
+          .query("qrScanLog")
+          .withIndex("by_qr_code", (q) => q.eq("qrCodeId", qrCodeId))
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("scannedBy"), scannedBy),
+              q.eq(q.field("action"), scanEntry.action),
+            ),
+          )
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("qrScanLog", {
+            qrCodeId,
+            scannedBy,
+            action: scanEntry.action,
+            metadata: scanEntry.metadata,
+            createdAt: scanCreatedAt,
+            updatedAt: scanCreatedAt,
+          });
+          qrScanLogCreated++;
+          console.log(`Created QR scan log: ${scanEntry.action} for equipment[${scanEntry.equipmentIndex}]`);
+        } else {
+          console.log(`Skipping QR scan: already exists for equipment[${scanEntry.equipmentIndex}] ${scanEntry.action}`);
+        }
+      }
+    } else {
+      console.log(`Skipping QR scan log: already has ${existingQrScanCount} records`);
+      qrScanLogCreated = existingQrScanCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. Consumable usage log
+    // -----------------------------------------------------------------------
+    let consumableUsageLogCreated = 0;
+    const existingUsageCount = (
+      await ctx.db.query("consumableUsageLog").collect()
+    ).length;
+
+    if (existingUsageCount < 8) {
+      for (const entry of SEED_CONSUMABLE_USAGE_LOG) {
+        const consumableId = consumableIds[entry.consumableIndex];
+        if (consumableId === undefined) continue;
+
+        const usedBy = userKeyMap[entry.usedByKey]!;
+        const equipmentId =
+          entry.equipmentIndex !== undefined
+            ? equipmentIds[entry.equipmentIndex]!
+            : undefined;
+        const entryCreatedAt = now - entry.daysAgo * 24 * ONE_HOUR_MS;
+
+        // Idempotency: check by consumable + transactionType + usedBy
+        const existing = await ctx.db
+          .query("consumableUsageLog")
+          .withIndex("by_consumable", (q) =>
+            q.eq("consumableId", consumableId),
+          )
+          .filter((q) =>
+            q.and(
+              q.eq(q.field("transactionType"), entry.transactionType),
+              q.eq(q.field("usedBy"), usedBy),
+            ),
+          )
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("consumableUsageLog", {
+            consumableId,
+            quantity: entry.quantity,
+            transactionType: entry.transactionType,
+            usedBy,
+            equipmentId,
+            notes: entry.notes,
+            createdAt: entryCreatedAt,
+            updatedAt: entryCreatedAt,
+          });
+          consumableUsageLogCreated++;
+          console.log(`Created consumable usage log: ${entry.transactionType} for consumable[${entry.consumableIndex}]`);
+        } else {
+          console.log(`Skipping consumable usage: already exists for consumable[${entry.consumableIndex}] ${entry.transactionType}`);
+        }
+      }
+    } else {
+      console.log(`Skipping consumable usage log: already has ${existingUsageCount} records`);
+      consumableUsageLogCreated = existingUsageCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. Reorder requests
+    // -----------------------------------------------------------------------
+    let reorderRequestsCreated = 0;
+    const existingReorderCount = (
+      await ctx.db
+        .query("reorderRequests")
+        .withIndex("by_org", (q) => q.eq("organizationId", hospitalOrgId))
+        .collect()
+    ).length;
+
+    if (existingReorderCount < 3) {
+      for (const req of SEED_REORDER_REQUESTS) {
+        const consumableId = consumableIds[req.consumableIndex];
+        if (consumableId === undefined) continue;
+
+        const requestedBy = userKeyMap[req.requestedByKey]!;
+        const approvedBy =
+          req.approvedByKey !== null ? userKeyMap[req.approvedByKey]! : undefined;
+
+        const existing = await ctx.db
+          .query("reorderRequests")
+          .withIndex("by_consumable", (q) => q.eq("consumableId", consumableId))
+          .filter((q) => q.eq(q.field("status"), req.status))
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("reorderRequests", {
+            consumableId,
+            organizationId: hospitalOrgId,
+            quantity: req.quantity,
+            status: req.status,
+            requestedBy,
+            approvedBy,
+            notes: req.notes,
+            createdAt: now - req.daysAgo * 24 * ONE_HOUR_MS,
+            updatedAt: now,
+          });
+          reorderRequestsCreated++;
+          console.log(`Created reorder request: ${req.status} for consumable[${req.consumableIndex}]`);
+        } else {
+          console.log(`Skipping reorder request: already exists (${req.status}) for consumable[${req.consumableIndex}]`);
+        }
+      }
+    } else {
+      console.log(`Skipping reorder requests: already has ${existingReorderCount} records`);
+      reorderRequestsCreated = existingReorderCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. Notifications
+    // -----------------------------------------------------------------------
+    let notificationsCreated = 0;
+    const existingNotifCount = (
+      await ctx.db.query("notifications").collect()
+    ).length;
+
+    if (existingNotifCount < 5) {
+      for (const notif of SEED_NOTIFICATIONS) {
+        const userId = userKeyMap[notif.userKey]!;
+        const notifCreatedAt = now - notif.hoursAgo * ONE_HOUR_MS;
+
+        const existing = await ctx.db
+          .query("notifications")
+          .withIndex("by_user", (q) => q.eq("userId", userId))
+          .filter((q) => q.eq(q.field("type"), notif.type))
+          .first();
+
+        if (existing === null) {
+          await ctx.db.insert("notifications", {
+            userId,
+            type: notif.type,
+            titleVi: notif.titleVi,
+            titleEn: notif.titleEn,
+            bodyVi: notif.bodyVi,
+            bodyEn: notif.bodyEn,
+            read: notif.read,
+            createdAt: notifCreatedAt,
+            updatedAt: notifCreatedAt,
+          });
+          notificationsCreated++;
+          console.log(`Created notification: ${notif.type} for ${notif.userKey}`);
+        } else {
+          console.log(`Skipping notification: already exists (${notif.type}) for ${notif.userKey}`);
+        }
+      }
+    } else {
+      console.log(`Skipping notifications: already has ${existingNotifCount} records`);
+      notificationsCreated = existingNotifCount;
+    }
+
+    return {
+      departmentsCreated,
+      borrowRequestsCreated,
+      failureReportsCreated,
+      equipmentHistoryCreated,
+      qrScanLogCreated,
+      consumableUsageLogCreated,
+      reorderRequestsCreated,
+      notificationsCreated,
+    };
+  },
+});
+
+// ---------------------------------------------------------------------------
 // seedAuthAccounts: Cleans up stale Better Auth records for all seeded users.
 // Entry point: npx convex run seed:seedAuthAccounts
 //
@@ -1424,7 +2150,7 @@ export default action({
 
     // Step 1: Base entities (users, orgs, memberships)
     console.log(
-      "\n[1/5] Seeding base entities (users, organizations, memberships)...",
+      "\n[1/8] Seeding base entities (users, organizations, memberships)...",
     );
     const baseIds = (await ctx.runMutation(
       internal.seed.seedBaseEntities,
@@ -1434,7 +2160,7 @@ export default action({
 
     // Step 2: Equipment data (categories, equipment, QR codes)
     console.log(
-      "\n[2/5] Seeding equipment data (categories, equipment, QR codes)...",
+      "\n[2/8] Seeding equipment data (categories, equipment, QR codes)...",
     );
     const equipmentData = (await ctx.runMutation(
       internal.seed.seedEquipmentData,
@@ -1450,7 +2176,7 @@ export default action({
 
     // Step 3: Provider data (profile, offerings, certifications, coverage)
     console.log(
-      "\n[3/5] Seeding provider data (profile, offerings, certifications, coverage areas)...",
+      "\n[3/8] Seeding provider data (profile, offerings, certifications, coverage areas)...",
     );
     const providerData = (await ctx.runMutation(
       internal.seed.seedProviderData,
@@ -1464,14 +2190,14 @@ export default action({
     );
 
     // Step 4: Consumables
-    console.log("\n[4/5] Seeding consumables...");
+    console.log("\n[4/8] Seeding consumables...");
     await ctx.runMutation(internal.seed.seedConsumablesData, {
       hospitalOrgId: baseIds.hospitalOrgId,
     });
     console.log(`  ✓ Consumables: 3`);
 
     // Step 5: Service requests and quotes
-    console.log("\n[5/6] Seeding service requests and quotes...");
+    console.log("\n[5/8] Seeding service requests and quotes...");
     const serviceData = (await ctx.runMutation(
       internal.seed.seedServiceRequestData,
       {
@@ -1489,7 +2215,7 @@ export default action({
 
     // Step 6: Admin portal data (audit logs, automation logs, escalated disputes, extra orgs)
     console.log(
-      "\n[6/6] Seeding admin portal data (auditLog, automationLog, escalated disputes, extra orgs)...",
+      "\n[6/8] Seeding admin portal data (auditLog, automationLog, escalated disputes, extra orgs)...",
     );
     const adminData = (await ctx.runMutation(internal.seed.seedAdminData, {
       adminUserId: baseIds.adminUserId,
@@ -1509,6 +2235,73 @@ export default action({
     );
     console.log(
       `  ✓ Escalated dispute: ${adminData.escalatedDisputeCreated ? "created" : "skipped"} | Extra orgs: ${adminData.extraOrgsCreated}`,
+    );
+
+    // Step 7: Provider richness data (ratings, completion reports, extra offerings/certs/coverage)
+    console.log(
+      "\n[7/8] Seeding provider richness data (ratings, reports, extra offerings, certs, coverage)...",
+    );
+    const providerRichnessData = (await ctx.runMutation(
+      internal.seed.seedProviderRichnessData,
+      {
+        providerId: providerData.providerId,
+        requestIds: serviceData.requestIds,
+        hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+        hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+        hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
+      },
+    )) as {
+      ratingsCreated: number;
+      reportsCreated: number;
+      extraOfferingsCreated: number;
+      extraCertsCreated: number;
+      extraAreasCreated: number;
+    };
+    console.log(
+      `  ✓ Ratings: ${providerRichnessData.ratingsCreated} | Reports: ${providerRichnessData.reportsCreated}`,
+    );
+    console.log(
+      `  ✓ Extra offerings: ${providerRichnessData.extraOfferingsCreated} | Certs: ${providerRichnessData.extraCertsCreated} | Coverage: ${providerRichnessData.extraAreasCreated}`,
+    );
+
+    // Step 8: Hospital workflow data (departments, borrowRequests, failureReports, history, QR scans, etc.)
+    console.log(
+      "\n[8/8] Seeding hospital workflow data (departments, borrows, failures, history, QR scans, consumables, notifications)...",
+    );
+    const consumableData = (await ctx.runMutation(
+      internal.seed.seedConsumablesData,
+      { hospitalOrgId: baseIds.hospitalOrgId },
+    )) as { consumableIds: Id<"consumables">[] };
+    const hospitalWorkflowData = (await ctx.runMutation(
+      internal.seed.seedHospitalWorkflowData,
+      {
+        hospitalOrgId: baseIds.hospitalOrgId,
+        equipmentIds: equipmentData.equipmentIds,
+        consumableIds: consumableData.consumableIds,
+        adminUserId: baseIds.adminUserId,
+        hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+        hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+        hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
+        providerOwnerUserId: baseIds.providerOwnerUserId,
+      },
+    )) as {
+      departmentsCreated: number;
+      borrowRequestsCreated: number;
+      failureReportsCreated: number;
+      equipmentHistoryCreated: number;
+      qrScanLogCreated: number;
+      consumableUsageLogCreated: number;
+      reorderRequestsCreated: number;
+      notificationsCreated: number;
+    };
+    console.log(
+      `  ✓ Departments: ${hospitalWorkflowData.departmentsCreated} | Borrow requests: ${hospitalWorkflowData.borrowRequestsCreated} | Failure reports: ${hospitalWorkflowData.failureReportsCreated}`,
+    );
+    console.log(
+      `  ✓ Equipment history: ${hospitalWorkflowData.equipmentHistoryCreated} | QR scans: ${hospitalWorkflowData.qrScanLogCreated}`,
+    );
+    console.log(
+      `  ✓ Consumable usage: ${hospitalWorkflowData.consumableUsageLogCreated} | Reorders: ${hospitalWorkflowData.reorderRequestsCreated} | Notifications: ${hospitalWorkflowData.notificationsCreated}`,
     );
 
     // Final summary
@@ -1531,9 +2324,15 @@ export default action({
     console.log("  QR Codes      : 12 (1 per equipment)");
     console.log("  Maintenance   : 1 overdue record (X-Ray machine)");
     console.log("  Provider      : 1 profile (TechMed, verified)");
-    console.log("  Offerings     : 3 (repair, calibration, preventive_maint)");
-    console.log("  Certifications: 2 (1 valid ISO 13485 + 1 expired)");
-    console.log("  Coverage areas: 2 (HCMC + Binh Duong)");
+    console.log(
+      "  Offerings     : 6 (repair, calibration, preventive_maint, electrical, software, installation)",
+    );
+    console.log(
+      "  Certifications: 3 (1 valid ISO 13485 + 1 expired + 1 expiring-soon CBET)",
+    );
+    console.log(
+      "  Coverage areas: 4 (HCMC + Binh Duong + Dong Nai + Long An)",
+    );
     console.log("  Consumables   : 3 (gloves, ECG electrodes, disinfectant)");
     console.log(
       "  Service reqs  : 6 (pending/quoted/accepted/in_progress/completed/disputed)",
@@ -1546,6 +2345,36 @@ export default action({
     );
     console.log(
       `  Automation log: ${adminData.automationLogCount} entries (all 5 rule names, mix success/error)`,
+    );
+    console.log(
+      `  Service ratings: ${providerRichnessData.ratingsCreated} (3 ratings for completed defibrillator maintenance)`,
+    );
+    console.log(
+      `  Completion reports: ${providerRichnessData.reportsCreated} (detailed work report with parts/hours/photos)`,
+    );
+    console.log(
+      `  Departments   : ${hospitalWorkflowData.departmentsCreated} (Cardiology, Emergency, Radiology)`,
+    );
+    console.log(
+      `  Borrow requests: ${hospitalWorkflowData.borrowRequestsCreated} (pending/approved/returned)`,
+    );
+    console.log(
+      `  Failure reports: ${hospitalWorkflowData.failureReportsCreated} (ventilator open/autoclave resolved)`,
+    );
+    console.log(
+      `  Equipment history: ${hospitalWorkflowData.equipmentHistoryCreated} (status changes + inspection + repair)`,
+    );
+    console.log(
+      `  QR scan log   : ${hospitalWorkflowData.qrScanLogCreated} (view/borrow/return/report_issue scans)`,
+    );
+    console.log(
+      `  Consumable usage: ${hospitalWorkflowData.consumableUsageLogCreated} (RECEIVE/USAGE/ADJUSTMENT transactions)`,
+    );
+    console.log(
+      `  Reorder requests: ${hospitalWorkflowData.reorderRequestsCreated} (pending/approved/received)`,
+    );
+    console.log(
+      `  Notifications : ${hospitalWorkflowData.notificationsCreated} (maintenance due/stock low/service complete/dispute)`,
     );
     console.log("\nRun again safely — seed is idempotent.");
   },
