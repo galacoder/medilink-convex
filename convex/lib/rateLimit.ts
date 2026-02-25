@@ -103,10 +103,8 @@ const rateLimiter = new RateLimiter(
  * @param endpoint - The endpoint name matching RATE_LIMIT_CONFIGS
  */
 export async function checkOrgRateLimit(
-  ctx: {
-    runMutation: (...args: unknown[]) => Promise<unknown>;
-    runQuery: (...args: unknown[]) => Promise<unknown>;
-  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Convex GenericMutationCtx has specific method signatures that are incompatible with narrow unknown[] params
+  ctx: { runMutation: any; runQuery: any },
   organizationId: Id<"organizations">,
   endpoint: RateLimitedEndpoint,
 ): Promise<void> {
