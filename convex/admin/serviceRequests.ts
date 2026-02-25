@@ -12,6 +12,7 @@
  */
 
 import { ConvexError, v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { createAuditEntry } from "../lib/auditLog";
@@ -107,64 +108,44 @@ export const listAllServiceRequests = query({
       ),
     ),
     hospitalId: v.optional(v.id("organizations")),
-    providerId: v.optional(v.id("providers")),
-    fromDate: v.optional(v.number()),
-    toDate: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     // Guard: platform admin only
     await requirePlatformAdmin(ctx);
 
-    // Load all service requests (no org filter — cross-tenant)
-    let serviceRequests;
-    if (args.hospitalId) {
-      serviceRequests = args.status
-        ? await ctx.db
-            .query("serviceRequests")
-            .withIndex("by_org_and_status", (q) =>
-              q
-                .eq("organizationId", args.hospitalId!)
-                .eq("status", args.status!),
-            )
-            .collect()
-        : await ctx.db
-            .query("serviceRequests")
-            .withIndex("by_org", (q) => q.eq("organizationId", args.hospitalId!))
-            .collect();
-    } else if (args.status) {
-      // Full-scan with status filter — acceptable for admin views
-      serviceRequests = await ctx.db
+    // Build paginated query using indexes (never .collect())
+    let paginatedResult;
+    if (args.hospitalId && args.status) {
+      paginatedResult = await ctx.db
         .query("serviceRequests")
-        .filter((q) => q.eq(q.field("status"), args.status))
-        .collect();
+        .withIndex("by_org_and_status", (q) =>
+          q
+            .eq("organizationId", args.hospitalId!)
+            .eq("status", args.status!),
+        )
+        .paginate(args.paginationOpts);
+    } else if (args.hospitalId) {
+      paginatedResult = await ctx.db
+        .query("serviceRequests")
+        .withIndex("by_org", (q) => q.eq("organizationId", args.hospitalId!))
+        .paginate(args.paginationOpts);
+    } else if (args.status) {
+      paginatedResult = await ctx.db
+        .query("serviceRequests")
+        .withIndex("by_status", (q) => q.eq("status", args.status!))
+        .paginate(args.paginationOpts);
     } else {
-      serviceRequests = await ctx.db.query("serviceRequests").collect();
-    }
-
-    // Apply date range filter
-    if (args.fromDate !== undefined) {
-      serviceRequests = serviceRequests.filter(
-        (sr) => sr.createdAt >= args.fromDate!,
-      );
-    }
-    if (args.toDate !== undefined) {
-      serviceRequests = serviceRequests.filter(
-        (sr) => sr.createdAt <= args.toDate!,
-      );
-    }
-
-    // Apply provider filter
-    if (args.providerId !== undefined) {
-      serviceRequests = serviceRequests.filter(
-        (sr) => sr.assignedProviderId === args.providerId,
-      );
+      paginatedResult = await ctx.db
+        .query("serviceRequests")
+        .paginate(args.paginationOpts);
     }
 
     const now = Date.now();
 
-    // Enrich with hospital name, provider name, bottleneck flag
-    const enriched = await Promise.all(
-      serviceRequests.map(async (sr) => {
+    // Enrich page items with hospital name, provider name, bottleneck flag
+    const enrichedPage = await Promise.all(
+      paginatedResult.page.map(async (sr) => {
         const [hospital, provider] = await Promise.all([
           ctx.db.get(sr.organizationId),
           sr.assignedProviderId ? ctx.db.get(sr.assignedProviderId) : null,
@@ -184,7 +165,10 @@ export const listAllServiceRequests = query({
       }),
     );
 
-    return enriched;
+    return {
+      ...paginatedResult,
+      page: enrichedPage,
+    };
   },
 });
 
