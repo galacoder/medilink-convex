@@ -37,7 +37,7 @@ import {
  */
 export default function BillingDetailPage() {
   const params = useParams<{ organizationId: string }>();
-  const locale = "vi" as string;
+  const locale = "vi" as "vi" | "en";
   const L = billingLabels;
 
   const organizationId = params.organizationId as Id<"organizations">;

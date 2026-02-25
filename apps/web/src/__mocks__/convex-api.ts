@@ -101,4 +101,11 @@ export const api = {
     addMessage: "aiConversation:addMessage",
     remove: "aiConversation:remove",
   },
+  billing: {
+    credits_queries: {
+      getAiCreditBalance: "billing/credits_queries:getAiCreditBalance",
+      getCreditConsumptionHistory:
+        "billing/credits_queries:getCreditConsumptionHistory",
+    },
+  },
 } as const;

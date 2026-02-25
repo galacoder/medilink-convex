@@ -68,7 +68,7 @@ const PLAN_PRICING: Record<string, Record<string, number>> = {
 export default function ActivateSubscriptionPage() {
   const params = useParams<{ organizationId: string }>();
   const router = useRouter();
-  const locale = "vi" as string;
+  const locale = "vi" as "vi" | "en";
   const L = billingLabels;
 
   const organizationId = params.organizationId as Id<"organizations">;

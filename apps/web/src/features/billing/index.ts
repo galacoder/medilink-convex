@@ -17,3 +17,12 @@ export { ExpiredOverlay } from "./components/expired-overlay";
 export { SuspendedPage } from "./components/suspended-page";
 export { SubscriptionGate } from "./components/subscription-gate";
 export { TrialBanner } from "./components/trial-banner";
+// AI credit UI (M1-8)
+export { getBalanceState } from "./lib/credit-balance-state";
+export type { BalanceState } from "./lib/credit-balance-state";
+export { CreditBalanceWidget } from "./components/credit-balance-widget";
+export { CreditIndicator } from "./components/credit-indicator";
+export { AiActionButton } from "./components/ai-action-button";
+export { InsufficientCreditsModal } from "./components/insufficient-credits-modal";
+export { CreditHistoryTable } from "./components/credit-history-table";
+export { ConsumptionStatusBadge } from "./components/consumption-status-badge";
