@@ -7,7 +7,7 @@
  * @see Issue #172 — M1-3: Admin Subscription Management Panel
  */
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 
 /** Organization subscription status */
 export type OrgSubscriptionStatus =

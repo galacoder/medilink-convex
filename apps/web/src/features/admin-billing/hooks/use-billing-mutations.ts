@@ -10,9 +10,24 @@
  */
 "use client";
 
+import type { FunctionReference } from "convex/server";
 import { useMutation } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
+
+// The billing.admin namespace is dynamically registered at runtime
+type MutationRef = FunctionReference<"mutation">;
+
+interface BillingAdminMutationApi {
+  activateSubscription: MutationRef;
+  extendSubscription: MutationRef;
+  suspendSubscription: MutationRef;
+  reactivateSubscription: MutationRef;
+}
+
+const billingAdminApi = (
+  api as unknown as { billing: { admin: BillingAdminMutationApi } }
+).billing.admin;
 
 /**
  * Returns mutation hooks for all billing admin actions.
@@ -22,14 +37,14 @@ import { api } from "@medilink/db/api";
  */
 export function useBillingMutations() {
   const activateSubscription = useMutation(
-    api.billing.admin.activateSubscription,
+    billingAdminApi.activateSubscription,
   );
-  const extendSubscription = useMutation(api.billing.admin.extendSubscription);
+  const extendSubscription = useMutation(billingAdminApi.extendSubscription);
   const suspendSubscription = useMutation(
-    api.billing.admin.suspendSubscription,
+    billingAdminApi.suspendSubscription,
   );
   const reactivateSubscription = useMutation(
-    api.billing.admin.reactivateSubscription,
+    billingAdminApi.reactivateSubscription,
   );
 
   return {

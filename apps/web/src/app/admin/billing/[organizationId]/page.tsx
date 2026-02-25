@@ -15,7 +15,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import type { Id } from "@medilink/db/dataModel";
+import type { Id } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
 import { Skeleton } from "@medilink/ui/skeleton";
 

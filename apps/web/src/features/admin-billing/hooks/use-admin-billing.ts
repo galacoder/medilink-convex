@@ -10,11 +10,23 @@
  */
 "use client";
 
+import type { FunctionReference } from "convex/server";
 import { useQuery } from "convex/react";
 
-import { api } from "@medilink/db/api";
+import { api } from "@medilink/backend";
 
-import type { StatusFilter } from "../types";
+import type { OrganizationSubscriptionRow, StatusFilter } from "../types";
+
+// The billing.admin namespace is dynamically registered at runtime
+type QueryRef = FunctionReference<"query">;
+
+interface BillingAdminQueryApi {
+  listOrganizationSubscriptions: QueryRef;
+}
+
+const billingAdminApi = (
+  api as unknown as { billing: { admin: BillingAdminQueryApi } }
+).billing.admin;
 
 /**
  * Fetches all organizations with subscription info for the admin list view.
@@ -24,12 +36,12 @@ import type { StatusFilter } from "../types";
  */
 export function useAdminBillingList(
   statusFilter: StatusFilter = "all",
-  searchQuery: string = "",
+  searchQuery = "",
 ) {
-  const result = useQuery(api.billing.admin.listOrganizationSubscriptions, {
+  const result = useQuery(billingAdminApi.listOrganizationSubscriptions, {
     statusFilter: statusFilter === "all" ? undefined : statusFilter,
     searchQuery: searchQuery || undefined,
-  });
+  }) as { organizations: OrganizationSubscriptionRow[]; total: number } | undefined;
 
   return {
     organizations: result?.organizations ?? [],

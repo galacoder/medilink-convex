@@ -10,10 +10,24 @@
  */
 "use client";
 
+import type { FunctionReference } from "convex/server";
 import { useQuery } from "convex/react";
 
-import type { Id } from "@medilink/db/dataModel";
-import { api } from "@medilink/db/api";
+import type { Id } from "@medilink/backend";
+import { api } from "@medilink/backend";
+
+import type { OrganizationBillingDetail } from "../types";
+
+// The billing.admin namespace is dynamically registered at runtime
+type QueryRef = FunctionReference<"query">;
+
+interface BillingAdminQueryApi {
+  getOrganizationBillingDetail: QueryRef;
+}
+
+const billingAdminApi = (
+  api as unknown as { billing: { admin: BillingAdminQueryApi } }
+).billing.admin;
 
 /**
  * Fetches full billing detail for a single organization.
@@ -23,9 +37,9 @@ import { api } from "@medilink/db/api";
  */
 export function useBillingDetail(organizationId: Id<"organizations"> | null) {
   const result = useQuery(
-    api.billing.admin.getOrganizationBillingDetail,
+    billingAdminApi.getOrganizationBillingDetail,
     organizationId ? { organizationId } : "skip",
-  );
+  ) as OrganizationBillingDetail | null | undefined;
 
   return {
     detail: result ?? null,
