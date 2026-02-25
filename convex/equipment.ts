@@ -4,6 +4,7 @@ import { ConvexError, v } from "convex/values";
 import type { EquipmentStatus } from "./lib/statusMachine";
 import { type Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 import { assertTransition } from "./lib/statusMachine";
 
 // ---------------------------------------------------------------------------
@@ -331,6 +332,7 @@ export const create = mutation({
   },
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
+    await checkOrgRateLimit(ctx, organizationId, "equipment.create");
 
     // Validate categoryId exists and belongs to same org
     const category = await ctx.db.get(args.categoryId);
