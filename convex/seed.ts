@@ -1332,6 +1332,154 @@ export const seedNotificationPreferences = internalMutation({
 });
 
 // ---------------------------------------------------------------------------
+// Step 7: seedSupportData
+// Creates: 3 support tickets, 5 support messages
+// ---------------------------------------------------------------------------
+
+export const seedSupportData = internalMutation({
+  args: {
+    hospitalOrgId: v.id("organizations"),
+    providerOrgId: v.id("organizations"),
+    hospitalOwnerUserId: v.id("users"),
+    hospitalStaff1UserId: v.id("users"),
+    providerOwnerUserId: v.id("users"),
+    adminUserId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const now = Date.now();
+
+    // Idempotency check: if support tickets already exist for this org, skip
+    const existingTicket = await ctx.db
+      .query("supportTicket")
+      .withIndex("by_org", (q) => q.eq("organizationId", args.hospitalOrgId))
+      .first();
+
+    if (existingTicket) {
+      console.log("Skipping support seed: tickets already exist");
+      return;
+    }
+
+    // Ticket 1: open, medium priority, technical, from hospital owner, unassigned
+    const ticket1Id = await ctx.db.insert("supportTicket", {
+      organizationId: args.hospitalOrgId,
+      createdBy: args.hospitalOwnerUserId,
+      status: "open",
+      priority: "medium",
+      category: "technical",
+      subjectVi: "Loi dang nhap he thong",
+      subjectEn: "System login error",
+      descriptionVi:
+        "Khong the dang nhap vao he thong tu may tinh phong lab. Trinh duyet hien thi loi 403 khi truy cap trang quan ly thiet bi.",
+      descriptionEn:
+        "Cannot log in to the system from lab computers. Browser shows 403 error when accessing equipment management page.",
+      createdAt: now - 2 * 24 * 60 * 60 * 1000, // 2 days ago
+      updatedAt: now - 2 * 24 * 60 * 60 * 1000,
+    });
+    console.log(`  Created support ticket 1 (open): ${ticket1Id}`);
+
+    // Ticket 2: in_progress, high priority, billing, from provider owner, assigned to admin
+    const ticket2Id = await ctx.db.insert("supportTicket", {
+      organizationId: args.providerOrgId,
+      createdBy: args.providerOwnerUserId,
+      assignedTo: args.adminUserId,
+      status: "in_progress",
+      priority: "high",
+      category: "billing",
+      subjectVi: "Hoa don thanh toan khong chinh xac",
+      subjectEn: "Incorrect billing invoice",
+      descriptionVi:
+        "Hoa don thang 1/2026 bi tinh sai so tien. Yeu cau kiem tra va dieu chinh lai so tien thanh toan cho dich vu bao tri thiet bi.",
+      descriptionEn:
+        "January 2026 invoice has incorrect amount. Please review and adjust payment amount for equipment maintenance service.",
+      createdAt: now - 5 * 24 * 60 * 60 * 1000, // 5 days ago
+      updatedAt: now - 1 * 24 * 60 * 60 * 1000, // updated 1 day ago
+    });
+    console.log(`  Created support ticket 2 (in_progress): ${ticket2Id}`);
+
+    // Ticket 3: resolved, low priority, feature_request, from hospital staff, assigned to admin
+    const ticket3Id = await ctx.db.insert("supportTicket", {
+      organizationId: args.hospitalOrgId,
+      createdBy: args.hospitalStaff1UserId,
+      assignedTo: args.adminUserId,
+      status: "resolved",
+      priority: "low",
+      category: "feature_request",
+      subjectVi: "Yeu cau them tinh nang xuat bao cao PDF",
+      subjectEn: "Request to add PDF report export feature",
+      descriptionVi:
+        "De nghi them chuc nang xuat bao cao thong ke thiet bi sang dinh dang PDF de phuc vu bao cao hang thang cho ban giam doc.",
+      descriptionEn:
+        "Please add the ability to export equipment statistics reports to PDF format for monthly reports to the board of directors.",
+      createdAt: now - 10 * 24 * 60 * 60 * 1000, // 10 days ago
+      updatedAt: now - 3 * 24 * 60 * 60 * 1000, // updated 3 days ago
+    });
+    console.log(`  Created support ticket 3 (resolved): ${ticket3Id}`);
+
+    // Message 1: Ticket 1 — initial description from hospital owner
+    await ctx.db.insert("supportMessage", {
+      ticketId: ticket1Id,
+      authorId: args.hospitalOwnerUserId,
+      contentVi:
+        "Chao ban ho tro, chung toi gap loi 403 khi co dang nhap tu cac may tinh trong phong lab. Van de xay ra tu sang nay. Xin vui long ho tro kiem tra.",
+      contentEn:
+        "Hello support, we are getting 403 errors when trying to log in from lab computers. This issue started this morning. Please help investigate.",
+      createdAt: now - 2 * 24 * 60 * 60 * 1000,
+      updatedAt: now - 2 * 24 * 60 * 60 * 1000,
+    });
+
+    // Message 2: Ticket 2 — initial from provider owner
+    await ctx.db.insert("supportMessage", {
+      ticketId: ticket2Id,
+      authorId: args.providerOwnerUserId,
+      contentVi:
+        "Chao doi ho tro, hoa don thang 1 bi tinh du 15 trieu VND nhung thuc te chi la 10 trieu VND theo hop dong. Xin kiem tra lai.",
+      contentEn:
+        "Hello support team, the January invoice shows 15M VND but the actual amount per contract is only 10M VND. Please review.",
+      createdAt: now - 5 * 24 * 60 * 60 * 1000,
+      updatedAt: now - 5 * 24 * 60 * 60 * 1000,
+    });
+
+    // Message 3: Ticket 2 — admin response
+    await ctx.db.insert("supportMessage", {
+      ticketId: ticket2Id,
+      authorId: args.adminUserId,
+      contentVi:
+        "Chao anh/chi, chung toi da nhan duoc yeu cau va dang kiem tra lai hoa don. Se cap nhat ket qua trong vong 24 gio.",
+      contentEn:
+        "Hello, we have received your request and are reviewing the invoice. We will update you within 24 hours.",
+      createdAt: now - 4 * 24 * 60 * 60 * 1000,
+      updatedAt: now - 4 * 24 * 60 * 60 * 1000,
+    });
+
+    // Message 4: Ticket 3 — initial from hospital staff
+    await ctx.db.insert("supportMessage", {
+      ticketId: ticket3Id,
+      authorId: args.hospitalStaff1UserId,
+      contentVi:
+        "Chao ban, hien tai chung toi chi co the xuat bao cao dang CSV. De nghi them chuc nang xuat PDF de trinh ban giam doc.",
+      contentEn:
+        "Hello, currently we can only export reports in CSV format. Please add PDF export functionality for board presentations.",
+      createdAt: now - 10 * 24 * 60 * 60 * 1000,
+      updatedAt: now - 10 * 24 * 60 * 60 * 1000,
+    });
+
+    // Message 5: Ticket 3 — admin resolution note
+    await ctx.db.insert("supportMessage", {
+      ticketId: ticket3Id,
+      authorId: args.adminUserId,
+      contentVi:
+        "Chao anh/chi, chuc nang xuat PDF da duoc them vao phien ban moi. Anh/chi co the su dung tu menu Bao cao > Xuat PDF. Vui long xac nhan da su dung duoc.",
+      contentEn:
+        "Hello, the PDF export feature has been added in the new version. You can access it from Reports > Export PDF menu. Please confirm it works for you.",
+      createdAt: now - 3 * 24 * 60 * 60 * 1000,
+      updatedAt: now - 3 * 24 * 60 * 60 * 1000,
+    });
+
+    console.log("  Created 5 support messages across 3 tickets");
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Step 7: Default action — orchestrates all internal mutations
 // Entry point: npx convex run seed:default
 // ---------------------------------------------------------------------------
@@ -1425,7 +1573,7 @@ export default action({
     console.log(`  ✓ Notification preferences: ${notifPrefsCreated} created`);
 
     // Step 7: AI conversations
-    console.log("\n[7/7] Seeding AI conversations...");
+    console.log("\n[7/8] Seeding AI conversations...");
     await ctx.runMutation(internal.seed.seedAiConversationData, {
       hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
       hospitalOrgId: baseIds.hospitalOrgId,
@@ -1433,6 +1581,18 @@ export default action({
       providerOrgId: baseIds.providerOrgId,
     });
     console.log("  ✓ AI conversations: 2 (1 hospital + 1 provider)");
+
+    // Step 8: Support tickets and messages
+    console.log("\n[8/8] Seeding support tickets and messages...");
+    await ctx.runMutation(internal.seed.seedSupportData, {
+      hospitalOrgId: baseIds.hospitalOrgId,
+      providerOrgId: baseIds.providerOrgId,
+      hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+      hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+      providerOwnerUserId: baseIds.providerOwnerUserId,
+      adminUserId: baseIds.adminUserId,
+    });
+    console.log(`  ✓ Support tickets: 3 | Messages: 5`);
 
     // Final summary
     console.log("\n" + "=".repeat(60));
@@ -1466,6 +1626,9 @@ export default action({
     );
     console.log(
       "  AI convos     : 2 (1 hospital equip search + 1 provider SR status)",
+    );
+    console.log(
+      "  Support tix   : 3 (open/in_progress/resolved) + 5 messages",
     );
     console.log("\nRun again safely — seed is idempotent.");
   },
