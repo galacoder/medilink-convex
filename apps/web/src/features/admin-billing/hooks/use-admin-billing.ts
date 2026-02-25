@@ -41,7 +41,9 @@ export function useAdminBillingList(
   const result = useQuery(billingAdminApi.listOrganizationSubscriptions, {
     statusFilter: statusFilter === "all" ? undefined : statusFilter,
     searchQuery: searchQuery || undefined,
-  }) as { organizations: OrganizationSubscriptionRow[]; total: number } | undefined;
+  }) as
+    | { organizations: OrganizationSubscriptionRow[]; total: number }
+    | undefined;
 
   return {
     organizations: result?.organizations ?? [],

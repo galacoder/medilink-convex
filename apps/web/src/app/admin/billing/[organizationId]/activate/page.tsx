@@ -97,7 +97,7 @@ export default function ActivateSubscriptionPage() {
       await activateSubscription({
         organizationId,
         plan: plan as "starter" | "professional" | "enterprise",
-        billingCycle: billingCycle as BillingCycle,
+        billingCycle: billingCycle,
         paymentId: paymentIdInput as Id<"payments">,
         amountVnd: amountVnd || suggestedAmount,
       });

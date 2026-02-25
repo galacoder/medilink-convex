@@ -40,9 +40,7 @@ export function useBillingMutations() {
     billingAdminApi.activateSubscription,
   );
   const extendSubscription = useMutation(billingAdminApi.extendSubscription);
-  const suspendSubscription = useMutation(
-    billingAdminApi.suspendSubscription,
-  );
+  const suspendSubscription = useMutation(billingAdminApi.suspendSubscription);
   const reactivateSubscription = useMutation(
     billingAdminApi.reactivateSubscription,
   );

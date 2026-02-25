@@ -75,7 +75,7 @@ export default function ExtendSubscriptionPage() {
     try {
       await extendSubscription({
         organizationId,
-        billingCycle: billingCycle as BillingCycle,
+        billingCycle: billingCycle,
         paymentId: paymentIdInput as Id<"payments">,
         amountVnd,
       });
