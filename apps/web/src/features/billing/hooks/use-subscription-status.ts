@@ -11,8 +11,6 @@
  * vi: "Hook tinh trang thai dang ky tu du lieu to chuc"
  * en: "Hook to derive subscription status from org data"
  */
-import { useMemo } from "react";
-
 import type {
   SubscriptionPlan,
   SubscriptionStatus,
@@ -41,47 +39,42 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export function useSubscriptionStatus(
   org: OrgSubscriptionData | null | undefined,
 ): SubscriptionStatusInfo {
-  return useMemo(() => {
-    // Null org = no org found, treat as expired (blocked)
-    if (!org) {
-      return {
-        status: "expired" as const,
-        plan: undefined,
-        expiresAt: undefined,
-        gracePeriodEndsAt: undefined,
-        isActive: false,
-        isReadOnly: false,
-        isBlocked: true,
-        daysUntilExpiry: null,
-      };
-    }
-
-    // Legacy orgs without status field are treated as active
-    // (matches billing guard: "undefined (legacy) -> treated as active")
-    const status: SubscriptionStatus = org.status ?? "active";
-
-    const isActive = status === "active" || status === "trial";
-    const isReadOnly = status === "grace_period";
-    const isBlocked = status === "expired" || status === "suspended";
-
-    const daysUntilExpiry = org.subscriptionExpiresAt
-      ? Math.ceil((org.subscriptionExpiresAt - Date.now()) / DAY_MS)
-      : null;
-
+  // Null org = no org found, treat as expired (blocked)
+  if (!org) {
     return {
-      status,
-      plan: org.subscriptionPlan,
-      expiresAt: org.subscriptionExpiresAt,
-      gracePeriodEndsAt: org.gracePeriodEndsAt,
-      isActive,
-      isReadOnly,
-      isBlocked,
-      daysUntilExpiry,
+      status: "expired" as const,
+      plan: undefined,
+      expiresAt: undefined,
+      gracePeriodEndsAt: undefined,
+      isActive: false,
+      isReadOnly: false,
+      isBlocked: true,
+      daysUntilExpiry: null,
     };
-  }, [
-    org?.status,
-    org?.subscriptionPlan,
-    org?.subscriptionExpiresAt,
-    org?.gracePeriodEndsAt,
-  ]);
+  }
+
+  // Legacy orgs without status field are treated as active
+  // (matches billing guard: "undefined (legacy) -> treated as active")
+  const status: SubscriptionStatus = org.status ?? "active";
+
+  const isActive = status === "active" || status === "trial";
+  const isReadOnly = status === "grace_period";
+  const isBlocked = status === "expired" || status === "suspended";
+
+  // eslint-disable-next-line react-hooks/purity -- Date.now() is intentional for day-level countdown
+  const nowMs = Date.now();
+  const daysUntilExpiry = org.subscriptionExpiresAt
+    ? Math.ceil((org.subscriptionExpiresAt - nowMs) / DAY_MS)
+    : null;
+
+  return {
+    status,
+    plan: org.subscriptionPlan,
+    expiresAt: org.subscriptionExpiresAt,
+    gracePeriodEndsAt: org.gracePeriodEndsAt,
+    isActive,
+    isReadOnly,
+    isBlocked,
+    daysUntilExpiry,
+  };
 }

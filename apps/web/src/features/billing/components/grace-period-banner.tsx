@@ -26,9 +26,9 @@ interface GracePeriodBannerProps {
 export function GracePeriodBanner({
   gracePeriodEndsAt,
 }: GracePeriodBannerProps) {
-  const daysRemaining = Math.ceil(
-    (gracePeriodEndsAt - Date.now()) / (1000 * 60 * 60 * 24),
-  );
+  const msPerDay = 1000 * 60 * 60 * 24;
+  // eslint-disable-next-line react-hooks/purity -- Date.now() is intentional for day-level countdown
+  const daysRemaining = Math.ceil((gracePeriodEndsAt - Date.now()) / msPerDay);
 
   const description = BILLING_LABELS.gracePeriodDescription(daysRemaining);
 

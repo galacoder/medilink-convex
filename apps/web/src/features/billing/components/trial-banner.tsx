@@ -21,9 +21,9 @@ interface TrialBannerProps {
 }
 
 export function TrialBanner({ expiresAt }: TrialBannerProps) {
-  const daysRemaining = Math.ceil(
-    (expiresAt - Date.now()) / (1000 * 60 * 60 * 24),
-  );
+  const msPerDay = 1000 * 60 * 60 * 24;
+  // eslint-disable-next-line react-hooks/purity -- Date.now() is intentional for day-level countdown
+  const daysRemaining = Math.ceil((expiresAt - Date.now()) / msPerDay);
 
   // Only show when <7 days remain (or exactly 7)
   if (daysRemaining > 7) return null;
