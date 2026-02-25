@@ -79,6 +79,10 @@ export default defineSchema({
     maxStaffSeats: v.optional(v.number()), // Số lượng nhân viên tối đa / Max staff seats
     maxEquipment: v.optional(v.number()), // Số lượng thiết bị tối đa / Max equipment records (-1 = unlimited)
 
+    // === Theo doi email thanh toan / Billing email tracking (M1-7 #176) ===
+    lastBillingEmailSentAt: v.optional(v.number()), // Thoi gian gui email cuoi / Last billing email timestamp
+    lastBillingEmailType: v.optional(v.string()), // Loai email cuoi / Last email type (e.g., "expiry_30d")
+
     createdAt: v.number(),
     updatedAt: v.number(),
   })
