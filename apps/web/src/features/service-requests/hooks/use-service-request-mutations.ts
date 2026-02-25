@@ -85,7 +85,6 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function acceptQuote(quoteId: string): Promise<void> {
     setIsAccepting(true);
     try {
-       
       await acceptMutation({ id: quoteId as Id<"quotes"> });
     } finally {
       setIsAccepting(false);
@@ -95,7 +94,6 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
   async function rejectQuote(quoteId: string): Promise<void> {
     setIsRejecting(true);
     try {
-       
       await rejectMutation({ id: quoteId as Id<"quotes"> });
     } finally {
       setIsRejecting(false);
@@ -106,7 +104,6 @@ export function useServiceRequestMutations(): UseServiceRequestMutationsResult {
     serviceRequestId: string,
     data: RatingInput,
   ): Promise<void> {
-     
     await rateMutation({
       serviceRequestId: serviceRequestId as Id<"serviceRequests">,
       rating: data.rating,

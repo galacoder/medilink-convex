@@ -44,7 +44,7 @@ const mockUseQuery = vi.mocked(useQuery);
 const mockUseMutation = vi.mocked(useMutation);
 
 /** All 10 notification preference types as defined in the schema */
-const ALL_PREFERENCE_TYPES = [
+const _ALL_PREFERENCE_TYPES = [
   "service_request_new_quote",
   "service_request_quote_approved",
   "service_request_quote_rejected",
@@ -124,6 +124,7 @@ describe("NotificationPreferences", () => {
 
     const switches = screen.getAllByRole("switch");
     // Toggle the first switch off
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fireEvent.click(switches[0]!);
 
     await waitFor(() => {

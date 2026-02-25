@@ -61,7 +61,6 @@ export function useSubscriptionStatus(
   const isReadOnly = status === "grace_period";
   const isBlocked = status === "expired" || status === "suspended";
 
-   
   const nowMs = Date.now();
   const daysUntilExpiry = org.subscriptionExpiresAt
     ? Math.ceil((org.subscriptionExpiresAt - nowMs) / DAY_MS)
