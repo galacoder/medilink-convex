@@ -80,6 +80,7 @@ export const supportLabels = {
     cancel: { vi: "Huy", en: "Cancel" },
     resolve: { vi: "Giai quyet", en: "Resolve" },
     close: { vi: "Dong", en: "Close" },
+    assign: { vi: "Phan cong", en: "Assign" },
     sendMessage: { vi: "Gui tin nhan", en: "Send Message" },
     addReply: { vi: "Them phan hoi", en: "Add Reply" },
     viewDetail: { vi: "Xem chi tiet", en: "View Detail" },
@@ -160,5 +161,18 @@ export const supportLabels = {
   detail: {
     ticketInfo: { vi: "Thong tin phieu ho tro", en: "Ticket Information" },
     statusInfo: { vi: "Trang thai & Tien trinh", en: "Status & Progress" },
+  },
+
+  // Admin labels
+  admin: {
+    title: { vi: "Quan ly phieu ho tro", en: "Support Ticket Management" },
+    subtitle: {
+      vi: "Quan ly tat ca phieu ho tro tren nen tang",
+      en: "Manage all support tickets across the platform",
+    },
+    organization: { vi: "To chuc", en: "Organization" },
+    assignee: { vi: "Nguoi phu trach", en: "Assignee" },
+    unassigned: { vi: "Chua phan cong", en: "Unassigned" },
+    selectAdmin: { vi: "Chon quan tri vien", en: "Select administrator" },
   },
 } as const;
