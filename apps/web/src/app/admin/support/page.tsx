@@ -75,7 +75,7 @@ export default function AdminSupportPage() {
   const updateStatusMutation = useMutation(adminUpdateStatusFn);
 
   const isLoading = tickets === undefined;
-  const ticketList = (tickets ?? []) as Array<{
+  const ticketList = (tickets ?? []) as {
     _id: string;
     subjectVi: string;
     category: string;
@@ -85,7 +85,7 @@ export default function AdminSupportPage() {
     creatorName?: string | null;
     assigneeName?: string | null;
     createdAt: number;
-  }>;
+  }[];
 
   async function handleClose(ticketId: string) {
     try {
@@ -194,7 +194,7 @@ export default function AdminSupportPage() {
                     <span className="text-muted-foreground text-sm">
                       {supportLabels.categories[
                         ticket.category as keyof typeof supportLabels.categories
-                      ]?.vi ?? ticket.category}
+                      ].vi}
                     </span>
                   </TableCell>
                   <TableCell>
@@ -203,7 +203,7 @@ export default function AdminSupportPage() {
                     >
                       {supportLabels.priorities[
                         ticket.priority as keyof typeof supportLabels.priorities
-                      ]?.vi ?? ticket.priority}
+                      ].vi}
                     </Badge>
                   </TableCell>
                   <TableCell>

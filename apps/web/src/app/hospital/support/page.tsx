@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { LifeBuoyIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@medilink/ui/button";

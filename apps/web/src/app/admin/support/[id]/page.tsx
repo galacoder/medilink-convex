@@ -4,7 +4,7 @@ import type { FunctionReference } from "convex/server";
 import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
-import { ArrowLeftIcon, SendIcon, UserPlusIcon } from "lucide-react";
+import { ArrowLeftIcon, SendIcon } from "lucide-react";
 
 import { api } from "@medilink/backend";
 import { Button } from "@medilink/ui/button";
@@ -73,7 +73,7 @@ export default function AdminSupportDetailPage({
   const ticket = rawTicket as AdminTicketDetail | null | undefined;
   const addMessage = useMutation(adminAddMessageFn);
   const updateStatus = useMutation(adminUpdateStatusFn);
-  const assignMutation = useMutation(assignFn);
+  const _assignMutation = useMutation(assignFn);
   const closeMutation = useMutation(closeFn);
 
   const [messageContent, setMessageContent] = useState("");
@@ -190,7 +190,7 @@ export default function AdminSupportDetailPage({
               <dd>
                 {supportLabels.categories[
                   ticket.category as keyof typeof supportLabels.categories
-                ]?.vi ?? ticket.category}
+                ].vi}
               </dd>
             </div>
             <div>
@@ -200,7 +200,7 @@ export default function AdminSupportDetailPage({
               <dd>
                 {supportLabels.priorities[
                   ticket.priority as keyof typeof supportLabels.priorities
-                ]?.vi ?? ticket.priority}
+                ].vi}
               </dd>
             </div>
             <div>
