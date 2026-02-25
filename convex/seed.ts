@@ -20,6 +20,13 @@ import { components, internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import {
+  EXTRA_HOSPITAL_ORGS,
+  EXTRA_PROVIDER_ORGS,
+  SEED_AUDIT_LOG_ENTRIES,
+  SEED_AUTOMATION_LOG_ENTRIES,
+  VIETMED_PROVIDER_PROFILE,
+} from "./seedData/admin";
+import {
   ALL_SEED_CONSUMABLES,
   ALL_SEED_EQUIPMENT,
   CATEGORY_DIAGNOSTIC,
@@ -934,6 +941,300 @@ export const seedServiceRequestData = internalMutation({
 });
 
 // ---------------------------------------------------------------------------
+// Step 6: seedAdminData
+// Creates: 22 auditLog entries, 18 automationLog entries, escalated dispute,
+//          2 extra hospital orgs (trial + suspended), 1 extra provider org
+// ---------------------------------------------------------------------------
+
+export const seedAdminData = internalMutation({
+  args: {
+    adminUserId: v.id("users"),
+    hospitalOwnerUserId: v.id("users"),
+    hospitalStaff1UserId: v.id("users"),
+    hospitalStaff2UserId: v.id("users"),
+    hospitalOrgId: v.id("organizations"),
+    providerOrgId: v.id("organizations"),
+  },
+  returns: v.object({
+    auditLogCount: v.number(),
+    automationLogCount: v.number(),
+    escalatedDisputeCreated: v.boolean(),
+    extraOrgsCreated: v.number(),
+  }),
+  handler: async (
+    ctx,
+    {
+      adminUserId,
+      hospitalOwnerUserId,
+      hospitalStaff1UserId,
+      hospitalStaff2UserId,
+      hospitalOrgId,
+      providerOrgId,
+    },
+  ) => {
+    const now = Date.now();
+    const MS_PER_HOUR = 60 * 60 * 1000;
+    const MS_PER_DAY = 24 * MS_PER_HOUR;
+
+    // Actor key → user ID mapping
+    const actorMap: Record<string, Id<"users">> = {
+      admin: adminUserId,
+      hospital_owner: hospitalOwnerUserId,
+      hospital_staff_1: hospitalStaff1UserId,
+      hospital_staff_2: hospitalStaff2UserId,
+    };
+    // Org key → org ID mapping
+    const orgMap: Record<string, Id<"organizations">> = {
+      hospital: hospitalOrgId,
+      provider: providerOrgId,
+    };
+
+    // -----------------------------------------------------------------------
+    // 1. Audit Log entries
+    // -----------------------------------------------------------------------
+    // Check existing count for idempotency
+    const existingAuditCount = (
+      await ctx.db.query("auditLog").collect()
+    ).length;
+
+    let auditLogCount = 0;
+    if (existingAuditCount < 20) {
+      for (const entry of SEED_AUDIT_LOG_ENTRIES) {
+        const actorId = actorMap[entry.actorKey];
+        const organizationId = orgMap[entry.orgKey];
+        const entryCreatedAt = now - entry.daysAgo * MS_PER_DAY;
+
+        await ctx.db.insert("auditLog", {
+          organizationId,
+          actorId,
+          action: entry.action,
+          resourceType: entry.resourceType,
+          resourceId: entry.resourceIdPlaceholder,
+          previousValues: entry.previousValues ?? undefined,
+          newValues: entry.newValues ?? undefined,
+          ipAddress: entry.ipAddress,
+          createdAt: entryCreatedAt,
+          updatedAt: entryCreatedAt,
+        });
+        auditLogCount++;
+      }
+      console.log(`Created ${auditLogCount} audit log entries`);
+    } else {
+      console.log(
+        `Skipping audit log: already has ${existingAuditCount} entries (>= 20)`,
+      );
+      auditLogCount = existingAuditCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. Automation Log entries
+    // -----------------------------------------------------------------------
+    const existingAutoCount = (
+      await ctx.db.query("automationLog").collect()
+    ).length;
+
+    let automationLogCount = 0;
+    if (existingAutoCount < 15) {
+      for (const entry of SEED_AUTOMATION_LOG_ENTRIES) {
+        const runAt = now - entry.hoursAgo * MS_PER_HOUR;
+        await ctx.db.insert("automationLog", {
+          ruleName: entry.ruleName,
+          status: entry.status,
+          affectedCount: entry.affectedCount,
+          runAt,
+          errorMessage: entry.errorMessage,
+          metadata: entry.metadata,
+          createdAt: runAt,
+          updatedAt: runAt,
+        });
+        automationLogCount++;
+      }
+      console.log(`Created ${automationLogCount} automation log entries`);
+    } else {
+      console.log(
+        `Skipping automation log: already has ${existingAutoCount} entries (>= 15)`,
+      );
+      automationLogCount = existingAutoCount;
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. Escalated dispute (admin disputes page filters for status="escalated")
+    // -----------------------------------------------------------------------
+    let escalatedDisputeCreated = false;
+
+    // Find a service request to attach the escalated dispute to
+    // Use the existing "disputed" service request if available
+    const disputedServiceRequest = await ctx.db
+      .query("serviceRequests")
+      .filter((q) => q.eq(q.field("status"), "disputed"))
+      .first();
+
+    if (disputedServiceRequest !== null) {
+      // Check if an escalated dispute already exists
+      const existingEscalated = await ctx.db
+        .query("disputes")
+        .filter((q) => q.eq(q.field("status"), "escalated"))
+        .first();
+
+      if (existingEscalated === null) {
+        const escalatedDisputeId = await ctx.db.insert("disputes", {
+          organizationId: hospitalOrgId,
+          serviceRequestId: disputedServiceRequest._id,
+          raisedBy: hospitalOwnerUserId,
+          assignedTo: adminUserId,
+          status: "escalated",
+          type: "pricing",
+          descriptionVi:
+            "Tranh chấp về giá cả — Hóa đơn cuối cùng cao hơn báo giá ban đầu 40% mà không có thông báo trước",
+          descriptionEn:
+            "Pricing dispute — Final invoice was 40% higher than original quote without prior notice",
+          createdAt: now - 12 * MS_PER_DAY,
+          updatedAt: now - 3 * MS_PER_DAY,
+        });
+        console.log(`Created escalated dispute record`);
+
+        // Add 3 dispute messages for the escalated dispute
+        const disputeMessages = [
+          {
+            contentVi:
+              "Chúng tôi đã nhận được hóa đơn 5.600.000 VND nhưng báo giá ban đầu chỉ là 4.000.000 VND. Đề nghị giải thích chi tiết về sự chênh lệch này.",
+            contentEn:
+              "We received an invoice of 5,600,000 VND but the original quote was only 4,000,000 VND. Please provide a detailed explanation for this discrepancy.",
+            authorId: hospitalOwnerUserId,
+            daysAgo: 11,
+          },
+          {
+            contentVi:
+              "Sự chênh lệch là do các linh kiện bổ sung cần thiết phát sinh trong quá trình sửa chữa. Chúng tôi đã cố gắng liên hệ qua điện thoại nhưng không có ai trả lời.",
+            contentEn:
+              "The difference is due to additional parts required during the repair. We attempted to contact you by phone but received no answer.",
+            authorId: hospitalStaff1UserId,
+            daysAgo: 9,
+          },
+          {
+            contentVi:
+              "Sau khi xem xét, quản trị viên nền tảng đã leo thang tranh chấp này để phân xử chính thức. Hai bên cần cung cấp bằng chứng trong vòng 5 ngày làm việc.",
+            contentEn:
+              "After review, the platform admin has escalated this dispute for formal arbitration. Both parties must provide evidence within 5 business days.",
+            authorId: adminUserId,
+            daysAgo: 3,
+          },
+        ];
+
+        for (const msg of disputeMessages) {
+          const msgCreatedAt = now - msg.daysAgo * MS_PER_DAY;
+          await ctx.db.insert("disputeMessages", {
+            disputeId: escalatedDisputeId,
+            authorId: msg.authorId,
+            contentVi: msg.contentVi,
+            contentEn: msg.contentEn,
+            createdAt: msgCreatedAt,
+            updatedAt: msgCreatedAt,
+          });
+        }
+        console.log(`Created 3 dispute messages for escalated dispute`);
+        escalatedDisputeCreated = true;
+      } else {
+        console.log(
+          `Skipping escalated dispute: already exists (${existingEscalated._id})`,
+        );
+      }
+    } else {
+      console.log(
+        `Skipping escalated dispute: no disputed service request found`,
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. Extra organizations (hospital: trial + suspended, provider: vietmed)
+    // -----------------------------------------------------------------------
+    let extraOrgsCreated = 0;
+
+    // Extra hospital orgs
+    for (const orgData of EXTRA_HOSPITAL_ORGS) {
+      const existingOrgId = await findOrgBySlug(ctx, orgData.slug);
+      if (existingOrgId === null) {
+        await ctx.db.insert("organizations", {
+          name: orgData.name,
+          slug: orgData.slug,
+          org_type: orgData.org_type,
+          status: orgData.status,
+          createdAt: now - 90 * MS_PER_DAY,
+          updatedAt: now,
+        });
+        console.log(
+          `Created extra hospital org: ${orgData.slug} (${orgData.status})`,
+        );
+        extraOrgsCreated++;
+      } else {
+        console.log(
+          `Skipping extra hospital org: already exists (${orgData.slug})`,
+        );
+      }
+    }
+
+    // Extra provider org + provider profile
+    for (const orgData of EXTRA_PROVIDER_ORGS) {
+      let extraProviderOrgId = await findOrgBySlug(ctx, orgData.slug);
+      if (extraProviderOrgId === null) {
+        extraProviderOrgId = await ctx.db.insert("organizations", {
+          name: orgData.name,
+          slug: orgData.slug,
+          org_type: orgData.org_type,
+          createdAt: now - 60 * MS_PER_DAY,
+          updatedAt: now,
+        });
+        console.log(`Created extra provider org: ${orgData.slug}`);
+        extraOrgsCreated++;
+      } else {
+        console.log(
+          `Skipping extra provider org: already exists (${orgData.slug})`,
+        );
+      }
+
+      // Create provider profile for this org (pending_verification)
+      const existingProvider = await findProviderByOrg(
+        ctx,
+        extraProviderOrgId,
+      );
+      if (existingProvider === null) {
+        await ctx.db.insert("providers", {
+          organizationId: extraProviderOrgId,
+          nameVi: VIETMED_PROVIDER_PROFILE.nameVi,
+          nameEn: VIETMED_PROVIDER_PROFILE.nameEn,
+          companyName: VIETMED_PROVIDER_PROFILE.companyName,
+          descriptionVi: VIETMED_PROVIDER_PROFILE.descriptionVi,
+          descriptionEn: VIETMED_PROVIDER_PROFILE.descriptionEn,
+          status: VIETMED_PROVIDER_PROFILE.status,
+          verificationStatus: VIETMED_PROVIDER_PROFILE.verificationStatus,
+          contactEmail: VIETMED_PROVIDER_PROFILE.contactEmail,
+          contactPhone: VIETMED_PROVIDER_PROFILE.contactPhone,
+          address: VIETMED_PROVIDER_PROFILE.address,
+          totalRatings: VIETMED_PROVIDER_PROFILE.totalRatings,
+          completedServices: VIETMED_PROVIDER_PROFILE.completedServices,
+          createdAt: now - 60 * MS_PER_DAY,
+          updatedAt: now,
+        });
+        console.log(
+          `Created provider profile for ${orgData.slug} (pending_verification)`,
+        );
+      } else {
+        console.log(
+          `Skipping provider profile for ${orgData.slug}: already exists`,
+        );
+      }
+    }
+
+    return {
+      auditLogCount,
+      automationLogCount,
+      escalatedDisputeCreated,
+      extraOrgsCreated,
+    };
+  },
+});
+
+// ---------------------------------------------------------------------------
 // seedAuthAccounts: Cleans up stale Better Auth records for all seeded users.
 // Entry point: npx convex run seed:seedAuthAccounts
 //
@@ -1170,7 +1471,7 @@ export default action({
     console.log(`  ✓ Consumables: 3`);
 
     // Step 5: Service requests and quotes
-    console.log("\n[5/5] Seeding service requests and quotes...");
+    console.log("\n[5/6] Seeding service requests and quotes...");
     const serviceData = (await ctx.runMutation(
       internal.seed.seedServiceRequestData,
       {
@@ -1186,13 +1487,39 @@ export default action({
       `  ✓ Service requests: ${serviceData.requestIds.length} | Quotes: ${serviceData.quoteIds.length}`,
     );
 
+    // Step 6: Admin portal data (audit logs, automation logs, escalated disputes, extra orgs)
+    console.log(
+      "\n[6/6] Seeding admin portal data (auditLog, automationLog, escalated disputes, extra orgs)...",
+    );
+    const adminData = (await ctx.runMutation(internal.seed.seedAdminData, {
+      adminUserId: baseIds.adminUserId,
+      hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+      hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+      hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
+      hospitalOrgId: baseIds.hospitalOrgId,
+      providerOrgId: baseIds.providerOrgId,
+    })) as {
+      auditLogCount: number;
+      automationLogCount: number;
+      escalatedDisputeCreated: boolean;
+      extraOrgsCreated: number;
+    };
+    console.log(
+      `  ✓ Audit log: ${adminData.auditLogCount} | Automation log: ${adminData.automationLogCount}`,
+    );
+    console.log(
+      `  ✓ Escalated dispute: ${adminData.escalatedDisputeCreated ? "created" : "skipped"} | Extra orgs: ${adminData.extraOrgsCreated}`,
+    );
+
     // Final summary
     console.log("\n" + "=".repeat(60));
     console.log("MediLink Seed Script — Complete");
     console.log("vi: Hoàn thành khởi tạo dữ liệu mẫu MediLink");
     console.log("=".repeat(60));
     console.log("\nSeed Summary:");
-    console.log("  Organizations : 2 (SPMET Hospital + TechMed Provider)");
+    console.log(
+      "  Organizations : 5 (SPMET Hospital + TechMed Provider + 2 hospital variants + 1 provider)",
+    );
     console.log("  Users         : 6 (1 admin + 3 hospital + 2 provider)");
     console.log(
       "  Memberships   : 5 (1 owner + 2 member + 1 owner + 1 member)",
@@ -1212,7 +1539,14 @@ export default action({
       "  Service reqs  : 6 (pending/quoted/accepted/in_progress/completed/disputed)",
     );
     console.log("  Quotes        : 4 (pending/accepted/rejected/expired)");
-    console.log("  Dispute       : 1 (quality dispute on disputed request)");
+    console.log("  Disputes      : 1 open (quality) + 1 escalated (pricing)");
+    console.log("  Dispute msgs  : 3 (escalated dispute thread)");
+    console.log(
+      `  Audit log     : ${adminData.auditLogCount} entries (equipment/serviceRequests/disputes/quotes/users)`,
+    );
+    console.log(
+      `  Automation log: ${adminData.automationLogCount} entries (all 5 rule names, mix success/error)`,
+    );
     console.log("\nRun again safely — seed is idempotent.");
   },
 });
