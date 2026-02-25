@@ -37,7 +37,7 @@ import {
  * en: "Main subscription management page"
  */
 export default function AdminBillingPage() {
-  const locale = "vi" as string; // vi: default to Vietnamese
+  const locale = "vi" as "vi" | "en"; // vi: default to Vietnamese
   const L = billingLabels;
 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
