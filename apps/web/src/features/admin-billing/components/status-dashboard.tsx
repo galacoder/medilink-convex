@@ -63,7 +63,7 @@ export function StatusDashboard({
   // Count orgs per status
   const counts = organizations.reduce<Record<OrgSubscriptionStatus, number>>(
     (acc, org) => {
-      acc[org.status] = (acc[org.status] ?? 0) + 1;
+      acc[org.status] = acc[org.status] + 1;
       return acc;
     },
     { active: 0, trial: 0, grace_period: 0, expired: 0, suspended: 0 },

@@ -40,7 +40,7 @@ function formatDate(timestamp: number | null, locale: "vi" | "en"): string {
 }
 
 /** Format VND amount with Vietnamese formatting */
-function formatVnd(amount: number): string {
+function _formatVnd(amount: number): string {
   return new Intl.NumberFormat("vi-VN").format(amount) + " VND";
 }
 

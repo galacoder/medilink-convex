@@ -73,7 +73,7 @@ interface StatusBadgeProps {
  * en: "Display color-coded status badge"
  */
 export function StatusBadge({ status, locale = "vi" }: StatusBadgeProps) {
-  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.active;
+  const config = STATUS_CONFIG[status];
   const label = locale === "vi" ? config.labelVi : config.labelEn;
 
   return (

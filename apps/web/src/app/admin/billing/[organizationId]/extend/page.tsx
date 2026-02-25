@@ -49,7 +49,7 @@ import {
 export default function ExtendSubscriptionPage() {
   const params = useParams<{ organizationId: string }>();
   const router = useRouter();
-  const locale = "vi";
+  const locale = "vi" as string;
   const L = billingLabels;
 
   const organizationId = params.organizationId as Id<"organizations">;
