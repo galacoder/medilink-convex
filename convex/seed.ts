@@ -1109,7 +1109,111 @@ export const findOrgBySlugInternal = internalQuery({
 });
 
 // ---------------------------------------------------------------------------
-// Step 6: Default action — orchestrates all internal mutations
+// Step 6: seedNotificationPreferences
+// Creates: 1 notificationPreferences record per seeded user (6 total)
+// ---------------------------------------------------------------------------
+
+export const seedNotificationPreferences = internalMutation({
+  args: {
+    adminUserId: v.id("users"),
+    hospitalOwnerUserId: v.id("users"),
+    hospitalStaff1UserId: v.id("users"),
+    hospitalStaff2UserId: v.id("users"),
+    providerOwnerUserId: v.id("users"),
+    providerTechUserId: v.id("users"),
+  },
+  returns: v.number(),
+  handler: async (ctx, args): Promise<number> => {
+    const now = Date.now();
+    let created = 0;
+
+    // All true defaults for admin
+    const allTrue = {
+      service_request_new_quote: true,
+      service_request_quote_approved: true,
+      service_request_quote_rejected: true,
+      service_request_started: true,
+      service_request_completed: true,
+      equipment_maintenance_due: true,
+      equipment_status_broken: true,
+      consumable_stock_low: true,
+      dispute_new_message: true,
+      dispute_resolved: true,
+    };
+
+    // Hospital users: all true except systemAnnouncement-like fields
+    // (per spec: all true except systemAnnouncement=false — mapped to dispute_resolved as closest)
+    // Using spec literally: hospital users all true
+    const hospitalPrefs = { ...allTrue };
+
+    // Provider users: all true except maintenance-related
+    const providerPrefs = {
+      ...allTrue,
+      equipment_maintenance_due: false,
+      consumable_stock_low: false,
+    };
+
+    const userPrefs: Array<{
+      userId: typeof args.adminUserId;
+      prefs: typeof allTrue;
+      label: string;
+    }> = [
+      { userId: args.adminUserId, prefs: allTrue, label: "admin" },
+      {
+        userId: args.hospitalOwnerUserId,
+        prefs: hospitalPrefs,
+        label: "hospital_owner",
+      },
+      {
+        userId: args.hospitalStaff1UserId,
+        prefs: hospitalPrefs,
+        label: "hospital_staff_1",
+      },
+      {
+        userId: args.hospitalStaff2UserId,
+        prefs: hospitalPrefs,
+        label: "hospital_staff_2",
+      },
+      {
+        userId: args.providerOwnerUserId,
+        prefs: providerPrefs,
+        label: "provider_owner",
+      },
+      {
+        userId: args.providerTechUserId,
+        prefs: providerPrefs,
+        label: "provider_tech",
+      },
+    ];
+
+    for (const { userId, prefs, label } of userPrefs) {
+      // Idempotency: check by_user index before insert
+      const existing = await ctx.db
+        .query("notificationPreferences")
+        .withIndex("by_user", (q) => q.eq("userId", userId))
+        .first();
+
+      if (existing) {
+        console.log(`  Skipping notificationPreferences for ${label}: exists`);
+        continue;
+      }
+
+      await ctx.db.insert("notificationPreferences", {
+        userId,
+        ...prefs,
+        createdAt: now,
+        updatedAt: now,
+      });
+      created++;
+      console.log(`  Created notificationPreferences for ${label}`);
+    }
+
+    return created;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Step 7: Default action — orchestrates all internal mutations
 // Entry point: npx convex run seed:default
 // ---------------------------------------------------------------------------
 
@@ -1123,7 +1227,7 @@ export default action({
 
     // Step 1: Base entities (users, orgs, memberships)
     console.log(
-      "\n[1/5] Seeding base entities (users, organizations, memberships)...",
+      "\n[1/6] Seeding base entities (users, organizations, memberships)...",
     );
     const baseIds = (await ctx.runMutation(
       internal.seed.seedBaseEntities,
@@ -1133,7 +1237,7 @@ export default action({
 
     // Step 2: Equipment data (categories, equipment, QR codes)
     console.log(
-      "\n[2/5] Seeding equipment data (categories, equipment, QR codes)...",
+      "\n[2/6] Seeding equipment data (categories, equipment, QR codes)...",
     );
     const equipmentData = (await ctx.runMutation(
       internal.seed.seedEquipmentData,
@@ -1149,7 +1253,7 @@ export default action({
 
     // Step 3: Provider data (profile, offerings, certifications, coverage)
     console.log(
-      "\n[3/5] Seeding provider data (profile, offerings, certifications, coverage areas)...",
+      "\n[3/6] Seeding provider data (profile, offerings, certifications, coverage areas)...",
     );
     const providerData = (await ctx.runMutation(
       internal.seed.seedProviderData,
@@ -1163,14 +1267,14 @@ export default action({
     );
 
     // Step 4: Consumables
-    console.log("\n[4/5] Seeding consumables...");
+    console.log("\n[4/6] Seeding consumables...");
     await ctx.runMutation(internal.seed.seedConsumablesData, {
       hospitalOrgId: baseIds.hospitalOrgId,
     });
     console.log(`  ✓ Consumables: 3`);
 
     // Step 5: Service requests and quotes
-    console.log("\n[5/5] Seeding service requests and quotes...");
+    console.log("\n[5/6] Seeding service requests and quotes...");
     const serviceData = (await ctx.runMutation(
       internal.seed.seedServiceRequestData,
       {
@@ -1185,6 +1289,21 @@ export default action({
     console.log(
       `  ✓ Service requests: ${serviceData.requestIds.length} | Quotes: ${serviceData.quoteIds.length}`,
     );
+
+    // Step 6: Notification preferences
+    console.log("\n[6/6] Seeding notification preferences...");
+    const notifPrefsCreated = (await ctx.runMutation(
+      internal.seed.seedNotificationPreferences,
+      {
+        adminUserId: baseIds.adminUserId,
+        hospitalOwnerUserId: baseIds.hospitalOwnerUserId,
+        hospitalStaff1UserId: baseIds.hospitalStaff1UserId,
+        hospitalStaff2UserId: baseIds.hospitalStaff2UserId,
+        providerOwnerUserId: baseIds.providerOwnerUserId,
+        providerTechUserId: baseIds.providerTechUserId,
+      },
+    )) as number;
+    console.log(`  ✓ Notification preferences: ${notifPrefsCreated} created`);
 
     // Final summary
     console.log("\n" + "=".repeat(60));
@@ -1213,6 +1332,9 @@ export default action({
     );
     console.log("  Quotes        : 4 (pending/accepted/rejected/expired)");
     console.log("  Dispute       : 1 (quality dispute on disputed request)");
+    console.log(
+      "  Notif prefs   : 6 (1 per user, admin=all-on, hospital=all-on, provider=no-maint)",
+    );
     console.log("\nRun again safely — seed is idempotent.");
   },
 });

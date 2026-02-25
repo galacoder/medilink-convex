@@ -6,13 +6,14 @@
  * WHY: Users may not want to receive all notification types (e.g., a staff
  * member may only care about equipment_maintenance_due, not quote events).
  * This component lets them opt out of specific notification types.
+ * Toggling saves immediately via the Convex mutation (no save button needed).
  *
  * vi: "Giao diện cài đặt tùy chọn thông báo" / en: "Notification preferences UI"
  */
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 
-import { Button } from "@medilink/ui/button";
-import { Checkbox } from "@medilink/ui/checkbox";
+import { Label } from "@medilink/ui/label";
+import { Switch } from "@medilink/ui/switch";
 
 import type { NotificationType } from "../types";
 import { useNotificationPreferences } from "../hooks/use-notification-preferences";
@@ -37,8 +38,9 @@ const PREFERENCE_TYPES: NotificationType[] = [
 ];
 
 /**
- * Displays toggle switches for each notification type, allowing users to
+ * Displays switch toggles for each notification type, allowing users to
  * opt in or out. Defaults to enabled (true) for all types.
+ * Toggling saves immediately via updatePreferences mutation.
  *
  * vi: "Tùy chọn thông báo" / en: "Notification preferences"
  */
@@ -48,39 +50,22 @@ export function NotificationPreferences({
   const { preferences, isLoading, updatePreferences } =
     useNotificationPreferences();
 
-  // Local state for optimistic toggling before saving
-  const [localPrefs, setLocalPrefs] = useState<Record<string, boolean>>({});
-  const [isSaving, setIsSaving] = useState(false);
-
   const getPreferenceValue = useCallback(
     (type: NotificationType): boolean => {
-      // Local override takes priority, then Convex value, then default true
-      if (type in localPrefs) return localPrefs[type] ?? true;
-      const prefValue = preferences?.[type as keyof typeof preferences];
+      if (!preferences) return true; // Default: all enabled
+      const prefValue = preferences[type as keyof typeof preferences];
       if (typeof prefValue === "boolean") return prefValue;
-      return true; // Default: all enabled
+      return true; // Default: enabled if undefined
     },
-    [localPrefs, preferences],
+    [preferences],
   );
 
   const handleToggle = useCallback(
     (type: NotificationType, enabled: boolean) => {
-      setLocalPrefs((prev) => ({ ...prev, [type]: enabled }));
+      void updatePreferences({ [type]: enabled });
     },
-    [],
+    [updatePreferences],
   );
-
-  const handleSave = useCallback(async () => {
-    setIsSaving(true);
-    try {
-      await updatePreferences(localPrefs);
-      setLocalPrefs({});
-    } finally {
-      setIsSaving(false);
-    }
-  }, [localPrefs, updatePreferences]);
-
-  const hasChanges = Object.keys(localPrefs).length > 0;
 
   if (isLoading) {
     return (
@@ -93,7 +78,7 @@ export function NotificationPreferences({
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-6 p-4">
       <div>
         <h3 className="text-sm font-medium">
           {notificationLabels.preferences[locale]}
@@ -103,7 +88,7 @@ export function NotificationPreferences({
         </p>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {PREFERENCE_TYPES.map((type) => {
           const typeEntry =
             notificationLabels.types[
@@ -113,38 +98,23 @@ export function NotificationPreferences({
           const enabled = getPreferenceValue(type);
 
           return (
-            <div key={type} className="flex items-center gap-2">
-              <Checkbox
-                id={`notif-pref-${type}`}
-                checked={enabled}
-                onCheckedChange={(checked) =>
-                  handleToggle(type, checked === true)
-                }
-                aria-label={label}
-              />
-              <label
+            <div key={type} className="flex items-center justify-between gap-4">
+              <Label
                 htmlFor={`notif-pref-${type}`}
-                className="cursor-pointer text-sm"
+                className="cursor-pointer text-sm font-normal"
               >
                 {label}
-              </label>
+              </Label>
+              <Switch
+                id={`notif-pref-${type}`}
+                checked={enabled}
+                onCheckedChange={(checked) => handleToggle(type, checked)}
+                aria-label={label}
+              />
             </div>
           );
         })}
       </div>
-
-      {hasChanges && (
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          size="sm"
-          className="w-full"
-        >
-          {isSaving
-            ? notificationLabels.loading[locale]
-            : notificationLabels.save[locale]}
-        </Button>
-      )}
     </div>
   );
 }
