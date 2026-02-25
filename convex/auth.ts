@@ -25,9 +25,16 @@ const siteUrl = process.env.SITE_URL ?? "http://localhost:3000";
 // CLI variable not available in the function runtime. Instead, detect production
 // via SITE_URL: in dev it's unset (defaults to localhost); in production it's
 // explicitly set to the production domain via `npx convex env set SITE_URL`.
-const isProduction =
-  !!process.env.SITE_URL &&
-  !process.env.SITE_URL.startsWith("http://localhost");
+// Treat private-network IPs as dev so trustedOrigins stays broad
+// even when SITE_URL is set to a LAN IP for homelab access.
+const isPrivateNetworkUrl = (url: string) =>
+  url.startsWith("http://localhost") ||
+  url.startsWith("http://127.") ||
+  url.startsWith("http://192.168.") ||
+  url.startsWith("http://10.") ||
+  url.startsWith("http://172.1");
+
+const isProduction = !!process.env.SITE_URL && !isPrivateNetworkUrl(process.env.SITE_URL);
 
 const trustedOrigins = isProduction
   ? [siteUrl]
