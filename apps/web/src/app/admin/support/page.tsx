@@ -192,18 +192,22 @@ export default function AdminSupportPage() {
                   </TableCell>
                   <TableCell>
                     <span className="text-muted-foreground text-sm">
-                      {supportLabels.categories[
-                        ticket.category as keyof typeof supportLabels.categories
-                      ].vi}
+                      {
+                        supportLabels.categories[
+                          ticket.category as keyof typeof supportLabels.categories
+                        ].vi
+                      }
                     </span>
                   </TableCell>
                   <TableCell>
                     <Badge
                       className={`border ${PRIORITY_COLORS[ticket.priority] ?? ""}`}
                     >
-                      {supportLabels.priorities[
-                        ticket.priority as keyof typeof supportLabels.priorities
-                      ].vi}
+                      {
+                        supportLabels.priorities[
+                          ticket.priority as keyof typeof supportLabels.priorities
+                        ].vi
+                      }
                     </Badge>
                   </TableCell>
                   <TableCell>

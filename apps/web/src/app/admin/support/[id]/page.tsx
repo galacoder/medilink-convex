@@ -188,9 +188,11 @@ export default function AdminSupportDetailPage({
                 {supportLabels.fields.category.vi}
               </dt>
               <dd>
-                {supportLabels.categories[
-                  ticket.category as keyof typeof supportLabels.categories
-                ].vi}
+                {
+                  supportLabels.categories[
+                    ticket.category as keyof typeof supportLabels.categories
+                  ].vi
+                }
               </dd>
             </div>
             <div>
@@ -198,9 +200,11 @@ export default function AdminSupportDetailPage({
                 {supportLabels.fields.priority.vi}
               </dt>
               <dd>
-                {supportLabels.priorities[
-                  ticket.priority as keyof typeof supportLabels.priorities
-                ].vi}
+                {
+                  supportLabels.priorities[
+                    ticket.priority as keyof typeof supportLabels.priorities
+                  ].vi
+                }
               </dd>
             </div>
             <div>
