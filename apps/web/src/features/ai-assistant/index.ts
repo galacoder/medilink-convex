@@ -13,6 +13,7 @@
 // Components
 export { AIAssistantWidget } from "./components/ai-assistant-widget";
 export { AiChatHistory } from "./components/ai-chat-history";
+export { AiChatPage } from "./components/ai-chat-page";
 
 // Hooks
 export { useAiAssistant } from "./hooks/use-ai-assistant";

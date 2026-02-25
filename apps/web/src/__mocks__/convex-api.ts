@@ -94,4 +94,11 @@ export const api = {
     listPhotos: "consumablePhotos:listPhotos",
     getPhotoUrl: "consumablePhotos:getPhotoUrl",
   },
+  aiConversation: {
+    list: "aiConversation:list",
+    getById: "aiConversation:getById",
+    create: "aiConversation:create",
+    addMessage: "aiConversation:addMessage",
+    remove: "aiConversation:remove",
+  },
 } as const;

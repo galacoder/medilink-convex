@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /**
  * Tests for NotificationPreferences component.
  *
@@ -44,7 +46,7 @@ const mockUseQuery = vi.mocked(useQuery);
 const mockUseMutation = vi.mocked(useMutation);
 
 /** All 10 notification preference types as defined in the schema */
-const ALL_PREFERENCE_TYPES = [
+const _ALL_PREFERENCE_TYPES = [
   "service_request_new_quote",
   "service_request_quote_approved",
   "service_request_quote_rejected",
