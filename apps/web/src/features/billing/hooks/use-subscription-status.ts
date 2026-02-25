@@ -61,7 +61,7 @@ export function useSubscriptionStatus(
   const isReadOnly = status === "grace_period";
   const isBlocked = status === "expired" || status === "suspended";
 
-  // eslint-disable-next-line react-hooks/purity -- Date.now() is intentional for day-level countdown
+   
   const nowMs = Date.now();
   const daysUntilExpiry = org.subscriptionExpiresAt
     ? Math.ceil((org.subscriptionExpiresAt - nowMs) / DAY_MS)
