@@ -38,10 +38,7 @@ import {
   SheetTrigger,
 } from "@medilink/ui/sheet";
 
-import type {
-  AdminServiceRequest,
-  AdminServiceRequestFilters,
-} from "~/features/admin-disputes";
+import type { AdminServiceRequestFilters } from "~/features/admin-disputes";
 import {
   adminDisputeLabels,
   AdminServiceRequestTable,
