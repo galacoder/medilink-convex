@@ -38,7 +38,6 @@ export function AiChatPage({ portal, organizationId }: AiChatPageProps) {
     isLoading,
     selectedConversation,
     selectConversation,
-    clearSelection,
     createConversation,
     deleteConversation,
     addMessage,
