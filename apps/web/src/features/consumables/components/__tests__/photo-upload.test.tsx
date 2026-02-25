@@ -21,7 +21,6 @@ import { PhotoUpload } from "../PhotoUpload";
 vi.mock("convex/react", () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(() => vi.fn()),
-  useAction: vi.fn(() => vi.fn()),
 }));
 
 // Mock the Convex generated API

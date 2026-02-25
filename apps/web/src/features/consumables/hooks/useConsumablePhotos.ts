@@ -1,7 +1,7 @@
 "use client";
 
 import type { FunctionReference } from "convex/server";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 
 import { api } from "@medilink/backend";
 
@@ -10,11 +10,10 @@ import { api } from "@medilink/backend";
 const photosApi = (api as any).consumablePhotos;
 type QueryRef = FunctionReference<"query">;
 type MutationRef = FunctionReference<"mutation">;
-type ActionRef = FunctionReference<"action">;
 const listPhotosFn: QueryRef = photosApi.listPhotos;
 const savePhotoFn: MutationRef = photosApi.savePhoto;
 const deletePhotoFn: MutationRef = photosApi.deletePhoto;
-const generateUploadUrlFn: ActionRef = photosApi.generateUploadUrl;
+const generateUploadUrlFn: MutationRef = photosApi.generateUploadUrl;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
 /** Photo record shape returned by listPhotos query */
@@ -58,7 +57,7 @@ export function useConsumablePhotos(consumableId: string | undefined) {
   );
   const savePhoto = useMutation(savePhotoFn);
   const deletePhoto = useMutation(deletePhotoFn);
-  const generateUploadUrl = useAction(generateUploadUrlFn);
+  const generateUploadUrl = useMutation(generateUploadUrlFn);
 
   /**
    * Upload a file to Convex storage and save the photo record.
