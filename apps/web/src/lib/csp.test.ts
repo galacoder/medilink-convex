@@ -5,7 +5,7 @@
  * fields stored in Convex. These tests verify nonce generation, directive
  * correctness, and dev/prod mode differences.
  */
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { buildCspHeader, generateNonce } from "./csp";
 

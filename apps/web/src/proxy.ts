@@ -41,6 +41,7 @@ import {
  */
 function nextWithSecurityHeaders(): NextResponse {
   const nonce = generateNonce();
+  // eslint-disable-next-line no-restricted-properties -- NODE_ENV is safe in middleware (no t3-env)
   const isDev = process.env.NODE_ENV === "development";
 
   const response = NextResponse.next({
