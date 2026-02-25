@@ -39,7 +39,9 @@ describe("useAiHistory", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseQuery.mockReturnValue(undefined);
-    mockUseMutation.mockReturnValue(vi.fn());
+    mockUseMutation.mockReturnValue(
+      vi.fn() as unknown as ReturnType<typeof useMutation>,
+    );
   });
 
   it("returns loading true when query is undefined", () => {
