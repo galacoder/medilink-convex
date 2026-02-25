@@ -12,7 +12,8 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-import { requireAuth } from "./lib/auth";
+import { createAuditEntry } from "./lib/auditLog";
+import { requireAuth, requireOrgAuth } from "./lib/auth";
 
 /**
  * Submits a new quote for a service request.
@@ -231,5 +232,144 @@ export const listByProvider = query({
     );
 
     return enriched;
+  },
+});
+
+/**
+ * Accepts a quote for a service request.
+ *
+ * WHY: Hospitals accept provider quotes to move a service request forward.
+ * Accepting one quote auto-rejects all other pending quotes and transitions
+ * the service request to "accepted" with the assigned provider.
+ *
+ * Security: requires owner/admin role in the hospital org. The user who
+ * created the service request cannot accept quotes for it (self-approval
+ * prevention — Option D).
+ *
+ * vi: "Chấp nhận báo giá" / en: "Accept a quote for a service request"
+ */
+export const accept = mutation({
+  args: {
+    /** vi: "ID báo giá" / en: "Quote ID to accept" */
+    quoteId: v.id("quotes"),
+  },
+  handler: async (ctx, args) => {
+    // 1. Auth: require authenticated user with an active org
+    const auth = await requireOrgAuth(ctx);
+
+    // 2. Role gate: only owner/admin can accept quotes
+    // WHY: Uses JWT-based auth pattern (not component-based) because the
+    // Better Auth component cannot be reliably used in all environments.
+    // Look up the user's Convex ID via email, then check membership role.
+    const userRecord = auth.email
+      ? await ctx.db
+          .query("users")
+          .withIndex("by_email", (q) => q.eq("email", auth.email!))
+          .first()
+      : null;
+
+    if (!userRecord) {
+      throw new ConvexError({
+        vi: "Không tìm thấy người dùng",
+        en: "User not found",
+      });
+    }
+
+    const membership = await ctx.db
+      .query("organizationMemberships")
+      .withIndex("by_org_and_user", (q) =>
+        q
+          .eq("orgId", auth.organizationId as Id<"organizations">)
+          .eq("userId", userRecord._id),
+      )
+      .first();
+
+    if (!membership || !["owner", "admin"].includes(membership.role)) {
+      throw new ConvexError({
+        vi: "Bạn không có quyền chấp nhận báo giá",
+        en: "You do not have permission to accept quotes",
+      });
+    }
+
+    // 3. Load quote
+    const quote = await ctx.db.get(args.quoteId);
+    if (!quote) {
+      throw new ConvexError({
+        vi: "Không tìm thấy báo giá",
+        en: "Quote not found",
+      });
+    }
+
+    // 4. Load linked service request and verify org ownership
+    const request = await ctx.db.get(quote.serviceRequestId);
+    if (!request || request.organizationId !== auth.organizationId) {
+      throw new ConvexError({
+        vi: "Không có quyền",
+        en: "Not authorized",
+      });
+    }
+
+    // 5. Self-approval prevention (Option D)
+    if (request.requestedBy === userRecord._id) {
+      throw new ConvexError({
+        vi: "Người tạo yêu cầu không thể chấp nhận báo giá",
+        en: "You cannot accept a quote for your own service request",
+      });
+    }
+
+    // 6. Guard valid state: only pending quotes can be accepted
+    if (quote.status !== "pending") {
+      throw new ConvexError({
+        vi: "Chỉ chấp nhận báo giá đang chờ",
+        en: "Only pending quotes can be accepted",
+      });
+    }
+
+    const now = Date.now();
+
+    // 7. Accept this quote with audit fields
+    await ctx.db.patch(args.quoteId, {
+      status: "accepted",
+      acceptedBy: userRecord._id,
+      acceptedAt: now,
+      updatedAt: now,
+    });
+
+    // 8. Reject all other pending quotes for the same service request
+    const otherQuotes = await ctx.db
+      .query("quotes")
+      .withIndex("by_service_request", (q) =>
+        q.eq("serviceRequestId", quote.serviceRequestId),
+      )
+      .collect();
+
+    for (const q of otherQuotes) {
+      if (q._id !== args.quoteId && q.status === "pending") {
+        await ctx.db.patch(q._id, { status: "rejected", updatedAt: now });
+      }
+    }
+
+    // 9. Transition service request to "accepted"
+    await ctx.db.patch(quote.serviceRequestId, {
+      status: "accepted",
+      assignedProviderId: quote.providerId,
+      updatedAt: now,
+    });
+
+    // 10. Audit log
+    await createAuditEntry(ctx, {
+      organizationId: auth.organizationId as Id<"organizations">,
+      actorId: userRecord._id,
+      action: "quote_accepted",
+      resourceType: "quotes",
+      resourceId: args.quoteId,
+      newValues: {
+        acceptedBy: userRecord._id,
+        acceptedAt: now,
+        providerId: quote.providerId,
+      },
+    });
+
+    return { quoteId: args.quoteId, serviceRequestId: quote.serviceRequestId };
   },
 });

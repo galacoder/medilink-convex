@@ -681,6 +681,10 @@ export default defineSchema({
     estimatedDurationDays: v.optional(v.number()),
     // vi: "Ngày bắt đầu sớm nhất có thể" / en: "Earliest available start date (epoch ms)"
     availableStartDate: v.optional(v.number()),
+    // vi: "Người chấp nhận báo giá" / en: "User who accepted the quote (audit trail)"
+    acceptedBy: v.optional(v.id("users")),
+    // vi: "Thời điểm chấp nhận" / en: "When the quote was accepted (epoch ms)"
+    acceptedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
