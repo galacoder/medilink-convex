@@ -26,6 +26,26 @@ import { anyApi } from "convex/server";
 
 import { env } from "~/env";
 
+/**
+ * Reconstruct the client-visible base URL from the incoming request's Host header.
+ *
+ * WHY: Next.js Node.js-runtime route handlers populate `request.url` with the
+ * server's bind address (localhost:PORT), not the client-visible hostname.
+ * Edge-runtime middleware uses the real Host header, but this route runs in
+ * Node.js runtime — so `request.url` always resolves to localhost even when
+ * the browser is accessing via a LAN IP (e.g. 192.168.2.18:3002).
+ *
+ * Using the `Host` header guarantees redirects land on the same origin the
+ * browser used to make the request, preventing "refused connection" errors
+ * when clients access from non-localhost addresses.
+ */
+function getRequestBase(request: NextRequest): string {
+  const host = request.headers.get("host") ?? "localhost:3002";
+  // Respect x-forwarded-proto when behind a TLS-terminating reverse proxy.
+  const proto = request.headers.get("x-forwarded-proto") ?? "http";
+  return `${proto}://${host}`;
+}
+
 type UserContext = {
   orgId: string | null;
   orgType: string | null;
@@ -48,11 +68,13 @@ export async function GET(request: NextRequest) {
       ? returnTo
       : null;
 
+  const base = getRequestBase(request);
+
   // 1. Read Convex JWT (set by Better Auth's convex plugin after sign-in)
   const convexJwt = request.cookies.get("better-auth.convex_jwt")?.value;
   if (!convexJwt) {
     // No JWT → not authenticated or session expired
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/sign-in", base));
   }
 
   // 2. Query Convex for the user's org context (platformRole, orgType, orgId)
@@ -73,12 +95,12 @@ export async function GET(request: NextRequest) {
     )) as UserContext;
   } catch {
     // Convex query failed (expired JWT, network error) → force re-authentication
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+    return NextResponse.redirect(new URL("/sign-in", base));
   }
 
   if (!context) {
     // No org membership → user hasn't completed onboarding
-    return NextResponse.redirect(new URL("/sign-up", request.url));
+    return NextResponse.redirect(new URL("/sign-up", base));
   }
 
   // 3a. Platform admin/support — set admin sentinel cookie + redirect to admin portal
@@ -89,7 +111,7 @@ export async function GET(request: NextRequest) {
     context.platformRole === "platform_support"
   ) {
     const response = NextResponse.redirect(
-      new URL("/admin/dashboard", request.url),
+      new URL("/admin/dashboard", base),
     );
     response.cookies.set(
       "medilink-org-context",
@@ -107,7 +129,7 @@ export async function GET(request: NextRequest) {
   // 3b. Regular org user — set routing cookie + redirect to correct portal
   if (!context.orgType || !context.orgId) {
     // Context record exists but is missing required org fields → force sign-up
-    return NextResponse.redirect(new URL("/sign-up", request.url));
+    return NextResponse.redirect(new URL("/sign-up", base));
   }
 
   const portalDefault =
@@ -116,7 +138,7 @@ export async function GET(request: NextRequest) {
       : "/hospital/dashboard";
 
   const destination = safeReturnTo ?? portalDefault;
-  const response = NextResponse.redirect(new URL(destination, request.url));
+  const response = NextResponse.redirect(new URL(destination, base));
   response.cookies.set(
     "medilink-org-context",
     `${context.orgType}:${context.orgId}`,

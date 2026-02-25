@@ -41,7 +41,7 @@ export const auth = {
           ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
           : env.VERCEL_ENV === "preview" && env.VERCEL_URL
             ? `https://${env.VERCEL_URL}`
-            : "http://localhost:3000";
+            : "http://localhost:3002";
 
       try {
         const res = await fetch(`${baseUrl}/api/auth/get-session`, {
