@@ -62,9 +62,7 @@ export default function AdminPaymentsPage() {
             <div>
               <CardTitle>{L.title[locale]}</CardTitle>
               <CardDescription>
-                {isLoading
-                  ? L.loading[locale]
-                  : `${total} ${"thanh toan"}`}
+                {isLoading ? L.loading[locale] : `${total} ${"thanh toan"}`}
               </CardDescription>
             </div>
             <PaymentFiltersBar
