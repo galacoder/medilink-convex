@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 
 import { cn } from "@medilink/ui";
 import { ThemeProvider } from "@medilink/ui/theme";
@@ -54,6 +55,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   // making the initial page load faster and preventing auth flicker.
   const initialToken = await getToken();
 
+  // Read CSP nonce from proxy headers.
+  // WHY: The proxy generates a per-request nonce for Content-Security-Policy.
+  // Passing it here allows Next.js to tag inline scripts with the correct nonce.
+  const headersList = await headers();
+  const nonce = headersList.get("x-nonce") ?? undefined;
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -62,6 +69,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           geistSans.variable,
           geistMono.variable,
         )}
+        nonce={nonce}
       >
         <ThemeProvider>
           <ConvexClientProvider initialToken={initialToken}>
