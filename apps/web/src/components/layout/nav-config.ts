@@ -14,6 +14,7 @@ import {
   Briefcase,
   Building2,
   ClipboardList,
+  CreditCard,
   FileText,
   LayoutDashboard,
   Package,
@@ -162,6 +163,11 @@ export const adminNavItems: NavItem[] = [
     href: "/admin/service-requests",
     icon: ClipboardList,
     label: { vi: "Yêu cầu dịch vụ", en: "Service Requests" },
+  },
+  {
+    href: "/admin/billing",
+    icon: CreditCard,
+    label: { vi: "Quản lý đăng ký", en: "Subscriptions" },
   },
   {
     href: "/admin/disputes",
