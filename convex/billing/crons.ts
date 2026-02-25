@@ -394,3 +394,128 @@ export const getGracePeriodOrgs = internalQuery({
       .collect();
   },
 });
+
+// ---------------------------------------------------------------------------
+// Monthly AI credit reset (Issue #174 — M1-5)
+// ---------------------------------------------------------------------------
+
+/**
+ * Reset credit AI hang thang / Monthly AI credit reset orchestrator
+ *
+ * Runs on the 1st of every month at 00:00 UTC. For each active/trial org:
+ * 1. Gets the org's current subscription plan
+ * 2. Looks up monthlyIncluded credits from the plan
+ * 3. Resets: balance = monthlyIncluded (no rollover), monthlyUsed = 0
+ * 4. bonusCredits are NOT reset (they persist)
+ *
+ * Inactive orgs (expired, suspended, grace_period) are skipped.
+ *
+ * @see Issue #174 — M1-5: AI Credit System
+ */
+export const monthlyAiCreditReset = internalAction({
+  handler: async (ctx) => {
+    // 1. Query all aiCredits records
+    const allCredits = await ctx.runQuery(
+      internal.billing.crons.getAllAiCreditsRecords,
+    );
+
+    let resetCount = 0;
+    let skippedCount = 0;
+
+    // 2. Process each credits record
+    for (const creditRecord of allCredits) {
+      await ctx.runMutation(internal.billing.crons.resetOrgCredits, {
+        organizationId: creditRecord.organizationId,
+      });
+
+      // We track counts but the actual skip/reset logic is in the mutation
+      resetCount++;
+    }
+
+    console.log(
+      `[BILLING CRON] Monthly AI credit reset complete: ${resetCount} records processed, ${skippedCount} skipped`,
+    );
+  },
+});
+
+/**
+ * Reset credit cho mot to chuc / Reset credits for a single organization
+ *
+ * Called by the monthlyAiCreditReset action for each org.
+ * Skips orgs that are not "active" or "trial".
+ * No-rollover: balance is SET to monthlyIncluded (not added).
+ */
+export const resetOrgCredits = internalMutation({
+  args: {
+    organizationId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    // 1. Get org to check status
+    const org = await ctx.db.get(args.organizationId);
+    if (!org) return;
+
+    // 2. Skip inactive orgs (only reset for active and trial)
+    const activeStatuses = ["active", "trial"];
+    if (!org.status || !activeStatuses.includes(org.status)) {
+      console.log(
+        `[BILLING] Skip credit reset for org ${args.organizationId} (status: ${org.status ?? "none"})`,
+      );
+      return;
+    }
+
+    // 3. Get credits record
+    const orgCredits = await ctx.db
+      .query("aiCredits")
+      .withIndex("by_organizationId", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .unique();
+
+    if (!orgCredits) return;
+
+    // 4. Get the org's active subscription to look up monthlyAiCredits
+    const activeSub = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_organizationId_status", (q) =>
+        q.eq("organizationId", args.organizationId).eq("status", "active"),
+      )
+      .first();
+
+    // Use subscription's monthlyAiCredits, or fall back to the existing monthlyIncluded
+    const monthlyIncluded =
+      activeSub?.monthlyAiCredits ?? orgCredits.monthlyIncluded;
+
+    // 5. Calculate next month's reset date (1st of next month UTC)
+    const now = new Date();
+    const nextMonth = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0),
+    );
+
+    // 6. Reset credits (no rollover)
+    await ctx.db.patch(orgCredits._id, {
+      balance: monthlyIncluded,
+      monthlyUsed: 0,
+      monthlyIncluded: monthlyIncluded,
+      monthlyResetAt: nextMonth.getTime(),
+      lifetimeCreditsGranted:
+        orgCredits.lifetimeCreditsGranted + monthlyIncluded,
+      // bonusCredits intentionally NOT touched -- they persist
+      updatedAt: Date.now(),
+    });
+
+    console.log(
+      `[BILLING] Reset AI credits for org ${args.organizationId}: balance=${monthlyIncluded}, monthlyUsed=0`,
+    );
+  },
+});
+
+/**
+ * Lay tat ca ban ghi credit AI / Get all AI credits records
+ *
+ * Returns all aiCredits records for the monthly reset orchestrator.
+ */
+export const getAllAiCreditsRecords = internalQuery({
+  handler: async (ctx) => {
+    return await ctx.db.query("aiCredits").collect();
+  },
+});
