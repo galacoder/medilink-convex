@@ -126,6 +126,7 @@ describe("NotificationPreferences", () => {
 
     const switches = screen.getAllByRole("switch");
     // Toggle the first switch off
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     fireEvent.click(switches[0]!);
 
     await waitFor(() => {
