@@ -23,10 +23,10 @@ interface PaymentFiltersBarProps {
   locale?: "vi" | "en";
 }
 
-const STATUS_OPTIONS: Array<{
+const STATUS_OPTIONS: {
   value: PaymentStatus | "all";
   key: keyof typeof adminPaymentLabels.statuses | "all";
-}> = [
+}[] = [
   { value: "all", key: "all" },
   { value: "pending", key: "pending" },
   { value: "confirmed", key: "confirmed" },

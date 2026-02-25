@@ -37,7 +37,7 @@ vi.mock("@medilink/backend", () => ({
 
 const mockUseQuery = vi.mocked(useQuery);
 
-function makeMockPaymentListResult(count: number = 2) {
+function makeMockPaymentListResult(count = 2) {
   const payments = Array.from({ length: count }, (_, i) => ({
     _id: `payment_${i + 1}`,
     _creationTime: Date.now(),

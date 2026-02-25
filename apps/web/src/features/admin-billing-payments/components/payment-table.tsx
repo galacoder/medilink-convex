@@ -91,11 +91,10 @@ export function PaymentTable({
               <PaymentStatusBadge status={payment.status} locale={locale} />
             </TableCell>
             <TableCell>
-              {L.types[payment.paymentType]?.[locale] ?? payment.paymentType}
+              {L.types[payment.paymentType][locale]}
             </TableCell>
             <TableCell>
-              {L.methods[payment.paymentMethod]?.[locale] ??
-                payment.paymentMethod}
+              {L.methods[payment.paymentMethod][locale]}
             </TableCell>
             <TableCell className="font-mono text-xs">
               {payment.invoiceNumber ?? "—"}

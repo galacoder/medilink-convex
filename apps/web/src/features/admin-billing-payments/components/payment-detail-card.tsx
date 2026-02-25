@@ -96,20 +96,15 @@ export function PaymentDetailCard({
           />
           <DetailRow
             label={L.fields.paymentType[locale]}
-            value={
-              L.types[payment.paymentType]?.[locale] ?? payment.paymentType
-            }
+            value={L.types[payment.paymentType][locale]}
           />
           <DetailRow
             label={L.fields.paymentMethod[locale]}
-            value={
-              L.methods[payment.paymentMethod]?.[locale] ??
-              payment.paymentMethod
-            }
+            value={L.methods[payment.paymentMethod][locale]}
           />
           <DetailRow
             label={L.fields.status[locale]}
-            value={L.statuses[payment.status]?.[locale] ?? payment.status}
+            value={L.statuses[payment.status][locale]}
           />
           <DetailRow
             label={L.fields.date[locale]}

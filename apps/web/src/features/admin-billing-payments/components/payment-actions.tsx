@@ -52,7 +52,7 @@ export function ConfirmPaymentDialog({
   const handleConfirm = async () => {
     try {
       setLoading(true);
-      await confirmPayment({ paymentId: paymentId as any });
+      await confirmPayment({ paymentId });
       setOpen(false);
       onSuccess?.();
     } catch {
@@ -117,7 +117,7 @@ export function RejectPaymentDialog({
     try {
       setLoading(true);
       await rejectPayment({
-        paymentId: paymentId as any,
+        paymentId,
         rejectionReason: reason.trim(),
       });
       setOpen(false);
@@ -197,7 +197,7 @@ export function VoidPaymentDialog({
     try {
       setLoading(true);
       await voidPayment({
-        paymentId: paymentId as any,
+        paymentId,
         reason: reason.trim(),
       });
       setOpen(false);

@@ -35,8 +35,8 @@ export function PaymentStatusBadge({
   status,
   locale = "vi",
 }: PaymentStatusBadgeProps) {
-  const variant = STATUS_VARIANT_MAP[status] ?? "outline";
-  const label = adminPaymentLabels.statuses[status]?.[locale] ?? status;
+  const variant = STATUS_VARIANT_MAP[status];
+  const label = adminPaymentLabels.statuses[status][locale];
 
   return <Badge variant={variant}>{label}</Badge>;
 }

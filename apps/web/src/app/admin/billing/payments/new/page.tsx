@@ -28,28 +28,36 @@ import {
   RecordPaymentForm,
 } from "~/features/admin-billing-payments";
 
-// Cast the api reference for admin.hospitals.listHospitals
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-const adminHospitalsApi = (api as any).admin?.hospitals;
+// Build a typed reference for admin.hospitals.listHospitals
+// The admin namespace is dynamically registered at runtime
 type QueryRef = FunctionReference<"query">;
-const listHospitalsFn: QueryRef = adminHospitalsApi?.listHospitals;
-/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
+interface AdminHospitalsApi {
+  hospitals: { listHospitals: QueryRef };
+}
+
+const listHospitalsFn: QueryRef = (
+  api as unknown as { admin: AdminHospitalsApi }
+).admin.hospitals.listHospitals;
+
+interface HospitalListResult {
+  hospitals: { _id: string; name: string }[];
+}
 
 export default function RecordPaymentPage() {
   const locale = "vi";
   const L = adminPaymentLabels;
 
   // Fetch organizations for the selector
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const orgsResult = useQuery(listHospitalsFn, { pageSize: 100 });
+  const orgsResult = useQuery(listHospitalsFn, { pageSize: 100 }) as
+    | HospitalListResult
+    | undefined;
 
   const isLoading = orgsResult === undefined;
-  const organizations =
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ((orgsResult as any)?.hospitals ?? []).map((h: any) => ({
-      _id: h._id as string,
-      name: h.name as string,
-    }));
+  const organizations = (orgsResult?.hospitals ?? []).map((h) => ({
+    _id: h._id,
+    name: h.name,
+  }));
 
   return (
     <div className="space-y-6">

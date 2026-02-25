@@ -79,7 +79,7 @@ export function RecordPaymentForm({
     try {
       setLoading(true);
       await recordPayment({
-        organizationId: organizationId as any,
+        organizationId,
         amountVnd: Number(amountVnd.replace(/[^0-9]/g, "")),
         paymentMethod,
         paymentType,
