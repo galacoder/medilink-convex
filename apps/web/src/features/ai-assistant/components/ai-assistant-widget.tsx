@@ -22,9 +22,8 @@ import { CopilotSidebar } from "@copilotkit/react-ui";
 
 import "@copilotkit/react-ui/styles.css";
 
-import { ClassErrorBoundary } from "~/components/error-boundary";
-
 import type { AiAssistantPortal } from "../types";
+import { ClassErrorBoundary } from "~/components/error-boundary";
 import { aiAssistantLabels } from "../labels";
 
 interface AIAssistantWidgetProps {
@@ -131,44 +130,44 @@ export function AIAssistantWidget({
     // registered (e.g., missing OPENAI_API_KEY or empty CopilotRuntime).
     // The AI assistant is optional — a crash here must never block the page.
     <ClassErrorBoundary fallback={() => null}>
-    <CopilotKit runtimeUrl={runtimeUrl}>
-      {/* Floating action button — bottom-right corner */}
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-label={`${aiAssistantLabels.floatingButton.vi} (${aiAssistantLabels.floatingButton.en})`}
-        className="bg-primary text-primary-foreground focus:ring-primary fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none"
-        title={`${aiAssistantLabels.floatingButton.vi} / ${aiAssistantLabels.floatingButton.en}`}
-      >
-        {/* Bot/Chat icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+      <CopilotKit runtimeUrl={runtimeUrl}>
+        {/* Floating action button — bottom-right corner */}
+        <button
+          type="button"
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-label={`${aiAssistantLabels.floatingButton.vi} (${aiAssistantLabels.floatingButton.en})`}
+          className="bg-primary text-primary-foreground focus:ring-primary fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform hover:scale-110 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          title={`${aiAssistantLabels.floatingButton.vi} / ${aiAssistantLabels.floatingButton.en}`}
         >
-          <path d="M12 8V4H8" />
-          <rect width="16" height="12" x="4" y="8" rx="2" />
-          <path d="M2 14h2" />
-          <path d="M20 14h2" />
-          <path d="M15 13v2" />
-          <path d="M9 13v2" />
-        </svg>
-      </button>
+          {/* Bot/Chat icon */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 8V4H8" />
+            <rect width="16" height="12" x="4" y="8" rx="2" />
+            <path d="M2 14h2" />
+            <path d="M20 14h2" />
+            <path d="M15 13v2" />
+            <path d="M9 13v2" />
+          </svg>
+        </button>
 
-      {/* Slide-out CopilotKit sidebar */}
-      <AIAssistantInner
-        portal={portal}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
-    </CopilotKit>
+        {/* Slide-out CopilotKit sidebar */}
+        <AIAssistantInner
+          portal={portal}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+      </CopilotKit>
     </ClassErrorBoundary>
   );
 }

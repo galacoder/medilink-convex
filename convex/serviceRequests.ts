@@ -17,6 +17,7 @@ import type { ServiceRequestStatus } from "./lib/workflowStateMachine";
 import { mutation, query } from "./_generated/server";
 import { createAuditEntry } from "./lib/auditLog";
 import { requireAuth, requireOrgAuth } from "./lib/auth";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 import { canTransition } from "./lib/workflowStateMachine";
 
 // ---------------------------------------------------------------------------
@@ -136,6 +137,9 @@ export const create = mutation({
   handler: async (ctx, args) => {
     // 1. Authenticate the caller
     const auth = await requireAuth(ctx);
+
+    // 1a. Rate limit per org
+    await checkOrgRateLimit(ctx, args.organizationId, "serviceRequests.create");
 
     // 2. Verify the org is a hospital
     await assertHospitalOrg(ctx, args.organizationId);
@@ -263,6 +267,16 @@ export const cancel = mutation({
  * Providers can transition: accepted->in_progress, in_progress->completed
  * Either party can dispute: in_progress->disputed, completed->disputed
  */
+/**
+ * Status transitions that require owner or admin role in the hospital org.
+ * vi: "Chuyển đổi cần phê duyệt" / en: "Approval-class transitions"
+ */
+const APPROVAL_TRANSITIONS: ServiceRequestStatus[] = [
+  "quoted",
+  "accepted",
+  "in_progress",
+];
+
 export const updateStatus = mutation({
   args: {
     id: v.id("serviceRequests"),
@@ -277,8 +291,8 @@ export const updateStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    // 1. Authenticate
-    const auth = await requireOrgAuth(ctx);
+    // 1. Authenticate (local helper to avoid better-auth dep in tests)
+    const auth = await localRequireOrgAuth(ctx);
 
     // 2. Load the service request
     const request = await ctx.db.get(args.id);
@@ -321,6 +335,59 @@ export const updateStatus = mutation({
         currentStatus,
         targetStatus,
       });
+    }
+
+    // 4a. Self-approval prevention: the user who created the request cannot
+    // approve it, regardless of role. This enforces conflict-of-interest
+    // controls per medical equipment workflow integrity requirements.
+    if (
+      APPROVAL_TRANSITIONS.includes(targetStatus) &&
+      isHospitalOwner &&
+      request.requestedBy === auth.userId
+    ) {
+      throw new ConvexError({
+        vi: "Bạn không thể phê duyệt yêu cầu của chính mình",
+        en: "You cannot approve your own service request",
+      });
+    }
+
+    // 4b. Role gate for approval-class transitions: only owner or admin
+    // members of the hospital org can approve/accept service requests.
+    // Regular members can still view and create requests but cannot
+    // perform approval transitions.
+    if (APPROVAL_TRANSITIONS.includes(targetStatus) && isHospitalOwner) {
+      // Look up the caller's user record by email to find their Convex user ID
+      const identity = await ctx.auth.getUserIdentity();
+      const email = identity?.email as string | undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let callerUserId: Id<"users"> | null = null;
+      if (email) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const user = await (ctx.db as any)
+          .query("users")
+          .withIndex("by_email", (q: any) => q.eq("email", email))
+          .first();
+        if (user) {
+          callerUserId = user._id;
+        }
+      }
+
+      if (callerUserId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const membership = await (ctx.db as any)
+          .query("organizationMemberships")
+          .withIndex("by_org_and_user", (q: any) =>
+            q.eq("orgId", auth.organizationId).eq("userId", callerUserId),
+          )
+          .first();
+
+        if (!membership || !["owner", "admin"].includes(membership.role)) {
+          throw new ConvexError({
+            vi: "Chỉ quản trị viên hoặc chủ sở hữu mới có thể phê duyệt yêu cầu dịch vụ",
+            en: "Only admin or owner can approve service requests",
+          });
+        }
+      }
     }
 
     // 5. Build patch fields
@@ -383,8 +450,7 @@ export const declineRequest = mutation({
     const request = await ctx.db.get(args.serviceRequestId);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -508,8 +574,7 @@ export const startService = mutation({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -567,12 +632,18 @@ export const updateProgress = mutation({
     // 1. Authenticate (local helper to avoid better-auth dep in tests)
     const auth = await localRequireOrgAuth(ctx);
 
+    // 1a. Rate limit per org
+    await checkOrgRateLimit(
+      ctx,
+      auth.organizationId,
+      "serviceRequests.updateProgress",
+    );
+
     // 2. Load the service request
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -632,8 +703,7 @@ export const completeService = mutation({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }
@@ -701,8 +771,7 @@ export const submitCompletionReport = mutation({
     const request = await ctx.db.get(args.id);
     if (!request) {
       throw new ConvexError({
-        message:
-          "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
+        message: "Không tìm thấy yêu cầu dịch vụ. (Service request not found.)",
         code: "SERVICE_REQUEST_NOT_FOUND",
       });
     }

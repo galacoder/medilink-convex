@@ -12,7 +12,7 @@
  * en: "Platform admin dispute management hooks"
  */
 import type { FunctionReference } from "convex/server";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 
 import type { Id } from "@medilink/backend";
 import { api } from "@medilink/backend";
@@ -37,12 +37,15 @@ const resolveDisputeFn: MutationRef = adminSrApi.resolveDispute;
 const reassignProviderFn: MutationRef = adminSrApi.reassignProvider;
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 
+// vi: "Kích thước trang mặc định" / en: "Default page size"
+const DEFAULT_PAGE_SIZE = 50;
+
 /**
- * Hook to list all service requests across all organizations.
- * Supports optional filters for status, hospital, provider, and date range.
+ * Hook to list all service requests across all organizations with cursor pagination.
+ * Returns paginated results with loadMore capability. Default page size: 50.
  *
- * vi: "Danh sách tất cả yêu cầu dịch vụ (toàn nền tảng)"
- * en: "All service requests (platform-wide)"
+ * vi: "Danh sách tất cả yêu cầu dịch vụ (phân trang, toàn nền tảng)"
+ * en: "All service requests (paginated, platform-wide)"
  */
 export function useAdminServiceRequests(
   filters: {
@@ -55,14 +58,19 @@ export function useAdminServiceRequests(
       | "cancelled"
       | "disputed";
     hospitalId?: Id<"organizations">;
-    providerId?: Id<"providers">;
-    fromDate?: number;
-    toDate?: number;
   } = {},
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const result = useQuery(listAllFn, filters);
-  return result as AdminServiceRequest[] | undefined;
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
+    listAllFn,
+    filters,
+    { initialNumItems: DEFAULT_PAGE_SIZE },
+  );
+  return {
+    results: results as AdminServiceRequest[],
+    status,
+    loadMore,
+    isLoading,
+  };
 }
 
 /**

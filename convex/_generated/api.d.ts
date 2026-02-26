@@ -14,6 +14,7 @@ import type * as admin_hospitals from "../admin/hospitals.js";
 import type * as admin_providers from "../admin/providers.js";
 import type * as admin_serviceRequests from "../admin/serviceRequests.js";
 import type * as aiAssistant from "../aiAssistant.js";
+import type * as aiConversation from "../aiConversation.js";
 import type * as auth from "../auth.js";
 import type * as consumables from "../consumables.js";
 import type * as equipment from "../equipment.js";
@@ -38,6 +39,7 @@ import type * as seedData_serviceRequests from "../seedData/serviceRequests.js";
 import type * as seedData_users from "../seedData/users.js";
 import type * as seedHelpers from "../seedHelpers.js";
 import type * as serviceRequests from "../serviceRequests.js";
+import type * as support from "../support.js";
 import type * as userActions from "../userActions.js";
 
 import type {
@@ -53,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   "admin/providers": typeof admin_providers;
   "admin/serviceRequests": typeof admin_serviceRequests;
   aiAssistant: typeof aiAssistant;
+  aiConversation: typeof aiConversation;
   auth: typeof auth;
   consumables: typeof consumables;
   equipment: typeof equipment;
@@ -77,6 +80,7 @@ declare const fullApi: ApiFromModules<{
   "seedData/users": typeof seedData_users;
   seedHelpers: typeof seedHelpers;
   serviceRequests: typeof serviceRequests;
+  support: typeof support;
   userActions: typeof userActions;
 }>;
 

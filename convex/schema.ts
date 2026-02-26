@@ -10,8 +10,8 @@ import { v } from "convex/values";
  *  - Indexes:    by_<field> prefix
  *  - All tables: createdAt + updatedAt as v.number()
  *
- * Domain table count: 25 tables across 8 domains
- *   Base: organizations (+ optional status field for M4-1), organizationMemberships, users,
+ * Domain table count: 30 tables across 9 domains
+ *   Base: organizations (+ billing subscription fields), organizationMemberships, users,
  *         departments (4)
  *   Equipment: equipmentCategories, equipment (+ departmentId), equipmentHistory,
  *              maintenanceRecords, failureReports, borrowRequests (6)
@@ -21,6 +21,7 @@ import { v } from "convex/values";
  *   Consumables: consumables, consumableUsageLog, reorderRequests (3)
  *   Disputes: disputes, disputeMessages (2)
  *   Audit Log: auditLog (1)
+ *   Billing: subscriptions, payments, aiCredits, aiCreditConsumption, aiCreditPacks (5)
  */
 export default defineSchema({
   // ===========================================================================
@@ -32,27 +33,63 @@ export default defineSchema({
    * org_type distinguishes between hospital facilities and equipment providers.
    *
    * status enum (hospital orgs only — managed by platform_admin):
-   *   active    - vi: "Đang hoạt động" / en: "Active"
-   *   suspended - vi: "Đã đình chỉ"   / en: "Suspended"
-   *   trial     - vi: "Đang dùng thử" / en: "Trial"
+   *   active       - vi: "Đang hoạt động" / en: "Active"
+   *   suspended    - vi: "Đã đình chỉ"   / en: "Suspended"
+   *   trial        - vi: "Đang dùng thử" / en: "Trial"
+   *   grace_period - vi: "Gia hạn"       / en: "Grace period (7-day read-only after expiry)"
+   *   expired      - vi: "Hết hạn"       / en: "Subscription expired"
    */
   organizations: defineTable({
     name: v.string(),
     slug: v.string(),
     // Bilingual label: vi: "Loại tổ chức" / en: "Organization type"
     org_type: v.union(v.literal("hospital"), v.literal("provider")),
-    // Bilingual label: vi: "Trạng thái tổ chức (bệnh viện)" / en: "Hospital org status"
+    // Trạng thái tổ chức / Organization status (extended for billing)
     // Optional: only set for hospital orgs managed by platform_admin.
     // Defaults to "active" if not set.
     status: v.optional(
-      v.union(v.literal("active"), v.literal("suspended"), v.literal("trial")),
+      v.union(
+        v.literal("active"), // Đang hoạt động / Active subscription
+        v.literal("suspended"), // Tạm ngưng / Admin suspended
+        v.literal("trial"), // Dùng thử / Trial period
+        v.literal("grace_period"), // Gia hạn / Grace period (7 days read-only after expiry)
+        v.literal("expired"), // Hết hạn / Subscription expired
+      ),
     ),
+
+    // === Trường đăng ký gói / Subscription fields ===
+    subscriptionPlan: v.optional(
+      v.union(
+        v.literal("starter"), // Gói cơ bản / Starter plan
+        v.literal("professional"), // Gói chuyên nghiệp / Professional plan
+        v.literal("enterprise"), // Gói doanh nghiệp / Enterprise plan
+        v.literal("trial"), // Gói dùng thử / Trial plan
+      ),
+    ),
+    billingCycle: v.optional(
+      v.union(
+        v.literal("monthly_3"), // 3 tháng / 3 months
+        v.literal("monthly_6"), // 6 tháng / 6 months
+        v.literal("monthly_12"), // 12 tháng / 12 months
+      ),
+    ),
+    subscriptionStartDate: v.optional(v.number()), // Ngày bắt đầu / Unix timestamp ms
+    subscriptionExpiresAt: v.optional(v.number()), // Ngày hết hạn / Unix timestamp ms
+    gracePeriodEndsAt: v.optional(v.number()), // Ngày hết gia hạn / Unix timestamp ms (7 days after expiresAt)
+    maxStaffSeats: v.optional(v.number()), // Số lượng nhân viên tối đa / Max staff seats
+    maxEquipment: v.optional(v.number()), // Số lượng thiết bị tối đa / Max equipment records (-1 = unlimited)
+
+    // === Theo doi email thanh toan / Billing email tracking (M1-7 #176) ===
+    lastBillingEmailSentAt: v.optional(v.number()), // Thoi gian gui email cuoi / Last billing email timestamp
+    lastBillingEmailType: v.optional(v.string()), // Loai email cuoi / Last email type (e.g., "expiry_30d")
+
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_type", ["org_type"])
     .index("by_slug", ["slug"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_subscriptionExpiresAt", ["subscriptionExpiresAt"]),
 
   /**
    * Links users to organizations with a specific role.
@@ -649,6 +686,7 @@ export default defineSchema({
   })
     .index("by_org", ["organizationId"])
     .index("by_org_and_status", ["organizationId", "status"])
+    .index("by_status", ["status"])
     .index("by_equipment", ["equipmentId"])
     .index("by_provider", ["assignedProviderId"]),
 
@@ -681,6 +719,10 @@ export default defineSchema({
     estimatedDurationDays: v.optional(v.number()),
     // vi: "Ngày bắt đầu sớm nhất có thể" / en: "Earliest available start date (epoch ms)"
     availableStartDate: v.optional(v.number()),
+    // vi: "Người chấp nhận báo giá" / en: "User who accepted the quote (audit trail)"
+    acceptedBy: v.optional(v.id("users")),
+    // vi: "Thời điểm chấp nhận" / en: "When the quote was accepted (epoch ms)"
+    acceptedAt: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -1146,7 +1188,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_org", ["organizationId"]),
+    .index("by_org", ["organizationId"])
+    .index("by_user_and_org", ["userId", "organizationId"]),
 
   // ===========================================================================
   // SUPPORT DOMAIN (2 tables) — Wave 2
@@ -1295,4 +1338,212 @@ export default defineSchema({
   })
     .index("by_consumable", ["consumableId"])
     .index("by_org", ["organizationId"]),
+
+  // ===========================================================================
+  // BILLING DOMAIN (5 tables) — M1 Billing Schema
+  // ===========================================================================
+
+  /**
+   * Bảng lịch sử đăng ký / Subscription history table
+   * Mỗi lần gia hạn tạo bản ghi mới / Each renewal creates a new record
+   *
+   * Monthly AI credit allocations by plan:
+   *   trial: 20, starter: 50, professional: 200, enterprise: 500
+   */
+  subscriptions: defineTable({
+    // Liên kết / References
+    organizationId: v.id("organizations"), // Tổ chức / Organization FK
+
+    // Thông tin gói / Plan information
+    plan: v.union(
+      v.literal("starter"), // Gói cơ bản / Starter plan
+      v.literal("professional"), // Gói chuyên nghiệp / Professional plan
+      v.literal("enterprise"), // Gói doanh nghiệp / Enterprise plan
+      v.literal("trial"), // Gói dùng thử / Trial plan
+    ),
+    billingCycle: v.union(
+      v.literal("monthly_3"), // 3 tháng / 3 months
+      v.literal("monthly_6"), // 6 tháng / 6 months
+      v.literal("monthly_12"), // 12 tháng / 12 months
+      v.literal("trial_14d"), // Dùng thử 14 ngày / 14-day trial
+    ),
+
+    // Thời gian / Time period
+    startDate: v.number(), // Ngày bắt đầu / Unix timestamp ms
+    endDate: v.number(), // Ngày kết thúc / Unix timestamp ms
+
+    // Thanh toán / Payment
+    amountVnd: v.number(), // Số tiền VND / Amount in VND
+    paymentId: v.optional(v.id("payments")), // Thanh toán liên kết / Linked payment record
+
+    // Trạng thái / Status
+    status: v.union(
+      v.literal("active"), // Đang hoạt động / Currently active
+      v.literal("expired"), // Hết hạn / Period ended
+      v.literal("cancelled"), // Đã hủy / Cancelled before end
+      v.literal("renewed"), // Đã gia hạn / Renewed (replaced by new subscription)
+    ),
+
+    // AI credits cấp phát / AI credits allocated
+    monthlyAiCredits: v.number(), // Số credit AI mỗi tháng / Monthly AI credit allocation
+
+    // Meta
+    activatedBy: v.optional(v.id("users")), // Admin kích hoạt / Admin who activated
+    activatedAt: v.optional(v.number()), // Thời gian kích hoạt / Activation timestamp
+    cancelledAt: v.optional(v.number()), // Thời gian hủy / Cancellation timestamp
+    cancelReason: v.optional(v.string()), // Lý do hủy / Cancellation reason
+    notes: v.optional(v.string()), // Ghi chú / Admin notes
+
+    // Timestamps
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_organizationId_status", ["organizationId", "status"])
+    .index("by_status", ["status"])
+    .index("by_endDate", ["endDate"]),
+
+  /**
+   * Bảng thanh toán / Payment records table
+   * Ghi nhận mỗi giao dịch chuyển khoản / Records every bank transfer
+   */
+  payments: defineTable({
+    // Liên kết / References
+    organizationId: v.id("organizations"), // Tổ chức / Organization FK
+    subscriptionId: v.optional(v.id("subscriptions")), // Đăng ký liên kết / Linked subscription
+
+    // Thông tin thanh toán / Payment details
+    amountVnd: v.number(), // Số tiền VND / Amount in VND
+    paymentMethod: v.union(
+      v.literal("bank_transfer"), // Chuyển khoản ngân hàng / Bank transfer
+      v.literal("cash"), // Tiền mặt / Cash
+      v.literal("momo"), // MoMo (Phase 3)
+      v.literal("vnpay"), // VNPay (Phase 3)
+      v.literal("other"), // Khác / Other
+    ),
+
+    // Chi tiết chuyển khoản / Transfer details
+    bankReference: v.optional(v.string()), // Mã giao dịch ngân hàng / Bank transaction reference
+    bankName: v.optional(v.string()), // Tên ngân hàng / Bank name
+    transferDate: v.optional(v.number()), // Ngày chuyển khoản / Transfer date
+    invoiceNumber: v.optional(v.string()), // Số hóa đơn / Invoice number
+
+    // Trạng thái / Status
+    status: v.union(
+      v.literal("pending"), // Chờ xác nhận / Awaiting confirmation
+      v.literal("confirmed"), // Đã xác nhận / Confirmed by admin
+      v.literal("rejected"), // Từ chối / Rejected (invalid transfer)
+      v.literal("refunded"), // Hoàn tiền / Refunded
+    ),
+
+    // Loại thanh toán / Payment type
+    paymentType: v.union(
+      v.literal("subscription_new"), // Đăng ký mới / New subscription
+      v.literal("subscription_renewal"), // Gia hạn / Renewal
+      v.literal("ai_credits"), // Mua credit AI / AI credit purchase
+      v.literal("upgrade"), // Nâng cấp gói / Plan upgrade
+      v.literal("other"), // Khác / Other
+    ),
+
+    // Xác nhận / Confirmation
+    confirmedBy: v.optional(v.id("users")), // Admin xác nhận / Confirming admin
+    confirmedAt: v.optional(v.number()), // Thời gian xác nhận / Confirmation timestamp
+    rejectionReason: v.optional(v.string()), // Lý do từ chối / Rejection reason
+    notes: v.optional(v.string()), // Ghi chú / Admin notes
+
+    // Timestamps
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_organizationId", ["organizationId"])
+    .index("by_subscriptionId", ["subscriptionId"])
+    .index("by_status", ["status"])
+    .index("by_invoiceNumber", ["invoiceNumber"])
+    .index("by_organizationId_status", ["organizationId", "status"]),
+
+  /**
+   * Bảng số dư credit AI / AI credit balance table
+   * Mỗi tổ chức có một bản ghi / One record per organization
+   */
+  aiCredits: defineTable({
+    // Liên kết / References
+    organizationId: v.id("organizations"), // Tổ chức / Organization FK
+
+    // Số dư / Balance
+    balance: v.number(), // Số credit hiện tại / Current available credits (integer)
+
+    // Thống kê / Lifetime statistics
+    lifetimeCreditsGranted: v.number(), // Tổng credit đã cấp / All credits ever granted
+    lifetimeCreditsUsed: v.number(), // Tổng credit đã dùng / All credits ever consumed
+
+    // Theo tháng / Monthly tracking
+    monthlyIncluded: v.number(), // Credit theo gói tháng này / Credits from subscription this month
+    monthlyUsed: v.number(), // Credit đã dùng tháng này / Credits used this calendar month
+    monthlyResetAt: v.number(), // Thời gian reset tiếp theo / Next monthly reset (Unix timestamp ms)
+
+    // Bonus credits (admin-granted, do not reset)
+    bonusCredits: v.optional(v.number()), // Credit thưởng / Bonus credits from admin
+
+    // Timestamps
+    updatedAt: v.number(),
+  }).index("by_organizationId", ["organizationId"]),
+
+  /**
+   * Bảng nhật ký sử dụng credit AI / AI credit consumption audit log
+   * Không thể thay đổi / Immutable audit trail
+   */
+  aiCreditConsumption: defineTable({
+    // Liên kết / References
+    organizationId: v.id("organizations"), // Tổ chức / Organization FK
+    userId: v.id("users"), // Người dùng / User who triggered the AI action
+
+    // Thông tin hành động / Action details
+    featureId: v.string(), // Tính năng / e.g., "equipment_diagnosis", "report_generation"
+    creditsUsed: v.number(), // Số credit đã trừ / Credits deducted
+    creditSource: v.union(
+      v.literal("org_pool"), // Từ gói tổ chức / From organization's shared pool
+      v.literal("personal"), // Từ gói cá nhân / From provider's personal subscription
+      v.literal("bonus"), // Từ credit thưởng / From admin-granted bonus
+    ),
+
+    // Chi tiết API / Claude API details (for margin analysis)
+    promptTokens: v.optional(v.number()), // Token đầu vào / Tokens sent to Claude
+    completionTokens: v.optional(v.number()), // Token đầu ra / Tokens received from Claude
+    claudeModel: v.optional(v.string()), // Mô hình / "claude-haiku-4-5" | "claude-sonnet-4-5"
+    apiCostUsd: v.optional(v.number()), // Chi phí API thực tế / Actual API cost in USD cents
+
+    // Đối tượng liên quan / Related entity
+    entityType: v.optional(v.string()), // Loại đối tượng / e.g., "equipment", "maintenanceTask"
+    entityId: v.optional(v.string()), // ID đối tượng / The entity this action was for
+
+    // Trạng thái / Status
+    status: v.union(
+      v.literal("pending"), // Đang xử lý / Deducted, API call in progress
+      v.literal("completed"), // Hoàn thành / API call succeeded
+      v.literal("failed"), // Thất bại / API call failed, credits refunded
+      v.literal("refunded"), // Hoàn trả / Manually refunded by admin
+    ),
+    errorMessage: v.optional(v.string()), // Thông báo lỗi / Error details if failed
+
+    // Timestamps
+    createdAt: v.number(),
+  })
+    .index("by_organizationId_createdAt", ["organizationId", "createdAt"])
+    .index("by_userId_createdAt", ["userId", "createdAt"])
+    .index("by_organizationId_featureId", ["organizationId", "featureId"])
+    .index("by_status", ["status"]),
+
+  /**
+   * Bảng gói credit AI / AI credit pack definitions
+   * Các gói credit có thể mua thêm / Purchasable credit packs (Phase 2 prep)
+   */
+  aiCreditPacks: defineTable({
+    name: v.string(), // Tên gói / Pack name (e.g., "50 Credits")
+    credits: v.number(), // Số credit / Number of credits
+    priceVnd: v.number(), // Giá VND / Price in VND
+    isActive: v.boolean(), // Đang bán / Currently available for purchase
+    description: v.optional(v.string()), // Mô tả / Description
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_isActive", ["isActive"]),
 });

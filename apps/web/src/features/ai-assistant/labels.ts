@@ -49,4 +49,48 @@ export const aiAssistantLabels = {
 
   // Close button
   close: { vi: "Đóng", en: "Close" },
+
+  // Page-level labels
+  pageTitle: { vi: "Trợ lý AI", en: "AI Assistant" },
+  pageSubtitle: {
+    vi: "Hỏi về thiết bị, dịch vụ và phân tích",
+    en: "Ask about equipment, services and analytics",
+  },
+
+  // Conversation list sidebar
+  conversations: { vi: "Hội thoại", en: "Conversations" },
+  newConversation: {
+    vi: "Hội thoại mới",
+    en: "New Conversation",
+  },
+  deleteConversation: { vi: "Xóa hội thoại", en: "Delete Conversation" },
+  deleteConfirm: {
+    vi: "Bạn có chắc chắn muốn xóa hội thoại này?",
+    en: "Are you sure you want to delete this conversation?",
+  },
+  cancel: { vi: "Hủy", en: "Cancel" },
+  confirm: { vi: "Xác nhận", en: "Confirm" },
+
+  // Chat input
+  sendMessage: { vi: "Gửi", en: "Send" },
+  inputPlaceholder: {
+    vi: "Nhập tin nhắn...",
+    en: "Type a message...",
+  },
+
+  // Roles
+  roleUser: { vi: "Bạn", en: "You" },
+  roleAssistant: { vi: "Trợ lý AI", en: "AI Assistant" },
+
+  // Empty state
+  selectOrCreate: {
+    vi: "Chọn hội thoại hoặc tạo mới để bắt đầu",
+    en: "Select a conversation or create a new one to start",
+  },
+
+  // Stub response
+  stubResponse: {
+    vi: "Tích hợp AI đang được phát triển. Tính năng này sẽ sớm được kết nối với mô hình AI.",
+    en: "AI integration is under development. This feature will soon be connected to an AI model.",
+  },
 } as const;

@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 
 import { type Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { checkOrgRateLimit } from "./lib/rateLimit";
 
 // ---------------------------------------------------------------------------
 // Helper: extract authenticated organizationId from JWT identity
@@ -268,6 +269,53 @@ export const getReorderRequests = query({
   },
 });
 
+// ---------------------------------------------------------------------------
+// Helper: validate numeric fields for consumable create/update
+// vi: "Kiểm tra giá trị số cho vật tư" / en: "Validate numeric fields"
+// ---------------------------------------------------------------------------
+
+function validateConsumableNumericFields(args: {
+  currentStock?: number;
+  reorderPoint?: number;
+  parLevel?: number;
+  maxLevel?: number;
+  unitCost?: number;
+}) {
+  if (args.currentStock !== undefined && args.currentStock < 0)
+    throw new ConvexError({
+      vi: "Tồn kho không thể âm",
+      en: "Stock cannot be negative",
+    });
+  if (args.reorderPoint !== undefined && args.reorderPoint < 0)
+    throw new ConvexError({
+      vi: "Điểm đặt hàng lại không thể âm",
+      en: "Reorder point cannot be negative",
+    });
+  if (args.unitCost !== undefined && args.unitCost < 0)
+    throw new ConvexError({
+      vi: "Đơn giá không thể âm",
+      en: "Unit cost cannot be negative",
+    });
+  if (
+    args.parLevel !== undefined &&
+    args.reorderPoint !== undefined &&
+    args.parLevel < args.reorderPoint
+  )
+    throw new ConvexError({
+      vi: "Mức par phải ≥ điểm đặt hàng lại",
+      en: "Par level must be >= reorder point",
+    });
+  if (
+    args.maxLevel !== undefined &&
+    args.parLevel !== undefined &&
+    args.maxLevel < args.parLevel
+  )
+    throw new ConvexError({
+      vi: "Mức tối đa phải ≥ mức par",
+      en: "Max level must be >= par level",
+    });
+}
+
 // ===========================================================================
 // MUTATIONS (Write)
 // vi: "Đột biến (ghi)" / en: "Mutations (write)"
@@ -305,6 +353,7 @@ export const create = mutation({
     relatedEquipmentId: v.optional(v.id("equipment")),
   },
   handler: async (ctx, args) => {
+    validateConsumableNumericFields(args);
     const { organizationId } = await requireAuth(ctx);
 
     // Validate relatedEquipmentId belongs to same org
@@ -379,6 +428,7 @@ export const update = mutation({
     relatedEquipmentId: v.optional(v.id("equipment")),
   },
   handler: async (ctx, args) => {
+    validateConsumableNumericFields(args);
     const { organizationId } = await requireAuth(ctx);
 
     const consumable = await ctx.db.get(args.id);
@@ -417,6 +467,7 @@ export const recordUsage = mutation({
   },
   handler: async (ctx, args) => {
     const { organizationId } = await requireAuth(ctx);
+    await checkOrgRateLimit(ctx, organizationId, "consumables.recordUsage");
 
     // FIX 5: Reject non-positive quantity
     if (args.quantity <= 0) {

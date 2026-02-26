@@ -148,6 +148,8 @@ For parallel multi-agent execution via git worktrees:
 - Medical equipment safety codes must follow Vietnamese medical device regulations
 - Patient data must comply with Vietnamese Personal Data Protection Decree 13/2023
 - NEVER use tRPC in MediLink -- all data access goes through Convex functions (useQuery/useMutation/useAction)
+- NEVER use dangerouslySetInnerHTML for user-supplied text from Convex (notes, descriptions)
+- Always render free-text fields via JSX text interpolation {value}
   </critical_rules>
 
 ## Skills Library
